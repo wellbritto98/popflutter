@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 8,
+  "next_id": 11,
   "lessons": [
     {
       "id": "L-001",
@@ -130,6 +130,60 @@
       ],
       "created": "2026-08-18T14:16:03Z",
       "last_seen": "2026-08-18T14:16:03Z"
+    },
+    {
+      "id": "L-008",
+      "key": "spec_precision_gap::when a spec names an exact user visible string notification title label assert that string in a test production only presence is not evidence or zero",
+      "text": "When a spec names an exact user-visible string (notification title, label), assert that string in a test — production-only presence is not evidence-or-zero",
+      "signal": "spec_precision_gap",
+      "scope": "apps/popmundo_app",
+      "status": "candidate",
+      "features": [
+        "background-keepalive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "FGS-01 / validation.md (apps/popmundo_app)"
+      ],
+      "created": "2026-08-18T18:49:50Z",
+      "last_seen": "2026-08-18T18:49:50Z"
+    },
+    {
+      "id": "L-009",
+      "key": "spec_precision_gap::independence claims bootstrap must not block webview need an explicit test or a documented uat checklist item wiring comments alone do not close the ac",
+      "text": "Independence claims (bootstrap must not block WebView) need an explicit test or a documented UAT/checklist item — wiring comments alone do not close the AC",
+      "signal": "spec_precision_gap",
+      "scope": "apps/popmundo_app",
+      "status": "candidate",
+      "features": [
+        "background-keepalive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "BG-01 / validation.md (apps/popmundo_app)"
+      ],
+      "created": "2026-08-18T18:49:50Z",
+      "last_seen": "2026-08-18T18:49:50Z"
+    },
+    {
+      "id": "L-010",
+      "key": "ac_gap::for isolate or cross isolate callbacks assert that garbage or missing payloads leave prior state intact and do not throw",
+      "text": "For isolate or cross-isolate callbacks, assert that garbage or missing payloads leave prior state intact and do not throw",
+      "signal": "ac_gap",
+      "scope": "apps/popmundo_app",
+      "status": "candidate",
+      "features": [
+        "background-keepalive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "edge: TaskHandler isolate unreachable / validation.md (apps/popmundo_app)"
+      ],
+      "created": "2026-08-18T18:49:50Z",
+      "last_seen": "2026-08-18T18:49:50Z"
     }
   ]
 }
