@@ -56,6 +56,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: edge cases / validation.md Edge Cases (packages/popmundo_utils)
 - last seen: 2026-08-18T14:16:03Z
 
+### L-008 — When a spec names an exact user-visible string (notification title, label), assert that string in a test — production-only presence is not evidence-or-zero
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `apps/popmundo_app` · harmful: 0
+- features: background-keepalive
+- evidence: FGS-01 / validation.md (apps/popmundo_app)
+- last seen: 2026-08-18T18:49:50Z
+
+### L-009 — Independence claims (bootstrap must not block WebView) need an explicit test or a documented UAT/checklist item — wiring comments alone do not close the AC
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `apps/popmundo_app` · harmful: 0
+- features: background-keepalive
+- evidence: BG-01 / validation.md (apps/popmundo_app)
+- last seen: 2026-08-18T18:49:50Z
+
+### L-010 — For isolate or cross-isolate callbacks, assert that garbage or missing payloads leave prior state intact and do not throw
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `apps/popmundo_app` · harmful: 0
+- features: background-keepalive
+- evidence: edge: TaskHandler isolate unreachable / validation.md (apps/popmundo_app)
+- last seen: 2026-08-18T18:49:50Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
