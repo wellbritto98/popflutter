@@ -3,27 +3,29 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:popmundo_app/menu/app_menu_registry.dart';
 
 void main() {
-  test('always includes the userscripts item', () {
+  test('always includes auto-login and userscripts', () {
     final items = buildAppMenuItems(
       onOpenDebugPanel: () {},
       onOpenUserScripts: () {},
+      onOpenAutoLogin: () {},
       includeDebugItem: false,
     );
 
-    expect(items.length, 1);
-    expect(items.single.id, 'userscripts');
-    expect(items.single.label, 'Userscripts');
+    expect(items.map((e) => e.id), ['auto-login', 'userscripts']);
+    expect(items.first.label, 'Auto Login');
   });
 
-  test('returns userscripts + debug when includeDebugItem is true', () {
+  test('returns auto-login + userscripts + debug when includeDebugItem is true',
+      () {
     final items = buildAppMenuItems(
       onOpenDebugPanel: () {},
       onOpenUserScripts: () {},
+      onOpenAutoLogin: () {},
       includeDebugItem: true,
     );
 
-    expect(items.map((e) => e.id), ['userscripts', 'debug']);
-    expect(items[1].label, 'Debug panel');
+    expect(items.map((e) => e.id), ['auto-login', 'userscripts', 'debug']);
+    expect(items[2].label, 'Debug panel');
   });
 
   test("the debug item's onTap invokes onOpenDebugPanel exactly once", () {
@@ -31,6 +33,7 @@ void main() {
     final items = buildAppMenuItems(
       onOpenDebugPanel: () => callCount++,
       onOpenUserScripts: () {},
+      onOpenAutoLogin: () {},
       includeDebugItem: true,
     );
 
@@ -39,15 +42,31 @@ void main() {
     expect(callCount, 1);
   });
 
-  test("the userscripts item's onTap invokes onOpenUserScripts exactly once", () {
+  test("the userscripts item's onTap invokes onOpenUserScripts exactly once",
+      () {
     var callCount = 0;
     final items = buildAppMenuItems(
       onOpenDebugPanel: () {},
       onOpenUserScripts: () => callCount++,
+      onOpenAutoLogin: () {},
       includeDebugItem: false,
     );
 
-    items.single.onTap();
+    items.firstWhere((e) => e.id == 'userscripts').onTap();
+
+    expect(callCount, 1);
+  });
+
+  test("the auto-login item's onTap invokes onOpenAutoLogin exactly once", () {
+    var callCount = 0;
+    final items = buildAppMenuItems(
+      onOpenDebugPanel: () {},
+      onOpenUserScripts: () {},
+      onOpenAutoLogin: () => callCount++,
+      includeDebugItem: false,
+    );
+
+    items.firstWhere((e) => e.id == 'auto-login').onTap();
 
     expect(callCount, 1);
   });
@@ -56,8 +75,10 @@ void main() {
     final items = buildAppMenuItems(
       onOpenDebugPanel: () {},
       onOpenUserScripts: () {},
+      onOpenAutoLogin: () {},
     );
 
+    expect(items.any((e) => e.id == 'auto-login'), isTrue);
     expect(items.any((e) => e.id == 'userscripts'), isTrue);
     expect(items.any((e) => e.id == 'debug'), kDebugMode);
   });

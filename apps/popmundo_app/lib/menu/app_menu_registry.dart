@@ -10,9 +10,17 @@ import 'app_menu_item.dart';
 List<AppMenuItem> buildAppMenuItems({
   required VoidCallback onOpenDebugPanel,
   required VoidCallback onOpenUserScripts,
+  required VoidCallback onOpenAutoLogin,
   bool includeDebugItem = kDebugMode,
 }) {
   return [
+    AppMenuItem(
+      id: 'auto-login',
+      icon: Icons.key,
+      label: 'Auto Login',
+      subtitle: 'Credentials and character for TimedFetch login',
+      onTap: onOpenAutoLogin,
+    ),
     AppMenuItem(
       id: 'userscripts',
       icon: Icons.extension,

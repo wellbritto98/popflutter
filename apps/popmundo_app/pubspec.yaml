@@ -36,6 +36,7 @@ dependencies:
   popmundo_webview:
     path: ../../packages/popmundo_webview
   shared_preferences: ^2.5.3
+  flutter_secure_storage: ^9.2.4
   flutter_inappwebview: ^6.1.5
 
 dev_dependencies:
