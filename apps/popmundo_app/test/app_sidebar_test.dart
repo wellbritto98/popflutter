@@ -24,14 +24,15 @@ Future<void> _openDrawer(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('renders the drawer with a "Popmundo" header', (tester) async {
+  testWidgets('renders the drawer with the Popflutter logo header', (tester) async {
     await tester.pumpWidget(_harness(const [
       AppMenuItem(id: 'debug', icon: Icons.bug_report, label: 'Debug panel', onTap: _noop),
     ]));
     await _openDrawer(tester);
 
     expect(find.byKey(const Key('app-sidebar')), findsOneWidget);
-    expect(find.text('Popmundo'), findsOneWidget);
+    expect(find.byKey(const Key('sidebar-logo')), findsOneWidget);
+    expect(find.byType(Divider), findsOneWidget);
   });
 
   testWidgets('renders one ListTile per item with icon and label', (tester) async {

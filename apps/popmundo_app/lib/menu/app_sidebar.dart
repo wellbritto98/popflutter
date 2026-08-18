@@ -18,12 +18,8 @@ class AppSidebar extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Text('Popmundo'),
-            ),
-          ),
+          const _SidebarBrandHeader(),
+          const Divider(height: 1),
           if (items.isEmpty)
             const Padding(
               padding: EdgeInsets.all(16),
@@ -45,6 +41,32 @@ class AppSidebar extends StatelessWidget {
                 },
               ),
         ],
+      ),
+    );
+  }
+}
+
+/// Compact brand strip: black plate matching the logo art, wordmark kept small.
+class _SidebarBrandHeader extends StatelessWidget {
+  const _SidebarBrandHeader();
+
+  static const _logoHeight = 40.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final top = MediaQuery.paddingOf(context).top;
+    return Container(
+      height: top + 100,
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(20, top + 16, 20, 16),
+      alignment: Alignment.centerLeft,
+      child: Image.asset(
+        'assets/popflutter_logo.png',
+        height: _logoHeight,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.medium,
+        semanticLabel: 'Popflutter',
+        key: const Key('sidebar-logo'),
       ),
     );
   }
