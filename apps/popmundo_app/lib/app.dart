@@ -6,6 +6,8 @@ import 'package:popmundo_webview/popmundo_webview.dart';
 import 'app_shell.dart';
 import 'debug_overlay.dart';
 import 'menu/app_menu_registry.dart';
+import 'userscripts/userscript_http.dart';
+import 'userscripts/userscripts_screen.dart';
 
 class PopmundoApp extends StatelessWidget {
   const PopmundoApp({
@@ -44,13 +46,34 @@ class PopmundoHome extends StatefulWidget {
 class _PopmundoHomeState extends State<PopmundoHome> {
   var _cookies = const <CookieSummary>[];
   var _debugPanelVisible = false;
+  var _catalogReady = false;
+  var _enabledUserScripts = <InstalledUserScript>[];
+  var _previouslyEnabledIds = <String>{};
+
   late final storage = StorageService(widget.store);
+  late final catalog = UserScriptCatalog(widget.store);
+  late final importer = UserScriptImporter(
+    catalog: catalog,
+    httpGet: fetchUserScriptUrl,
+  );
 
   @override
   void initState() {
     super.initState();
     widget.runtime.events.navigation.listen((_) => _refreshCookies());
     _refreshCookies();
+    _bootstrapUserScripts();
+  }
+
+  Future<void> _bootstrapUserScripts() async {
+    final all = await catalog.list();
+    final enabled = all.where((s) => s.enabled).toList();
+    if (!mounted) return;
+    setState(() {
+      _enabledUserScripts = enabled;
+      _previouslyEnabledIds = {for (final s in enabled) s.id};
+      _catalogReady = true;
+    });
   }
 
   Future<void> _refreshCookies() async {
@@ -69,6 +92,35 @@ class _PopmundoHomeState extends State<PopmundoHome> {
     }
   }
 
+  Future<void> _applyUserScripts(List<InstalledUserScript> next) async {
+    try {
+      await widget.runtime.syncUserScripts(
+        previouslyEnabledIds: _previouslyEnabledIds,
+        nextCatalog: next,
+      );
+    } on PopmundoRuntimeException {
+      // WebView may not be attached yet (e.g. still loading builtins).
+    }
+    final enabled = next.where((s) => s.enabled).toList();
+    if (!mounted) return;
+    setState(() {
+      _enabledUserScripts = enabled;
+      _previouslyEnabledIds = {for (final s in enabled) s.id};
+    });
+  }
+
+  void _openUserScripts() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => UserScriptsScreen(
+          catalog: catalog,
+          importer: importer,
+          onApply: _applyUserScripts,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopmundoScope(
@@ -77,17 +129,23 @@ class _PopmundoHomeState extends State<PopmundoHome> {
       child: AppShell(
         items: buildAppMenuItems(
           onOpenDebugPanel: () => setState(() => _debugPanelVisible = true),
+          onOpenUserScripts: _openUserScripts,
         ),
         body: SafeArea(
-          child: DebugOverlay(
-            host: widget.runtime.host,
-            events: widget.runtime.events,
-            evaluate: widget.runtime.evaluate,
-            cookies: _cookies,
-            visible: _debugPanelVisible,
-            onClose: () => setState(() => _debugPanelVisible = false),
-            child: PopmundoWebView(runtime: widget.runtime),
-          ),
+          child: !_catalogReady
+              ? const Center(child: CircularProgressIndicator())
+              : DebugOverlay(
+                  host: widget.runtime.host,
+                  events: widget.runtime.events,
+                  evaluate: widget.runtime.evaluate,
+                  cookies: _cookies,
+                  visible: _debugPanelVisible,
+                  onClose: () => setState(() => _debugPanelVisible = false),
+                  child: PopmundoWebView(
+                    runtime: widget.runtime,
+                    enabledUserScripts: _enabledUserScripts,
+                  ),
+                ),
         ),
       ),
     );

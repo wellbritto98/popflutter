@@ -75,7 +75,7 @@
 - **Status**: active
 
 ### AD-010
-- **Decision**: UserScripts instalados pelo jogador vivem num catálogo persistido em `KeyValueStore` (`userscripts.v1`) e são injetados apenas via API `UserScript` do InAppWebView, cada um com `groupName: 'userscript:<id>'`. Add/remove em runtime usa `addUserScript` / `removeUserScriptsByGroupName` seguido de `reload()`. Esta feature NUNCA chama `removeAllUserScripts` (preserva `hooks.js`/`helpers.js`). Download de `.user.js` / `@require` usa fetcher HTTP injetado — não `TimedFetch`.
+- **Decision**: UserScripts instalados pelo jogador vivem num catálogo persistido em `KeyValueStore` (`userscripts.v1`) e são injetados apenas via API `UserScript` do InAppWebView, cada um com `groupName: 'userscript:<id>'`. Add/remove em runtime usa `addUserScript` / `removeUserScriptsByGroupName` seguido de `reload()`. Esta feature NUNCA chama `removeAllUserScripts` (preserva `hooks.js`/`helpers.js`). Download de `.user.js` / `@require` usa fetcher HTTP injetado — não `TimedFetch`. O item de menu "Userscripts" é sempre visível (debug e release), então o sidebar em release deixa de ficar vazio (amendment pontual ao empty-state de AD-009; o item Debug continua gated por `kDebugMode`).
 - **Reason**: Isolar scripts do usuário dos internos (AD-003); docs oficiais exigem reload após mudança em runtime; TimedFetch é throttle same-origin do jogo (AD-006).
 - **Trade-off**: Reload interrompe a página após cada import/toggle/delete; sem polyfill GM.
 - **Scope**: `popmundo_utils` (parser/catalog/importer), `popmundo_webview` (injector), `popmundo_app` (UI/HTTP)

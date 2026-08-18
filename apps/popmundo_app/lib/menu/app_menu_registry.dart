@@ -9,9 +9,17 @@ import 'app_menu_item.dart';
 /// `AppSidebar` — no existing widget or menu item needs to change.
 List<AppMenuItem> buildAppMenuItems({
   required VoidCallback onOpenDebugPanel,
+  required VoidCallback onOpenUserScripts,
   bool includeDebugItem = kDebugMode,
 }) {
   return [
+    AppMenuItem(
+      id: 'userscripts',
+      icon: Icons.extension,
+      label: 'Userscripts',
+      subtitle: 'Import, enable and remove .user.js scripts',
+      onTap: onOpenUserScripts,
+    ),
     if (includeDebugItem)
       AppMenuItem(
         id: 'debug',
