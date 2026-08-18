@@ -39,12 +39,36 @@ class TimedFetch {
     Map<String, dynamic> options = const {},
     bool useCache = true,
   }) async {
+    final result = await fetchResponse(
+      resource,
+      options: options,
+      useCache: useCache,
+      acceptRedirect: false,
+    );
+    return result.text;
+  }
+
+  /// Same serial queue as [fetch], but returns the full [InPageFetchResult].
+  ///
+  /// When [acceptRedirect] is true, HTTP 3xx responses are returned instead of
+  /// throwing. Cache still only stores successful 2xx text bodies.
+  Future<InPageFetchResult> fetchResponse(
+    String resource, {
+    Map<String, dynamic> options = const {},
+    bool useCache = true,
+    bool acceptRedirect = false,
+  }) async {
     final method = (options['method'] as String? ?? 'GET').toUpperCase();
     final url = _absoluteUrl(resource);
     final cacheKey = '$method:$url';
 
     if (useCache && _cache.containsKey(cacheKey)) {
-      return _cache[cacheKey]!;
+      return InPageFetchResult(
+        ok: true,
+        status: 200,
+        text: _cache[cacheKey]!,
+        url: url,
+      );
     }
 
     final previous = _queue;
@@ -54,18 +78,22 @@ class TimedFetch {
       await previous;
       while (_now().difference(_lastCall) < delay) {
         final remaining = delay - _now().difference(_lastCall);
-        final waitMs = remaining.inMilliseconds < 50 ? 50 : remaining.inMilliseconds;
+        final waitMs =
+            remaining.inMilliseconds < 50 ? 50 : remaining.inMilliseconds;
         await _sleep(Duration(milliseconds: waitMs));
       }
       await runtime.waitUntilReady();
       final result = await runtime.fetchInPage(url: url, options: options);
-      if (!result.ok || result.status < 200 || result.status >= 300) {
-        throw TimedFetchException('Bad response status: ${result.status}');
+      final status = result.status;
+      final isRedirect = status >= 300 && status < 400;
+      final isOk2xx = result.ok && status >= 200 && status < 300;
+      if (!isOk2xx && !(acceptRedirect && isRedirect)) {
+        throw TimedFetchException('Bad response status: $status');
       }
-      if (useCache) {
+      if (useCache && isOk2xx) {
         _cache[cacheKey] = result.text;
       }
-      return result.text;
+      return result;
     } finally {
       _lastCall = _now();
       done.complete();
@@ -77,6 +105,8 @@ class TimedFetch {
     if (parsed.hasScheme) return resource;
     final origin = runtime.host.currentOrigin;
     final path = resource.startsWith('/') ? resource : '/$resource';
-    return origin.replace(path: path, query: parsed.hasQuery ? parsed.query : null).toString();
+    return origin
+        .replace(path: path, query: parsed.hasQuery ? parsed.query : null)
+        .toString();
   }
 }
