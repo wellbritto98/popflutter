@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:popmundo_app/userscripts/userscripts_screen.dart';
@@ -159,5 +161,53 @@ void main() {
     expect(applyCalls, hasLength(1));
     expect(applyCalls.single, isEmpty);
     expect(find.byKey(const Key('userscripts-empty')), findsOneWidget);
+  });
+
+  testWidgets('disables add while an import is in progress', (tester) async {
+    const url = 'https://cdn.example.com/slow.user.js';
+    final gate = Completer<String>();
+    Future<String> slowGet(Uri requested, {Duration? timeout}) async {
+      if (requested.toString() != url) {
+        throw UserScriptImportException('unexpected ${requested}');
+      }
+      return gate.future;
+    }
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: UserScriptsScreen(
+          catalog: catalog,
+          importer: UserScriptImporter(catalog: catalog, httpGet: slowGet),
+          onApply: (list) async {
+            applyCalls.add(List.of(list));
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('userscript-add')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('userscript-url-field')), url);
+    await tester.tap(find.byKey(const Key('userscript-add-confirm')));
+    await tester.pump(); // start import; dialog closes
+
+    final addButton = tester.widget<IconButton>(
+      find.byKey(const Key('userscript-add')),
+    );
+    expect(addButton.onPressed, isNull);
+
+    gate.complete('''
+// ==UserScript==
+// @name Slow
+// @grant none
+// ==/UserScript==
+1;
+''');
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<IconButton>(find.byKey(const Key('userscript-add'))).onPressed,
+      isNotNull,
+    );
   });
 }

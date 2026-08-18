@@ -165,6 +165,35 @@ var x = 1;
       );
     });
 
+    test('rejects unsupported @inject-into', () {
+      const raw = '''
+// ==UserScript==
+// @name Inject
+// @inject-into page
+// ==/UserScript==
+1;
+''';
+      // page/content/auto are allowed; use an unsupported value
+      const bad = '''
+// ==UserScript==
+// @name Inject Bad
+// @inject-into browser
+// ==/UserScript==
+1;
+''';
+      expect(UserScriptParser.parse(raw).name, 'Inject');
+      expect(
+        () => UserScriptParser.parse(bad),
+        throwsA(
+          isA<UserScriptParseException>().having(
+            (e) => e.unsupportedHeaders,
+            'unsupported',
+            contains('@inject-into browser'),
+          ),
+        ),
+      );
+    });
+
     test('accepts @grant unsafeWindow and unwrap', () {
       const raw = '''
 // ==UserScript==

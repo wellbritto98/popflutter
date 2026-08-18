@@ -84,6 +84,23 @@ console.log('ok');
     expect(await catalog.list(), isEmpty);
   });
 
+  test('empty response body leaves catalog empty', () async {
+    final url = 'https://cdn.example.com/empty.user.js';
+    responses[url] = '   \n';
+    final importer = UserScriptImporter(catalog: catalog, httpGet: fakeGet);
+    expect(
+      () => importer.importFromUrl(url),
+      throwsA(
+        isA<UserScriptImportException>().having(
+          (e) => e.message,
+          'message',
+          contains('empty'),
+        ),
+      ),
+    );
+    expect(await catalog.list(), isEmpty);
+  });
+
   test('parse failure leaves catalog empty', () async {
     final url = 'https://cdn.example.com/bad.user.js';
     responses[url] = 'not a userscript';
