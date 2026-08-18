@@ -90,13 +90,21 @@
 - **Date**: 2026-08-18
 - **Status**: active
 
+### AD-012
+- **Decision**: Keepalive de sessão em segundo plano vive no app shell via `flutter_foreground_task` (Foreground Service `dataSync` + notificação + isenção de bateria no Android; pedido de notificação no iOS). O isolate do FGS só emite heartbeat — não executa TimedFetch nem toca o WebView. Cookies/sessão continuam AD-004; intercept observe-only AD-003.
+- **Reason**: Utils permanece Flutter-free (AD-002); um plugin cobre permissões + FGS + prova de vida no debug; iOS não oferece JS contínuo em background.
+- **Trade-off**: Notificação persistente obrigatória no Android; teto `dataSync` no Android 15+; iOS suspende a página (debug deve ser honesto).
+- **Scope**: `apps/popmundo_app` (background facade, manifest, Info.plist, DebugOverlay)
+- **Date**: 2026-08-18
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: auto-login / `.specs/features/auto-login`
-- **Phase / Task**: Execute done; **Verifier PASS** (re-verify iteration 1 — see `validation.md`)
-- **Completed**: spec.md, context.md, design.md, tasks.md, AD-011, T1–T10, Fix NAV-04/UI-02/NAV-02/VIEWSTATE, gate **163** green, sensor 2/2 killed on re-verify
-- **In-progress**: none
-- **Next step**: Commit when requested (feature verification complete)
+- **Feature**: background-keepalive / `.specs/features/background-keepalive`
+- **Phase / Task**: Spec/Design/Tasks done; Execute starting at T1
+- **Completed**: spec.md, context.md, design.md, tasks.md, AD-012
+- **In-progress**: T1 BackgroundStatus
+- **Next step**: Implement T1 → T8 with atomic commits; then Verifier
 - **Blockers**: none
-- **Uncommitted files**: auto-login feature tree + `.specs/features/auto-login/validation.md`
+- **Uncommitted files**: `.specs/features/background-keepalive/*`, STATE.md AD-012
 - **Branch**: master
