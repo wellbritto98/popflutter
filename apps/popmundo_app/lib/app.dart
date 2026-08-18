@@ -3,7 +3,9 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 import 'package:popmundo_webview/popmundo_webview.dart';
 
+import 'app_shell.dart';
 import 'debug_overlay.dart';
+import 'menu/app_menu_registry.dart';
 
 class PopmundoApp extends StatelessWidget {
   const PopmundoApp({
@@ -41,6 +43,7 @@ class PopmundoHome extends StatefulWidget {
 
 class _PopmundoHomeState extends State<PopmundoHome> {
   var _cookies = const <CookieSummary>[];
+  var _debugPanelVisible = false;
   late final storage = StorageService(widget.store);
 
   @override
@@ -71,13 +74,18 @@ class _PopmundoHomeState extends State<PopmundoHome> {
     return PopmundoScope(
       runtime: widget.runtime,
       storage: storage,
-      child: Scaffold(
+      child: AppShell(
+        items: buildAppMenuItems(
+          onOpenDebugPanel: () => setState(() => _debugPanelVisible = true),
+        ),
         body: SafeArea(
           child: DebugOverlay(
             host: widget.runtime.host,
             events: widget.runtime.events,
             evaluate: widget.runtime.evaluate,
             cookies: _cookies,
+            visible: _debugPanelVisible,
+            onClose: () => setState(() => _debugPanelVisible = false),
             child: PopmundoWebView(runtime: widget.runtime),
           ),
         ),
