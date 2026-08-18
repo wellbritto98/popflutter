@@ -4,7 +4,7 @@ import 'package:popmundo_app/debug_overlay.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 
 void main() {
-  testWidgets('collapsed overlay does not show the panel', (tester) async {
+  testWidgets('collapsed overlay renders no debug control and no panel', (tester) async {
     final bus = PopmundoEventBus();
     await tester.pumpWidget(
       MaterialApp(
@@ -16,11 +16,11 @@ void main() {
         ),
       ),
     );
-    expect(find.byKey(const Key('debug-toggle')), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsNothing);
     expect(find.byKey(const Key('debug-panel')), findsNothing);
   });
 
-  testWidgets('expanded overlay shows host, events, eval and clear', (tester) async {
+  testWidgets('visible overlay shows host, events, eval and clear', (tester) async {
     final bus = PopmundoEventBus();
     final host = HostTracker()..onNavigation(Uri.parse('https://73.popmundo.com/'));
     await tester.pumpWidget(
@@ -30,13 +30,11 @@ void main() {
           events: bus,
           evaluate: (source) async => 'result:$source',
           cookies: const [CookieSummary(name: 'session', domain: 'popmundo.com')],
+          visible: true,
           child: const SizedBox.expand(),
         ),
       ),
     );
-
-    await tester.tap(find.byKey(const Key('debug-toggle')));
-    await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('debug-panel')), findsOneWidget);
     expect(find.byKey(const Key('debug-host')), findsOneWidget);
@@ -60,5 +58,34 @@ void main() {
     await tester.pump();
     expect(find.textContaining('GET 200'), findsNothing);
     expect(find.textContaining('hello-console'), findsNothing);
+  });
+
+  testWidgets('tapping debug-close invokes onClose, and visible:false hides the panel', (tester) async {
+    final bus = PopmundoEventBus();
+    var closeCount = 0;
+
+    Widget harness(bool visible) {
+      return MaterialApp(
+        home: DebugOverlay(
+          host: HostTracker(),
+          events: bus,
+          evaluate: (source) async => source,
+          visible: visible,
+          onClose: () => closeCount++,
+          child: const SizedBox.expand(),
+        ),
+      );
+    }
+
+    await tester.pumpWidget(harness(true));
+    expect(find.byKey(const Key('debug-panel')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('debug-close')));
+    await tester.pump();
+    expect(closeCount, 1);
+
+    await tester.pumpWidget(harness(false));
+    await tester.pump();
+    expect(find.byKey(const Key('debug-panel')), findsNothing);
   });
 }

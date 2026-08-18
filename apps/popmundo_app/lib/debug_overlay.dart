@@ -15,6 +15,8 @@ class DebugOverlay extends StatefulWidget {
     required this.events,
     required this.evaluate,
     this.cookies = const [],
+    this.visible = false,
+    this.onClose,
     this.child,
   });
 
@@ -22,6 +24,8 @@ class DebugOverlay extends StatefulWidget {
   final PopmundoEventBus events;
   final Future<String?> Function(String source) evaluate;
   final List<CookieSummary> cookies;
+  final bool visible;
+  final VoidCallback? onClose;
   final Widget? child;
 
   @override
@@ -29,7 +33,6 @@ class DebugOverlay extends StatefulWidget {
 }
 
 class _DebugOverlayState extends State<DebugOverlay> {
-  var _expanded = false;
   final _networks = <NetworkEvent>[];
   final _consoles = <ConsoleEvent>[];
   final _evalController = TextEditingController();
@@ -74,7 +77,7 @@ class _DebugOverlayState extends State<DebugOverlay> {
     return Stack(
       children: [
         if (widget.child != null) Positioned.fill(child: widget.child!),
-        if (_expanded)
+        if (widget.visible)
           Positioned(
             left: 0,
             right: 0,
@@ -86,16 +89,6 @@ class _DebugOverlayState extends State<DebugOverlay> {
               child: _panel(),
             ),
           ),
-        Positioned(
-          right: 16,
-          bottom: 16,
-          child: FloatingActionButton(
-            key: const Key('debug-toggle'),
-            mini: true,
-            onPressed: () => setState(() => _expanded = !_expanded),
-            child: Icon(_expanded ? Icons.close : Icons.bug_report),
-          ),
-        ),
       ],
     );
   }
@@ -111,10 +104,20 @@ class _DebugOverlayState extends State<DebugOverlay> {
             key: const Key('debug-host'),
             style: const TextStyle(color: Colors.white),
           ),
-          trailing: TextButton(
-            key: const Key('debug-clear'),
-            onPressed: _clear,
-            child: const Text('clear'),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(
+                key: const Key('debug-clear'),
+                onPressed: _clear,
+                child: const Text('clear'),
+              ),
+              IconButton(
+                key: const Key('debug-close'),
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: widget.onClose,
+              ),
+            ],
           ),
         ),
         if (widget.cookies.isNotEmpty)
