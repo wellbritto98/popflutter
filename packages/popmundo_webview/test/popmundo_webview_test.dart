@@ -29,6 +29,9 @@ class _Runtime implements PopmundoRuntime {
       const InPageFetchResult(ok: true, status: 200, text: '');
 
   @override
+  Future<void> loadUrl(Uri url) async {}
+
+  @override
   Future<void> waitUntilReady({Duration timeout = const Duration(seconds: 30)}) async {}
 }
 
@@ -58,6 +61,45 @@ void main() {
     expect(helpers.contains('getMyID'), isTrue);
     expect(helpers.contains('applyScoringNumbers();'), isFalse);
     expect(helpers.contains('applyBarPercentage();'), isFalse);
+  });
+
+  test('JS __popmundo.fetch passes options and exposes Location header', () {
+    final hooks = _open(['assets/js/hooks.js', 'packages/popmundo_webview/assets/js/hooks.js']);
+    expect(hooks.contains('originalFetch(url, options || {})'), isTrue);
+    expect(hooks.contains("res.headers.get('Location')"), isTrue);
+    expect(hooks.contains("res.headers.get('location')"), isTrue);
+    expect(hooks.contains('headers.location'), isTrue);
+    expect(hooks.contains('url: res.url'), isTrue);
+  });
+
+  test('inPageFetchResultFromJsMap normalizes headers and url', () {
+    final result = inPageFetchResultFromJsMap({
+      'ok': false,
+      'status': 302,
+      'text': '',
+      'headers': {'Location': '/Login.aspx?t=abc', 'X-Unused': null},
+      'url': 'https://73.popmundo.com/Login.aspx',
+    });
+    expect(result.ok, isFalse);
+    expect(result.status, 302);
+    expect(result.headers['location'], '/Login.aspx?t=abc');
+    expect(result.headers.containsKey('x-unused'), isFalse);
+    expect(result.locationHeader, '/Login.aspx?t=abc');
+    expect(result.url, 'https://73.popmundo.com/Login.aspx');
+  });
+
+  test('loadUrl throws when WebView is not attached', () async {
+    final runtime = InAppPopmundoRuntime();
+    expect(
+      () => runtime.loadUrl(Uri.parse('https://www.popmundo.com/')),
+      throwsA(
+        isA<PopmundoRuntimeException>().having(
+          (e) => e.message,
+          'message',
+          'WebView not attached',
+        ),
+      ),
+    );
   });
 
   test('JS bridge emits network and console events', () async {

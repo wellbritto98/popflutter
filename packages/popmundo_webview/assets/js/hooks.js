@@ -111,9 +111,27 @@
   window.__popmundo.post = post;
   window.__popmundo.fetch = function (url, options) {
     if (!originalFetch) return Promise.reject(new Error('fetch unavailable'));
+    // Pass options through unchanged so redirect: 'manual' (and others) work.
     return originalFetch(url, options || {}).then(function (res) {
-      return res.text().then(function (text) {
-        return JSON.stringify({ ok: res.ok, status: res.status, text: text });
+      var location = null;
+      try {
+        if (res.headers && res.headers.get) {
+          location = res.headers.get('Location') || res.headers.get('location');
+        }
+      } catch (e) {}
+      var headers = {};
+      if (location) headers.location = location;
+      var build = function (text) {
+        return JSON.stringify({
+          ok: res.ok,
+          status: res.status,
+          text: text,
+          headers: headers,
+          url: res.url || ''
+        });
+      };
+      return res.text().then(build).catch(function () {
+        return build('');
       });
     });
   };
