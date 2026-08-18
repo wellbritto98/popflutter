@@ -38,6 +38,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: USM-04 @inject-into (packages/popmundo_utils/userscript)
 - last seen: 2026-08-18T02:39:06Z
 
+### L-005 — Composition wiring that sets WebView initialUrl from a store must have a widget or fake-runtime test asserting the exact URL, not only the production bootstrap code
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `apps/popmundo_app` · harmful: 0
+- features: auto-login
+- evidence: NAV-04 / validation.md Gap (apps/popmundo_app)
+- last seen: 2026-08-18T14:16:03Z
+
+### L-006 — When a settings screen AC lists exact enum option values, assert the option set in the widget test rather than only exercising one save path
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `apps/popmundo_app` · harmful: 0
+- features: auto-login
+- evidence: UI-02 status dropdown / validation.md (apps/popmundo_app)
+- last seen: 2026-08-18T14:16:03Z
+
+### L-007 — Controller abort branches listed in the feature edge-case table need dedicated tests, not only happy-path and one miss path
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `packages/popmundo_utils` · harmful: 0
+- features: auto-login
+- evidence: edge cases / validation.md Edge Cases (packages/popmundo_utils)
+- last seen: 2026-08-18T14:16:03Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

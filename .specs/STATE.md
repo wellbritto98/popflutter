@@ -82,13 +82,21 @@
 - **Date**: 2026-08-17
 - **Status**: active
 
+### AD-011
+- **Decision**: Auto Login autentica via TimedFetch in-page (`useCache: false`, `redirect: 'manual'` no POST) e trata o 302 de sucesso com `PopmundoRuntime.loadUrl(Location)` (navegação de documento). Senha vive só em `SecretStore` (app: `flutter_secure_storage`); settings não-secretos e last URL elegível em `KeyValueStore` (`autologin.v1`, `session.last_url.v1`). Observe-only (AD-003) permanece: nenhum intercept reescreve request/response. Host sticky continua só via navegação real (AD-007).
+- **Reason**: Fetch sozinho não atualiza HostTracker nem aplica o hop `www`→`N` como o form submit; Location não existia no contrato; senha em SharedPreferences é inaceitável.
+- **Trade-off**: Extensão do contrato `PopmundoRuntime` (`loadUrl` + headers em `InPageFetchResult`); plugin Flutter novo no app.
+- **Scope**: `popmundo_utils` (controller/stores/TimedFetch), `popmundo_webview` (hooks.js / loadUrl), `popmundo_app` (UI / secure storage)
+- **Date**: 2026-08-18
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: webview-back-navigation / `.specs/features/webview-back-navigation`
-- **Phase / Task**: Execute complete + Verifier PASS
-- **Completed**: PopScope intercepts system back; `WebViewBackHandler` + unit tests; validation.md PASS (21 tests, 3/3 mutants killed)
+- **Feature**: auto-login / `.specs/features/auto-login`
+- **Phase / Task**: Execute done; **Verifier PASS** (re-verify iteration 1 — see `validation.md`)
+- **Completed**: spec.md, context.md, design.md, tasks.md, AD-011, T1–T10, Fix NAV-04/UI-02/NAV-02/VIEWSTATE, gate **163** green, sensor 2/2 killed on re-verify
 - **In-progress**: none
-- **Next step**: Device UAT — navigate in-game, press/swipe back, confirm previous page; first page should still exit. Commit when requested.
+- **Next step**: Commit when requested (feature verification complete)
 - **Blockers**: none
-- **Uncommitted files**: webview back-navigation implementation + spec + validation.md
+- **Uncommitted files**: auto-login feature tree + `.specs/features/auto-login/validation.md`
 - **Branch**: master
