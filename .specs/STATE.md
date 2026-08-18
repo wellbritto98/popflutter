@@ -77,11 +77,11 @@
 ## Handoff
 
 - **Feature**: app-sidebar-menu / `.specs/features/app-sidebar-menu`
-- **Phase / Task**: Execute complete (T1–T7)
-- **Completed**: T1–T7
+- **Phase / Task**: Execute complete (T1–T7) + independent Verifier PASS + 1 follow-up fix applied
+- **Completed**: T1–T7, Verifier pass (`.specs/features/app-sidebar-menu/validation.md`), Fix 1 (MENU-01 AC4 drawer-close test coverage, commit `571a4d9`)
 - **In-progress**: none
-- **Next step**: Independent Verifier pass on `app-sidebar-menu` (spec-anchored coverage + discrimination sensor); manual `flutter run --release` check that the Debug panel item is absent
-- **Blockers**: none
+- **Next step**: Manual `flutter run --release` smoke test — confirm the Debug panel item is absent and the FAB still opens an empty-state sidebar (spec.md Success Criteria's last unchecked item; no device/emulator available in this session to perform it)
+- **Blockers**: none — the release smoke test is the only remaining item and is non-blocking (behavior is proven by the `includeDebugItem` unit-test seam; only the `kDebugMode` binding itself is unverified)
 - **Uncommitted files**: none
 - **Branch**: master
 
