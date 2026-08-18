@@ -74,5 +74,5 @@
 - **In-progress**: none
 - **Next step**: Device UAT — open the app, log in, kill process, confirm session; optional store listing
 - **Blockers**: none
-- **Uncommitted files**: full working tree
-- **Branch**: master (local git init)
+- **Uncommitted files**: none
+- **Branch**: master
