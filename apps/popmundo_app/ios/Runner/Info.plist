@@ -79,5 +79,13 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.pravera.flutter_foreground_task.refresh</string>
+	</array>
 </dict>
 </plist>
