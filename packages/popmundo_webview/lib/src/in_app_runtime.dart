@@ -7,6 +7,34 @@ import 'package:popmundo_utils/popmundo_utils.dart';
 import 'js_bridge.dart';
 import 'userscript_injector.dart';
 
+/// Builds [InPageFetchResult] from the JSON map returned by `__popmundo.fetch`.
+///
+/// Header names are normalized to lowercase. Empty/null header values are dropped.
+InPageFetchResult inPageFetchResultFromJsMap(Map<String, dynamic> map) {
+  final status =
+      map['status'] is int ? map['status'] as int : int.tryParse('${map['status']}') ?? 0;
+  final headers = <String, String>{};
+  final rawHeaders = map['headers'];
+  if (rawHeaders is Map) {
+    rawHeaders.forEach((key, value) {
+      if (value == null) return;
+      final name = '$key'.toLowerCase();
+      final text = '$value';
+      if (name.isEmpty || text.isEmpty || text == 'null') return;
+      headers[name] = text;
+    });
+  }
+  final urlRaw = map['url'];
+  final url = urlRaw == null || '$urlRaw'.isEmpty ? null : '$urlRaw';
+  return InPageFetchResult(
+    ok: map['ok'] == true,
+    status: status,
+    text: '${map['text'] ?? ''}',
+    headers: headers,
+    url: url,
+  );
+}
+
 class InAppPopmundoRuntime implements PopmundoRuntime {
   InAppPopmundoRuntime({
     HostTracker? host,
@@ -129,13 +157,16 @@ class InAppPopmundoRuntime implements PopmundoRuntime {
     if (decoded is! Map) {
       throw PopmundoRuntimeException('Unexpected fetch result');
     }
-    final map = Map<String, dynamic>.from(decoded);
-    final status = map['status'] is int ? map['status'] as int : int.tryParse('${map['status']}') ?? 0;
-    return InPageFetchResult(
-      ok: map['ok'] == true,
-      status: status,
-      text: '${map['text'] ?? ''}',
-    );
+    return inPageFetchResultFromJsMap(Map<String, dynamic>.from(decoded));
+  }
+
+  @override
+  Future<void> loadUrl(Uri url) async {
+    final c = controller;
+    if (c == null) {
+      throw PopmundoRuntimeException('WebView not attached');
+    }
+    await c.loadUrl(urlRequest: URLRequest(url: WebUri(url.toString())));
   }
 
   @override
