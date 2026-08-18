@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:popmundo_app/background/background_status.dart';
 import 'package:popmundo_app/debug_overlay.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 
@@ -41,6 +42,7 @@ void main() {
     expect(find.textContaining('73.popmundo.com'), findsWidgets);
     expect(find.text('session@popmundo.com'), findsOneWidget);
     expect(find.textContaining('secret-value'), findsNothing);
+    expect(find.byKey(const Key('debug-bg-service')), findsNothing);
 
     bus.emitNetwork(NetworkEvent(method: 'GET', url: 'https://73.popmundo.com/a', status: 200));
     bus.emitConsole(ConsoleEvent(level: 'log', message: 'hello-console'));
@@ -58,6 +60,70 @@ void main() {
     await tester.pump();
     expect(find.textContaining('GET 200'), findsNothing);
     expect(find.textContaining('hello-console'), findsNothing);
+  });
+
+  testWidgets('visible overlay shows keepalive status lines with keys', (tester) async {
+    final bus = PopmundoEventBus();
+    final tick = DateTime.now().subtract(const Duration(seconds: 12));
+    final status = BackgroundStatus(
+      notificationGranted: true,
+      batteryUnrestricted: true,
+      serviceRunning: true,
+      lifecycle: AppLifecycleState.resumed,
+      lastHeartbeat: tick,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DebugOverlay(
+          host: HostTracker(),
+          events: bus,
+          evaluate: (source) async => source,
+          backgroundStatus: status,
+          visible: true,
+          child: const SizedBox.expand(),
+        ),
+      ),
+    );
+
+    expect(find.byKey(const Key('debug-bg-service')), findsOneWidget);
+    expect(find.byKey(const Key('debug-bg-notif')), findsOneWidget);
+    expect(find.byKey(const Key('debug-bg-battery')), findsOneWidget);
+    expect(find.byKey(const Key('debug-bg-lifecycle')), findsOneWidget);
+    expect(find.byKey(const Key('debug-bg-heartbeat')), findsOneWidget);
+    expect(find.text('bg: running'), findsOneWidget);
+    expect(find.text('notif: granted'), findsOneWidget);
+    expect(find.text('battery: unrestricted'), findsOneWidget);
+    expect(find.text('lifecycle: resumed'), findsOneWidget);
+    expect(find.textContaining('heartbeat:'), findsOneWidget);
+    expect(find.textContaining('ago'), findsOneWidget);
+  });
+
+  testWidgets('iOS battery shows n/a in debug lines', (tester) async {
+    final bus = PopmundoEventBus();
+    const status = BackgroundStatus(
+      notificationGranted: false,
+      batteryUnrestricted: null,
+      serviceRunning: false,
+      lifecycle: AppLifecycleState.paused,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DebugOverlay(
+          host: HostTracker(),
+          events: bus,
+          evaluate: (source) async => source,
+          backgroundStatus: status,
+          visible: true,
+          child: const SizedBox.expand(),
+        ),
+      ),
+    );
+
+    expect(find.text('battery: n/a'), findsOneWidget);
+    expect(find.text('notif: denied'), findsOneWidget);
+    expect(find.text('bg: stopped'), findsOneWidget);
+    expect(find.text('lifecycle: paused'), findsOneWidget);
+    expect(find.text('heartbeat: never'), findsOneWidget);
   });
 
   testWidgets('tapping debug-close invokes onClose, and visible:false hides the panel', (tester) async {
