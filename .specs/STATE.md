@@ -98,13 +98,22 @@
 - **Date**: 2026-08-18
 - **Status**: active
 
+### AD-013
+
+- **Decision**: `stopWithTask` for the Android FGS (both `AndroidManifest.xml` `<service>` and `FlutterForegroundTaskPlatform.initService`'s `ForegroundTaskOptions`) is `false`, not `true`.
+- **Reason**: User-reported bug — the persistent notification disappeared as soon as the app left the foreground/Recents. Root cause: T4 (`ccbc15d`) shipped both settings as `stopWithTask: true` / `android:stopWithTask="true"`, which per `flutter_foreground_task` docs ("optionally set to true if the service should only run while the application is active") tells Android to kill the FGS the moment the task is removed — the exact opposite of AD-012's goal (survive backgrounding). No test asserted this value, so it shipped unnoticed through Verifier PASS.
+- **Trade-off**: None — this is a straight correction to match the stated P1 goal; no behavior is intentionally given up.
+- **Scope**: `apps/popmundo_app/android/app/src/main/AndroidManifest.xml`, `apps/popmundo_app/lib/background/flutter_foreground_task_platform.dart`
+- **Date**: 2026-08-18
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: background-keepalive / `.specs/features/background-keepalive`
-- **Phase / Task**: Execute done; **Verifier PASS** (see `validation.md`)
-- **Completed**: spec.md, context.md, design.md, tasks.md, AD-012, T1–T7 (T8 gate via Verifier), validation.md
+- **Phase / Task**: Execute done; **Verifier PASS** (see `validation.md`); post-verify bug fix applied (AD-013)
+- **Completed**: spec.md, context.md, design.md, tasks.md, AD-012, T1–T7 (T8 gate via Verifier), validation.md, AD-013 `stopWithTask` fix + regression test in `platform_config_test.dart`
 - **In-progress**: none
-- **Next step**: Device UAT — open app, grant notif/battery, confirm FGS notification + debug heartbeat; iOS confirm notif prompt + honest suspend
+- **Next step**: Device UAT — open app, grant notif/battery, background the app (both home-press AND swipe-from-Recents) and confirm the FGS notification survives; iOS confirm notif prompt + honest suspend
 - **Blockers**: none
-- **Uncommitted files**: none for this feature after validation commit
+- **Uncommitted files**: AndroidManifest.xml, flutter_foreground_task_platform.dart, platform_config_test.dart, STATE.md (pending commit)
 - **Branch**: master
