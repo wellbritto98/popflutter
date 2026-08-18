@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'in_app_runtime.dart';
 import 'user_scripts.dart';
+import 'userscript_injector.dart';
 import 'web_settings.dart';
 
 class PopmundoWebView extends StatefulWidget {
@@ -15,11 +16,15 @@ class PopmundoWebView extends StatefulWidget {
     required this.runtime,
     this.initialUrl = HostTracker.defaultOrigin,
     this.launchExternal,
+    this.enabledUserScripts = const [],
   });
 
   final InAppPopmundoRuntime runtime;
   final String initialUrl;
   final Future<void> Function(Uri uri)? launchExternal;
+
+  /// Catalog entries with `enabled == true` merged into [initialUserScripts].
+  final List<InstalledUserScript> enabledUserScripts;
 
   @override
   State<PopmundoWebView> createState() => _PopmundoWebViewState();
@@ -31,9 +36,39 @@ class _PopmundoWebViewState extends State<PopmundoWebView> {
   @override
   void initState() {
     super.initState();
-    PopmundoUserScripts.load().then((scripts) {
-      if (mounted) setState(() => _scripts = scripts);
-    });
+    _loadScripts();
+  }
+
+  @override
+  void didUpdateWidget(covariant PopmundoWebView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_sameEnabled(oldWidget.enabledUserScripts, widget.enabledUserScripts)) {
+      // initialUserScripts only apply on create; runtime sync is owned by the
+      // host via UserScriptInjector.sync. Rebuild list only if WebView not yet
+      // created (still loading builtins).
+      if (_scripts == null) {
+        _loadScripts();
+      }
+    }
+  }
+
+  bool _sameEnabled(List<InstalledUserScript> a, List<InstalledUserScript> b) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].id != b[i].id || a[i].source != b[i].source) return false;
+    }
+    return true;
+  }
+
+  Future<void> _loadScripts() async {
+    final builtin = await PopmundoUserScripts.load();
+    final merged = UserScriptInjector.mergeInitial(
+      builtin: builtin,
+      enabled: widget.enabledUserScripts,
+    );
+    if (!mounted) return;
+    setState(() => _scripts = merged);
   }
 
   Future<void> _openExternal(Uri uri) async {

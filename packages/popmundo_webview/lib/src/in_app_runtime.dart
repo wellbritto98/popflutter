@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 
 import 'js_bridge.dart';
+import 'userscript_injector.dart';
 
 class InAppPopmundoRuntime implements PopmundoRuntime {
   InAppPopmundoRuntime({
@@ -33,6 +34,22 @@ class InAppPopmundoRuntime implements PopmundoRuntime {
     next.addJavaScriptHandler(
       handlerName: 'popmundo',
       callback: _bridge.handleArguments,
+    );
+  }
+
+  /// Applies catalog enablement diff via [UserScriptInjector.sync] and reloads.
+  Future<void> syncUserScripts({
+    required Iterable<String> previouslyEnabledIds,
+    required Iterable<InstalledUserScript> nextCatalog,
+  }) async {
+    final c = controller;
+    if (c == null) {
+      throw PopmundoRuntimeException('WebView not attached');
+    }
+    await UserScriptInjector.sync(
+      port: InAppUserScriptWebViewPort(c),
+      previouslyEnabledIds: previouslyEnabledIds,
+      nextCatalog: nextCatalog,
     );
   }
 
