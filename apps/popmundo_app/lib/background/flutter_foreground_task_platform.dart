@@ -62,7 +62,7 @@ class FlutterForegroundTaskPlatform implements BackgroundPlatform {
         allowWakeLock: true,
         allowWifiLock: false,
         allowAutoRestart: true,
-        stopWithTask: true,
+        stopWithTask: false,
       ),
     );
   }

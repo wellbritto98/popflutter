@@ -36,6 +36,19 @@ void main() {
       isTrue,
     );
     expect(manifest.contains('android:foregroundServiceType="dataSync"'), isTrue);
+    // stopWithTask="true" kills the FGS the moment the app leaves Recents,
+    // defeating the whole point of background keepalive — must stay false.
+    expect(manifest.contains('android:stopWithTask="false"'), isTrue);
+    expect(manifest.contains('android:stopWithTask="true"'), isFalse);
+  });
+
+  test('FlutterForegroundTaskPlatform does not stop the service with the task', () {
+    final source = _open([
+      'lib/background/flutter_foreground_task_platform.dart',
+      'apps/popmundo_app/lib/background/flutter_foreground_task_platform.dart',
+    ]);
+    expect(source.contains('stopWithTask: false'), isTrue);
+    expect(source.contains('stopWithTask: true'), isFalse);
   });
 
   test('iOS ATS includes popmundo.com subdomains', () {
