@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 2,
+  "next_id": 5,
   "lessons": [
     {
       "id": "L-001",
@@ -22,6 +22,60 @@
       ],
       "created": "2026-08-18T00:05:39Z",
       "last_seen": "2026-08-18T00:05:39Z"
+    },
+    {
+      "id": "L-002",
+      "key": "ac_gap::assert empty http response bodies are rejected with zero catalog writes not only network parse failures",
+      "text": "Assert empty HTTP response bodies are rejected with zero catalog writes, not only network/parse failures",
+      "signal": "ac_gap",
+      "scope": "packages/popmundo_utils/userscript",
+      "status": "candidate",
+      "features": [
+        "userscript-manager"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "edge: empty response body (packages/popmundo_utils/userscript)"
+      ],
+      "created": "2026-08-18T02:39:06Z",
+      "last_seen": "2026-08-18T02:39:06Z"
+    },
+    {
+      "id": "L-003",
+      "key": "ac_gap::when ui disables actions during an in flight operation assert the disabled state in a widget test with a deferred async stub",
+      "text": "When UI disables actions during an in-flight operation, assert the disabled state in a widget test with a deferred/async stub",
+      "signal": "ac_gap",
+      "scope": "apps/popmundo_app",
+      "status": "candidate",
+      "features": [
+        "userscript-manager"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "edge: import-in-progress disables add (apps/popmundo_app)"
+      ],
+      "created": "2026-08-18T02:39:06Z",
+      "last_seen": "2026-08-18T02:39:06Z"
+    },
+    {
+      "id": "L-004",
+      "key": "ac_gap::every rejected header in an honor reject matrix needs a dedicated unit assertion not only sibling headers",
+      "text": "Every rejected header in an honor/reject matrix needs a dedicated unit assertion, not only sibling headers",
+      "signal": "ac_gap",
+      "scope": "packages/popmundo_utils/userscript",
+      "status": "candidate",
+      "features": [
+        "userscript-manager"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "USM-04 @inject-into (packages/popmundo_utils/userscript)"
+      ],
+      "created": "2026-08-18T02:39:06Z",
+      "last_seen": "2026-08-18T02:39:06Z"
     }
   ]
 }

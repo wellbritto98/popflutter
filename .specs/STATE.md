@@ -85,10 +85,10 @@
 ## Handoff
 
 - **Feature**: userscript-manager / `.specs/features/userscript-manager`
-- **Phase / Task**: Execute T1 (docs+AD) in progress → next T2 parser
-- **Completed**: none (spec/design/tasks/AD-010 being written)
-- **In-progress**: `.specs/features/userscript-manager/`
-- **Next step**: Commit T1 docs, then implement UserScriptParser (T2)
+- **Phase / Task**: Execute complete (T1–T7) + Verifier PASS + gap-fix tests
+- **Completed**: T1–T7, Verifier pass (`.specs/features/userscript-manager/validation.md`), fix commit `05e8818`
+- **In-progress**: none
+- **Next step**: Optional device UAT — import a real `.user.js`, toggle/delete, confirm WebView reload applies scripts
 - **Blockers**: none
-- **Uncommitted files**: `.specs/features/userscript-manager/*`, `.specs/STATE.md`
+- **Uncommitted files**: check git status for validation.md / lessons if any
 - **Branch**: master

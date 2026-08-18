@@ -20,6 +20,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: SESS-01 validation.md cookie relaunch (webview-session)
 - last seen: 2026-08-18T00:05:39Z
 
+### L-002 — Assert empty HTTP response bodies are rejected with zero catalog writes, not only network/parse failures
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `packages/popmundo_utils/userscript` · harmful: 0
+- features: userscript-manager
+- evidence: edge: empty response body (packages/popmundo_utils/userscript)
+- last seen: 2026-08-18T02:39:06Z
+
+### L-003 — When UI disables actions during an in-flight operation, assert the disabled state in a widget test with a deferred/async stub
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `apps/popmundo_app` · harmful: 0
+- features: userscript-manager
+- evidence: edge: import-in-progress disables add (apps/popmundo_app)
+- last seen: 2026-08-18T02:39:06Z
+
+### L-004 — Every rejected header in an honor/reject matrix needs a dedicated unit assertion, not only sibling headers
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `packages/popmundo_utils/userscript` · harmful: 0
+- features: userscript-manager
+- evidence: USM-04 @inject-into (packages/popmundo_utils/userscript)
+- last seen: 2026-08-18T02:39:06Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
