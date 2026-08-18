@@ -1,0 +1,8 @@
+name: popflutter
+publish_to: none
+environment:
+  sdk: ^3.13.0
+workspace:
+  - apps/popmundo_app
+  - packages/popmundo_utils
+  - packages/popmundo_webview

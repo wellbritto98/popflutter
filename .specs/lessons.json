@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 2,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "spec_precision_gap::assert the concrete persistence mechanism in unit tests and keep os level session survival as a device uat criterion",
+      "text": "Assert the concrete persistence mechanism in unit tests and keep OS-level session survival as a device UAT criterion",
+      "signal": "spec_precision_gap",
+      "scope": "webview-session",
+      "status": "candidate",
+      "features": [
+        "popmundo-wrapper"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "SESS-01 validation.md cookie relaunch (webview-session)"
+      ],
+      "created": "2026-08-18T00:05:39Z",
+      "last_seen": "2026-08-18T00:05:39Z"
+    }
+  ]
+}

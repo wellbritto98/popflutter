@@ -1,0 +1,7 @@
+Popflutter includes APIs translated from Popmundo-Utils (common/),
+https://github.com/ilpersi/Popmundo-Utils
+Copyright (C) ilpersi and contributors
+Licensed under the GNU General Public License v3.0.
+
+Chrome extension APIs (chrome.storage, chrome.runtime) were not copied;
+they are reimplemented in Dart (KeyValueStore / SharedPreferences).

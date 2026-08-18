@@ -1,0 +1,17 @@
+name: popmundo_utils
+description: Dart APIs for Popmundo helpers (TimedFetch, host, notifications, storage).
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+
+# Add regular dependencies here.
+dependencies:
+  # path: ^1.9.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6
