@@ -101,10 +101,10 @@
 ## Handoff
 
 - **Feature**: background-keepalive / `.specs/features/background-keepalive`
-- **Phase / Task**: Spec/Design/Tasks done; Execute starting at T1
-- **Completed**: spec.md, context.md, design.md, tasks.md, AD-012
-- **In-progress**: T1 BackgroundStatus
-- **Next step**: Implement T1 → T8 with atomic commits; then Verifier
+- **Phase / Task**: Execute done; **Verifier PASS** (see `validation.md`)
+- **Completed**: spec.md, context.md, design.md, tasks.md, AD-012, T1–T7 (T8 gate via Verifier), validation.md
+- **In-progress**: none
+- **Next step**: Device UAT — open app, grant notif/battery, confirm FGS notification + debug heartbeat; iOS confirm notif prompt + honest suspend
 - **Blockers**: none
-- **Uncommitted files**: `.specs/features/background-keepalive/*`, STATE.md AD-012
+- **Uncommitted files**: none for this feature after validation commit
 - **Branch**: master
