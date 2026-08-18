@@ -137,6 +137,9 @@ class _PopmundoWebViewState extends State<PopmundoWebView> {
           _syncHistory();
         },
         onLoadStop: (controller, url) {
+          // Auto-login (and similar) need a nav signal when the document is
+          // actually ready — onLoadStart alone can see an empty/partial DOM.
+          if (url != null) widget.runtime.onNativeNavigation(url);
           _syncHistory();
         },
         onUpdateVisitedHistory: (controller, url, isReload) {

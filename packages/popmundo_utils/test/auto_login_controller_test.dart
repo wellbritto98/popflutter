@@ -36,6 +36,25 @@ void main() {
 <input type="submit" name="ctl00\$cphLeftColumn\$repCharacters\$ctl04\$btnChooseCharacter2" value="Escolher Troy" />
 ''';
 
+  void wireLoginGet() {
+    runtime.fetchHandler = (url, options) async {
+      final method = (options?['method'] as String? ?? 'GET').toUpperCase();
+      if (method == 'GET' && (url.endsWith('/') || url.contains('Default'))) {
+        return const InPageFetchResult(ok: true, status: 200, text: loginHtml);
+      }
+      return const InPageFetchResult(ok: true, status: 200, text: '');
+    };
+  }
+
+  void wireChooseDom(String html) {
+    runtime.evaluateHandler = (source) {
+      if (source.contains('document.documentElement.outerHTML')) {
+        return html;
+      }
+      return 'ok';
+    };
+  }
+
   setUp(() async {
     runtime = FakePopmundoRuntime();
     final clock = _VirtualClock();
@@ -70,103 +89,57 @@ void main() {
     await controller.dispose();
   });
 
-  test('happy path: 302 loadUrl then choose then restore last URL', () async {
-    var step = 0;
-    runtime.fetchHandler = (url, options) async {
-      step++;
-      final method = (options?['method'] as String? ?? 'GET').toUpperCase();
-      if (method == 'GET' && url.endsWith('/')) {
-        return const InPageFetchResult(ok: true, status: 200, text: loginHtml);
-      }
-      if (method == 'POST' && url.endsWith('/')) {
-        expect(options?['redirect'], 'manual');
-        expect(options?['body'], contains('troyfournier'));
-        expect(options?['body'], contains('jovemfla1'));
-        return const InPageFetchResult(
-          ok: false,
-          status: 302,
-          text: '',
-          headers: {
-            'location':
-                'https://74.popmundo.com/Login.aspx?t=token',
-          },
-        );
-      }
-      if (method == 'GET' && url.contains('ChooseCharacter')) {
-        return const InPageFetchResult(ok: true, status: 200, text: chooseHtml);
-      }
-      if (method == 'POST' && url.contains('ChooseCharacter')) {
-        expect(
-          options?['body'],
-          contains(
-            Uri.encodeQueryComponent(
-              r'ctl00$cphLeftColumn$repCharacters$ctl04$btnChooseCharacter2',
-            ),
-          ),
-        );
-        return const InPageFetchResult(ok: true, status: 200, text: 'ok');
-      }
-      return const InPageFetchResult(ok: true, status: 200, text: '');
-    };
+  test('happy path: form-nav login then choose then restore last URL', () async {
+    wireLoginGet();
+    wireChooseDom(chooseHtml);
 
     runtime.events.emitNavigation(
       NavigationEvent(url: 'https://www.popmundo.com/'),
     );
-    await Future<void>.delayed(Duration.zero);
-    await Future<void>.delayed(const Duration(milliseconds: 10));
-
-    // Allow async cycle to progress through loadUrl → choose
-    for (var i = 0; i < 20 && runtime.loadUrlCalls.length < 1; i++) {
+    for (var i = 0; i < 30 && runtime.evaluateCalls.isEmpty; i++) {
       await Future<void>.delayed(const Duration(milliseconds: 20));
     }
-    expect(runtime.loadUrlCalls, isNotEmpty);
-    expect(
-      runtime.loadUrlCalls.first.toString(),
-      contains('74.popmundo.com/Login.aspx'),
-    );
+    expect(runtime.evaluateCalls, isNotEmpty);
+    expect(runtime.evaluateCalls.first, contains("form.method='POST'"));
+    expect(runtime.evaluateCalls.first, contains('troyfournier'));
+    expect(controller.inFlight, isTrue);
 
-    // Fake loadUrl already emitted navigation; emit ChooseCharacter explicitly
-    // if host path wasn't ChooseCharacter (loadUrl used Login.aspx URL).
+    runtime.host.onNavigation(Uri.parse('https://74.popmundo.com/'));
     runtime.events.emitNavigation(
       NavigationEvent(
         url: 'https://74.popmundo.com/World/Popmundo.aspx/ChooseCharacter',
       ),
     );
-    for (var i = 0; i < 30 && runtime.loadUrlCalls.length < 2; i++) {
+    for (var i = 0; i < 30; i++) {
+      final chose = runtime.evaluateCalls.any(
+        (c) =>
+            c.contains('btnChooseCharacter2') ||
+            c.contains('Escolher Troy'),
+      );
+      if (chose) break;
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+    }
+    expect(
+      runtime.evaluateCalls.any((c) => c.contains('Escolher Troy')),
+      isTrue,
+    );
+
+    // Character form-nav lands on World; restore runs on that navigation.
+    runtime.events.emitNavigation(
+      NavigationEvent(
+        url: 'https://74.popmundo.com/World/Popmundo.aspx',
+      ),
+    );
+    for (var i = 0; i < 30 && runtime.loadUrlCalls.isEmpty; i++) {
       await Future<void>.delayed(const Duration(milliseconds: 30));
     }
 
-    expect(runtime.loadUrlCalls.length, greaterThanOrEqualTo(2));
+    expect(runtime.loadUrlCalls, isNotEmpty);
     expect(
       runtime.loadUrlCalls.last.toString(),
       'https://74.popmundo.com/World/Popmundo.aspx/Character/99',
     );
     expect(controller.inFlight, isFalse);
-    expect(step, greaterThanOrEqualTo(4));
-  });
-
-  test('200 login response aborts without choose-character', () async {
-    runtime.fetchHandler = (url, options) async {
-      final method = (options?['method'] as String? ?? 'GET').toUpperCase();
-      if (method == 'GET') {
-        return const InPageFetchResult(ok: true, status: 200, text: loginHtml);
-      }
-      return const InPageFetchResult(
-        ok: true,
-        status: 200,
-        text: loginHtml,
-      );
-    };
-
-    runtime.events.emitNavigation(
-      NavigationEvent(url: 'https://www.popmundo.com/'),
-    );
-    await Future<void>.delayed(const Duration(milliseconds: 100));
-    expect(runtime.loadUrlCalls, isEmpty);
-    expect(
-      runtime.fetchCalls.any((c) => c.url.contains('ChooseCharacter')),
-      isFalse,
-    );
   });
 
   test('disabled settings skip login', () async {
@@ -215,40 +188,33 @@ void main() {
 
   test('null last URL restores World home after choose (NAV-02)', () async {
     await kv.remove(LastUrlStore.defaultStorageKey);
-    runtime.fetchHandler = (url, options) async {
-      final method = (options?['method'] as String? ?? 'GET').toUpperCase();
-      if (method == 'GET' && url.endsWith('/')) {
-        return const InPageFetchResult(ok: true, status: 200, text: loginHtml);
-      }
-      if (method == 'POST' && url.endsWith('/')) {
-        return const InPageFetchResult(
-          ok: false,
-          status: 302,
-          text: '',
-          headers: {
-            'location': 'https://74.popmundo.com/Login.aspx?t=token',
-          },
-        );
-      }
-      if (method == 'GET' && url.contains('ChooseCharacter')) {
-        return const InPageFetchResult(ok: true, status: 200, text: chooseHtml);
-      }
-      if (method == 'POST' && url.contains('ChooseCharacter')) {
-        return const InPageFetchResult(ok: true, status: 200, text: 'ok');
-      }
-      return const InPageFetchResult(ok: true, status: 200, text: '');
-    };
+    wireLoginGet();
+    wireChooseDom(chooseHtml);
 
     runtime.events.emitNavigation(
       NavigationEvent(url: 'https://www.popmundo.com/'),
     );
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+    for (var i = 0; i < 30 && runtime.evaluateCalls.isEmpty; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
+    runtime.host.onNavigation(Uri.parse('https://74.popmundo.com/'));
     runtime.events.emitNavigation(
       NavigationEvent(
         url: 'https://74.popmundo.com/World/Popmundo.aspx/ChooseCharacter',
       ),
     );
-    for (var i = 0; i < 30 && runtime.loadUrlCalls.length < 2; i++) {
+    for (var i = 0; i < 30; i++) {
+      if (runtime.evaluateCalls.any((c) => c.contains('Escolher Troy'))) {
+        break;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+    }
+    runtime.events.emitNavigation(
+      NavigationEvent(
+        url: 'https://74.popmundo.com/World/Popmundo.aspx',
+      ),
+    );
+    for (var i = 0; i < 30 && runtime.loadUrlCalls.isEmpty; i++) {
       await Future<void>.delayed(const Duration(milliseconds: 30));
     }
     expect(
@@ -270,44 +236,25 @@ void main() {
     );
     await Future<void>.delayed(const Duration(milliseconds: 100));
     expect(runtime.loadUrlCalls, isEmpty);
+    expect(runtime.evaluateCalls, isEmpty);
     expect(controller.inFlight, isFalse);
   });
 
   test('missing character button aborts without restore', () async {
-    runtime.fetchHandler = (url, options) async {
-      final method = (options?['method'] as String? ?? 'GET').toUpperCase();
-      if (method == 'GET' && url.endsWith('/')) {
-        return const InPageFetchResult(ok: true, status: 200, text: loginHtml);
-      }
-      if (method == 'POST' && url.endsWith('/')) {
-        return const InPageFetchResult(
-          ok: false,
-          status: 302,
-          text: '',
-          headers: {
-            'location': 'https://74.popmundo.com/Login.aspx?t=token',
-          },
-        );
-      }
-      if (url.contains('ChooseCharacter')) {
-        return const InPageFetchResult(
-          ok: true,
-          status: 200,
-          text: '''
+    wireLoginGet();
+    wireChooseDom('''
 <input type="hidden" name="__VIEWSTATE" value="VS2" />
 <input type="hidden" name="__VIEWSTATEGENERATOR" value="GEN2" />
 <input type="hidden" name="__EVENTVALIDATION" value="EV2" />
 <input type="submit" name="ctl00\$cphLeftColumn\$repCharacters\$ctl00\$btnChooseCharacter2" value="Escolher Peter" />
-''',
-        );
-      }
-      return const InPageFetchResult(ok: true, status: 200, text: '');
-    };
+''');
 
     runtime.events.emitNavigation(
       NavigationEvent(url: 'https://www.popmundo.com/'),
     );
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+    for (var i = 0; i < 30 && runtime.evaluateCalls.isEmpty; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
     runtime.events.emitNavigation(
       NavigationEvent(
         url: 'https://74.popmundo.com/World/Popmundo.aspx/ChooseCharacter',

@@ -29,6 +29,8 @@ class AutoLoginController {
   StreamSubscription<NavigationEvent>? _sub;
   var _inFlight = false;
   var _awaitingChooseCharacter = false;
+  var _awaitingRestore = false;
+  var _chooseSubmitInProgress = false;
 
   bool get inFlight => _inFlight;
 
@@ -47,6 +49,24 @@ class AutoLoginController {
 
     final path = uri.path.isEmpty ? '/' : uri.path;
 
+    if (_awaitingRestore &&
+        !AspNetForm.isLoginPath(path) &&
+        !path.startsWith('/World/Popmundo.aspx/ChooseCharacter') &&
+        !path.toLowerCase().contains('login.aspx')) {
+      _awaitingRestore = false;
+      final last = await lastUrlStore.read();
+      if (last != null && last != event.url) {
+        await runtime.loadUrl(Uri.parse(last));
+      } else if (last == null) {
+        final origin = runtime.host.currentOrigin;
+        await runtime.loadUrl(
+          origin.replace(path: '/World/Popmundo.aspx'),
+        );
+      }
+      _inFlight = false;
+      return;
+    }
+
     if (_awaitingChooseCharacter &&
         path.startsWith('/World/Popmundo.aspx/ChooseCharacter')) {
       await _runChooseCharacter();
@@ -55,15 +75,17 @@ class AutoLoginController {
 
     if (!AspNetForm.isLoginPath(path)) return;
     if (_inFlight) return;
+
     // Synchronous lock before any await (AUTH-06).
     _inFlight = true;
     _awaitingChooseCharacter = false;
+    _awaitingRestore = false;
     try {
       await _runLoginCycle(
         loginPath: path == '/Default.aspx' ? '/Default.aspx' : '/',
       );
     } finally {
-      if (!_awaitingChooseCharacter) {
+      if (!_awaitingChooseCharacter && !_awaitingRestore) {
         _inFlight = false;
       }
     }
@@ -71,11 +93,11 @@ class AutoLoginController {
 
   Future<void> _runLoginCycle({required String loginPath}) async {
     final settings = await settingsStore.load();
+    final password =
+        await secretStore.read(AutoLoginSettingsStore.passwordSecretKey);
     if (!settings.enabled) return;
     if (settings.username.trim().isEmpty) return;
     if (settings.characterName.trim().isEmpty) return;
-    final password =
-        await secretStore.read(AutoLoginSettingsStore.passwordSecretKey);
     if (password == null || password.isEmpty) return;
 
     try {
@@ -91,36 +113,11 @@ class AutoLoginController {
         r'ctl00$cphRightColumn$ucLogin$btnLogin': 'OK!',
       };
 
-      final response = await timedFetch.fetchResponse(
-        loginPath,
-        options: {
-          'method': 'POST',
-          'redirect': 'manual',
-          'headers': {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          'body': _encodeForm(body),
-        },
-        useCache: false,
-        acceptRedirect: true,
-      );
-
-      final status = response.status;
-      if (status >= 200 && status < 300) {
-        // Failed login stays on form.
-        return;
-      }
-      if (status < 300 || status >= 400) return;
-
-      final locationRaw = response.locationHeader;
-      if (locationRaw == null || locationRaw.isEmpty) return;
-      final location = _resolveLocation(locationRaw, response.url);
-      if (location == null) return;
-      if (!HostTracker.isPopmundoUri(location)) return;
-      if (!location.path.toLowerCase().contains('login.aspx')) return;
-
+      // Browser fetch with redirect:'manual' returns opaqueredirect (status 0)
+      // and strips Location. Document form POST navigates the WebView through
+      // the 302 hop (cookies + HostTracker update).
       _awaitingChooseCharacter = true;
-      await runtime.loadUrl(location);
+      await _submitFormNavigation(loginPath, body);
     } on TimedFetchException {
       _awaitingChooseCharacter = false;
     } catch (_) {
@@ -128,20 +125,56 @@ class AutoLoginController {
     }
   }
 
+  /// POSTs as a real document navigation (form.submit), not in-page fetch.
+  Future<void> _submitFormNavigation(
+    String actionPath,
+    Map<String, String> fields,
+  ) async {
+    final js = '''
+(function(){
+  var form=document.createElement('form');
+  form.method='POST';
+  form.action=${jsonEncode(actionPath)};
+  var fields=${jsonEncode(fields)};
+  Object.keys(fields).forEach(function(name){
+    var input=document.createElement('input');
+    input.type='hidden';
+    input.name=name;
+    input.value=fields[name];
+    form.appendChild(input);
+  });
+  document.body.appendChild(form);
+  form.submit();
+  return 'ok';
+})()
+''';
+    await runtime.evaluate(js);
+  }
+
   Future<void> _runChooseCharacter() async {
     if (!_inFlight || !_awaitingChooseCharacter) return;
-    _awaitingChooseCharacter = false;
-    try {
-      final settings = await settingsStore.load();
-      const path = '/World/Popmundo.aspx/ChooseCharacter';
-      final html = await timedFetch.fetch(path, useCache: false);
-      final tokens = AspNetForm.extractLoginTokens(html);
-      if (tokens.isEmpty) return;
+    if (_chooseSubmitInProgress) return;
 
+    try {
+      // Live DOM — TimedFetch can hit too early / wrong host with incomplete HTML.
+      final raw =
+          await runtime.evaluate('document.documentElement.outerHTML');
+      final html = raw ?? '';
+      final tokens = AspNetForm.extractLoginTokens(html);
       final buttons = AspNetForm.findCharacterButtons(html);
+      final settings = await settingsStore.load();
       final button =
           AspNetForm.matchCharacter(buttons, settings.characterName);
-      if (button == null) return;
+
+      if (buttons.isEmpty || tokens.isEmpty) {
+        // Page not ready yet — keep awaiting; onLoadStop / later nav retries.
+        return;
+      }
+      if (button == null) {
+        _awaitingChooseCharacter = false;
+        _inFlight = false;
+        return;
+      }
 
       final body = <String, String>{
         '__EVENTTARGET': AspNetForm.extractHidden(html, '__EVENTTARGET') ?? '',
@@ -151,60 +184,24 @@ class AutoLoginController {
         button.name: button.value,
       };
 
-      await timedFetch.fetchResponse(
-        path,
-        options: {
-          'method': 'POST',
-          'headers': {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          'body': _encodeForm(body),
-        },
-        useCache: false,
+      _chooseSubmitInProgress = true;
+      _awaitingChooseCharacter = false;
+      _awaitingRestore = true;
+      await _submitFormNavigation(
+        '/World/Popmundo.aspx/ChooseCharacter',
+        body,
       );
-
-      final last = await lastUrlStore.read();
-      if (last != null) {
-        await runtime.loadUrl(Uri.parse(last));
-      } else {
-        final origin = runtime.host.currentOrigin;
-        await runtime.loadUrl(
-          origin.replace(path: '/World/Popmundo.aspx'),
-        );
-      }
     } on TimedFetchException {
-      // stay on ChooseCharacter
-    } catch (_) {
-      // stay on ChooseCharacter
-    } finally {
+      _awaitingChooseCharacter = false;
+      _awaitingRestore = false;
       _inFlight = false;
+    } catch (_) {
+      _awaitingChooseCharacter = false;
+      _awaitingRestore = false;
+      _inFlight = false;
+    } finally {
+      _chooseSubmitInProgress = false;
     }
-  }
-
-  Uri? _resolveLocation(String locationRaw, String? responseUrl) {
-    final parsed = Uri.tryParse(locationRaw);
-    if (parsed == null) return null;
-    if (parsed.hasScheme) {
-      // Fix accidental double-slash path from server: //Login.aspx
-      if (parsed.path.startsWith('//')) {
-        return parsed.replace(path: parsed.path.substring(1));
-      }
-      return parsed;
-    }
-    final base = responseUrl != null
-        ? Uri.tryParse(responseUrl)
-        : runtime.host.currentOrigin;
-    if (base == null) return null;
-    return base.resolve(locationRaw);
-  }
-
-  static String _encodeForm(Map<String, String> fields) {
-    return fields.entries
-        .map(
-          (e) =>
-              '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value)}',
-        )
-        .join('&');
   }
 }
 
