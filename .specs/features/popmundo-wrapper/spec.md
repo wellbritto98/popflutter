@@ -33,7 +33,7 @@ Every ambiguity is resolved or recorded here — nothing is left silently unclea
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
 | Links externos (`host` não é `*.popmundo.com`) | Abrem no browser do SO | Evita sair da sessão do jogo no WebView | n (agent) |
-| Overlay em release | FAB toggle, default visível | App é ferramenta de desenvolvimento | n (agent) |
+| Overlay em release | FAB toggle, default visível — **superseded by AD-009** (`.specs/STATE.md`): overlay agora gated por `kDebugMode` via `buildAppMenuItems`, inacessível em release; FAB sempre visível passa a ser o do sidebar (`menu-toggle`), não um FAB próprio do overlay | App é ferramenta de desenvolvimento | n (agent) |
 | Body de fetch no stream | Texto/JSON até 32 KiB; binário omitido | Overlay e memória | n (agent) |
 | Host permitido no WebView | `popmundo.com` e qualquer subdomínio `*.popmundo.com` | Load balancing + `apps.` | n (agent) |
 | Cache TimedFetch | Somente memória, por sessão de processo | Igual ao JS original | y |
@@ -160,7 +160,7 @@ Every ambiguity is resolved or recorded here — nothing is left silently unclea
 
 **Acceptance Criteria**:
 
-1. WHEN the overlay is collapsed THEN pointer events SHALL pass through to the WebView except for the expand control.
+1. WHEN the overlay is collapsed THEN pointer events SHALL pass through to the WebView except for the expand control. **Note (AD-009, `app-sidebar-menu`):** the expand control is no longer owned by `DebugOverlay` itself — it is the shell-level FAB (`menu-toggle`) in `AppShell`, which opens the sidebar item that reveals the panel. When collapsed (`visible: false`), `DebugOverlay` now renders no control of its own at all over the WebView.
 2. WHEN expanded THEN the overlay SHALL show current host, a list of network events (method, URL, status), and console events.
 3. WHEN the developer submits a JS snippet THEN the system SHALL `evaluateJavascript` it and show the string result or error.
 4. WHEN clear is pressed THEN the in-memory event lists in the overlay SHALL become empty (underlying streams may continue).

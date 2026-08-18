@@ -60,7 +60,7 @@ App Flutter que embrulha `https://www.popmundo.com` em InAppWebView. A UI princi
 ### Declined / Undiscussed Gray Areas → Assumptions
 
 - Desktop/Web: fora do MVP (confirmado indiretamente pelas plataformas).
-- Overlay disponível também em release (não só `kDebugMode`) — o app é ferramenta de desenvolvedor; pode ser escondido por um toggle, default visível como FAB.
+- Overlay disponível também em release (não só `kDebugMode`) — o app é ferramenta de desenvolvedor; pode ser escondido por um toggle, default visível como FAB. **Superseded by AD-009** (`.specs/STATE.md`): o overlay agora é gated por `kDebugMode` via `buildAppMenuItems`, inacessível em release; o FAB que permanece sempre visível é o do sidebar (`AppShell`), não mais um FAB próprio do `DebugOverlay`.
 
 ---
 

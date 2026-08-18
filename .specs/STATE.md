@@ -66,13 +66,23 @@
 - **Date**: 2026-08-17
 - **Status**: active
 
+### AD-009
+- **Decision**: O ponto de entrada nativo do debug muda de um `FloatingActionButton` próprio do `DebugOverlay` para um sidebar (`Drawer`) componentizado (`AppShell`/`AppSidebar`), populado por um registro único (`buildAppMenuItems`). O item "Debug panel" só existe na lista quando `kDebugMode == true`. Em release (`kDebugMode == false`), o registro devolve lista vazia, mas o FAB do sidebar (`menu-toggle`) continua sempre visível — o sidebar abre mostrando o estado vazio "No options available." em vez de esconder o único controle nativo do shell.
+- **Reason**: O FAB de debug estava fisicamente acoplado ao `DebugOverlay`, sem lugar para hospedar features nativas futuras sem reescrever esse widget a cada nova função.
+- **Trade-off**: Uma camada de widget a mais (`AppShell`) entre `PopmundoHome` e o conteúdo atual; `DebugOverlay` passa a depender de props (`visible`/`onClose`) elevadas ao estado do host em vez de gerenciar seu próprio toggle.
+- **Scope**: `apps/popmundo_app` (`lib/app_shell.dart`, `lib/menu/`, `lib/debug_overlay.dart`, `lib/app.dart`)
+- **Date**: 2026-08-17
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: popmundo-wrapper / `.specs/features/popmundo-wrapper`
-- **Phase / Task**: Execute complete; validation PASS with 1 spec-precision gap (cookie relaunch e2e)
-- **Completed**: T1–T17
+- **Feature**: app-sidebar-menu / `.specs/features/app-sidebar-menu`
+- **Phase / Task**: Execute complete (T1–T7)
+- **Completed**: T1–T7
 - **In-progress**: none
-- **Next step**: Device UAT — open the app, log in, kill process, confirm session; optional store listing
+- **Next step**: Independent Verifier pass on `app-sidebar-menu` (spec-anchored coverage + discrimination sensor); manual `flutter run --release` check that the Debug panel item is absent
 - **Blockers**: none
 - **Uncommitted files**: none
 - **Branch**: master
+
+Previously active feature: popmundo-wrapper / `.specs/features/popmundo-wrapper` — Execute complete; validation PASS with 1 spec-precision gap (cookie relaunch e2e; device UAT for session persistence still pending).
