@@ -15,7 +15,10 @@ class FakePopmundoRuntime implements PopmundoRuntime {
   String? Function(String source)? evaluateHandler;
 
   final fetchCalls = <({String url, Map<String, dynamic>? options})>[];
-  FutureOr<InPageFetchResult> Function(String url, Map<String, dynamic>? options)? fetchHandler;
+  FutureOr<InPageFetchResult> Function(String url, Map<String, dynamic>? options)?
+      fetchHandler;
+
+  final loadUrlCalls = <Uri>[];
 
   var ready = true;
   Duration? readyDelay;
@@ -35,6 +38,13 @@ class FakePopmundoRuntime implements PopmundoRuntime {
     fetchCalls.add((url: url, options: options));
     if (fetchHandler != null) return await fetchHandler!(url, options);
     return const InPageFetchResult(ok: true, status: 200, text: '');
+  }
+
+  @override
+  Future<void> loadUrl(Uri url) async {
+    loadUrlCalls.add(url);
+    host.onNavigation(url);
+    events.emitNavigation(NavigationEvent(url: url.toString()));
   }
 
   @override

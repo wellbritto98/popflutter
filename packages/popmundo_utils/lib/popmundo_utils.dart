@@ -1,5 +1,9 @@
 library;
 
+export 'src/autologin/aspnet_form.dart';
+export 'src/autologin/auto_login_controller.dart';
+export 'src/autologin/auto_login_settings.dart';
+export 'src/autologin/last_url_store.dart';
 export 'src/css_selector.dart';
 export 'src/events.dart';
 export 'src/host_tracker.dart';
@@ -8,6 +12,7 @@ export 'src/notifications.dart';
 export 'src/observe_policy.dart';
 export 'src/popmundo_runtime.dart';
 export 'src/scoring.dart';
+export 'src/secret_store.dart';
 export 'src/storage.dart';
 export 'src/timed_fetch.dart';
 export 'src/userscript/gm_value_store.dart';

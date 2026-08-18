@@ -100,4 +100,45 @@ void main() {
     expect(text, contains('/WebServices/A/Open.asmx/GetPageNotifications'));
     expect(text.contains('www.popmundo.com'), isFalse);
   });
+
+  test('fetchResponse acceptRedirect returns 302 without throwing', () async {
+    final runtime = FakePopmundoRuntime();
+    runtime.fetchHandler = (url, options) => const InPageFetchResult(
+          ok: false,
+          status: 302,
+          text: '',
+          headers: {
+            'location':
+                'https://74.popmundo.com/Login.aspx?t=abc',
+          },
+        );
+    final clock = _VirtualClock();
+    final tf = TimedFetch(runtime, now: () => clock.now, sleep: clock.sleep);
+
+    final result = await tf.fetchResponse(
+      '/',
+      options: {'method': 'POST', 'redirect': 'manual'},
+      useCache: false,
+      acceptRedirect: true,
+    );
+    expect(result.status, 302);
+    expect(result.locationHeader, contains('74.popmundo.com/Login.aspx'));
+  });
+
+  test('fetchResponse without acceptRedirect throws on 302', () async {
+    final runtime = FakePopmundoRuntime();
+    runtime.fetchHandler = (url, options) => const InPageFetchResult(
+          ok: false,
+          status: 302,
+          text: '',
+          headers: {'location': 'https://74.popmundo.com/Login.aspx?t=abc'},
+        );
+    final clock = _VirtualClock();
+    final tf = TimedFetch(runtime, now: () => clock.now, sleep: clock.sleep);
+
+    await expectLater(
+      tf.fetchResponse('/', useCache: false),
+      throwsA(isA<TimedFetchException>()),
+    );
+  });
 }
