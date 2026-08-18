@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 5,
+  "next_id": 8,
   "lessons": [
     {
       "id": "L-001",
@@ -76,6 +76,60 @@
       ],
       "created": "2026-08-18T02:39:06Z",
       "last_seen": "2026-08-18T02:39:06Z"
+    },
+    {
+      "id": "L-005",
+      "key": "ac_gap::composition wiring that sets webview initialurl from a store must have a widget or fake runtime test asserting the exact url not only the production bootstrap code",
+      "text": "Composition wiring that sets WebView initialUrl from a store must have a widget or fake-runtime test asserting the exact URL, not only the production bootstrap code",
+      "signal": "ac_gap",
+      "scope": "apps/popmundo_app",
+      "status": "candidate",
+      "features": [
+        "auto-login"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "NAV-04 / validation.md Gap (apps/popmundo_app)"
+      ],
+      "created": "2026-08-18T14:16:03Z",
+      "last_seen": "2026-08-18T14:16:03Z"
+    },
+    {
+      "id": "L-006",
+      "key": "spec_precision_gap::when a settings screen ac lists exact enum option values assert the option set in the widget test rather than only exercising one save path",
+      "text": "When a settings screen AC lists exact enum option values, assert the option set in the widget test rather than only exercising one save path",
+      "signal": "spec_precision_gap",
+      "scope": "apps/popmundo_app",
+      "status": "candidate",
+      "features": [
+        "auto-login"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "UI-02 status dropdown / validation.md (apps/popmundo_app)"
+      ],
+      "created": "2026-08-18T14:16:03Z",
+      "last_seen": "2026-08-18T14:16:03Z"
+    },
+    {
+      "id": "L-007",
+      "key": "ac_gap::controller abort branches listed in the feature edge case table need dedicated tests not only happy path and one miss path",
+      "text": "Controller abort branches listed in the feature edge-case table need dedicated tests, not only happy-path and one miss path",
+      "signal": "ac_gap",
+      "scope": "packages/popmundo_utils",
+      "status": "candidate",
+      "features": [
+        "auto-login"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "edge cases / validation.md Edge Cases (packages/popmundo_utils)"
+      ],
+      "created": "2026-08-18T14:16:03Z",
+      "last_seen": "2026-08-18T14:16:03Z"
     }
   ]
 }
