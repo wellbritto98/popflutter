@@ -11,5 +11,6 @@ export 'src/scoring.dart';
 export 'src/storage.dart';
 export 'src/timed_fetch.dart';
 export 'src/userscript/userscript_catalog.dart';
+export 'src/userscript/userscript_importer.dart';
 export 'src/userscript/userscript_parser.dart';
 export 'src/utils.dart';
