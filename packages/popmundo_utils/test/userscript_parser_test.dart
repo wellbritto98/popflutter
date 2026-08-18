@@ -207,6 +207,55 @@ var x = 1;
       expect(parsed.grants, ['unsafeWindow', 'unwrap']);
     });
 
+    test('accepts Core GM grants (legacy and modern namespaced forms)', () {
+      const raw = '''
+// ==UserScript==
+// @name GM Core
+// @grant GM_getValue
+// @grant GM_setValue
+// @grant GM_deleteValue
+// @grant GM_listValues
+// @grant GM_addStyle
+// @grant GM_log
+// @grant GM_info
+// @grant GM.getValue
+// @grant GM.setValue
+// @grant GM.deleteValue
+// @grant GM.listValues
+// @grant GM.info
+// ==/UserScript==
+1;
+''';
+      final parsed = UserScriptParser.parse(raw);
+      expect(parsed.grants, hasLength(12));
+    });
+
+    test('still rejects unsupported GM_* grants like GM_xmlhttpRequest', () {
+      const raw = '''
+// ==UserScript==
+// @name Bad
+// @grant GM_openInTab
+// @grant GM_registerMenuCommand
+// @grant GM_setClipboard
+// ==/UserScript==
+1;
+''';
+      expect(
+        () => UserScriptParser.parse(raw),
+        throwsA(
+          isA<UserScriptParseException>().having(
+            (e) => e.unsupportedHeaders,
+            'unsupported',
+            allOf(
+              contains('@grant GM_openInTab'),
+              contains('@grant GM_registerMenuCommand'),
+              contains('@grant GM_setClipboard'),
+            ),
+          ),
+        ),
+      );
+    });
+
     test('collects @require URLs in order', () {
       const raw = '''
 // ==UserScript==

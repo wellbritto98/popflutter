@@ -54,6 +54,7 @@ void main() {
     expect(hooks.contains('XMLHttpRequest'), isTrue);
     expect(hooks.contains("type: 'console'"), isTrue);
     expect(hooks.contains('flutterInAppWebViewPlatformReady'), isTrue);
+    expect(hooks.contains('window.__popmundo.post = post;'), isTrue);
     expect(helpers.contains('getMyID'), isTrue);
     expect(helpers.contains('applyScoringNumbers();'), isFalse);
     expect(helpers.contains('applyBarPercentage();'), isFalse);
@@ -91,6 +92,33 @@ void main() {
     expect(networks.single.method, 'POST');
     expect(networks.single.url, contains('73.popmundo.com'));
     expect(consoles.single.message, 'boom');
+  });
+
+  test('JS bridge emits gmValue events for set and delete', () async {
+    final runtime = _Runtime();
+    final events = <GmValueEvent>[];
+    runtime.events.gmValue.listen(events.add);
+
+    final bridge = PopmundoJsBridge(runtime);
+    bridge.handleArguments([
+      {
+        'type': 'gmValue',
+        'payload': {'scriptId': 'abc', 'action': 'set', 'key': 'count', 'value': 3},
+      },
+    ]);
+    bridge.handleArguments([
+      {
+        'type': 'gmValue',
+        'payload': {'scriptId': 'abc', 'action': 'delete', 'key': 'count', 'value': null},
+      },
+    ]);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(events, hasLength(2));
+    expect(events[0].action, 'set');
+    expect(events[0].value, 3);
+    expect(events[1].action, 'delete');
+    expect(events[1].value, isNull);
   });
 
   test('initial URL default is www.popmundo.com', () {

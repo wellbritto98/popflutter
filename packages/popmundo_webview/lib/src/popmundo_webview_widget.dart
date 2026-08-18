@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,11 +10,13 @@ import 'in_app_runtime.dart';
 import 'user_scripts.dart';
 import 'userscript_injector.dart';
 import 'web_settings.dart';
+import 'webview_back_navigation.dart';
 
 class PopmundoWebView extends StatefulWidget {
   const PopmundoWebView({
     super.key,
     required this.runtime,
+    required this.gmValueStore,
     this.initialUrl = HostTracker.defaultOrigin,
     this.launchExternal,
     this.enabledUserScripts = const [],
@@ -22,6 +25,9 @@ class PopmundoWebView extends StatefulWidget {
   final InAppPopmundoRuntime runtime;
   final String initialUrl;
   final Future<void> Function(Uri uri)? launchExternal;
+
+  /// Backs `GM_getValue`/`GM_setValue` preloading for [enabledUserScripts].
+  final GmValueStore gmValueStore;
 
   /// Catalog entries with `enabled == true` merged into [initialUserScripts].
   final List<InstalledUserScript> enabledUserScripts;
@@ -32,6 +38,7 @@ class PopmundoWebView extends StatefulWidget {
 
 class _PopmundoWebViewState extends State<PopmundoWebView> {
   UnmodifiableListView<UserScript>? _scripts;
+  var _canGoBack = false;
 
   @override
   void initState() {
@@ -63,12 +70,33 @@ class _PopmundoWebViewState extends State<PopmundoWebView> {
 
   Future<void> _loadScripts() async {
     final builtin = await PopmundoUserScripts.load();
-    final merged = UserScriptInjector.mergeInitial(
+    final merged = await UserScriptInjector.mergeInitial(
       builtin: builtin,
       enabled: widget.enabledUserScripts,
+      valueStore: widget.gmValueStore,
     );
     if (!mounted) return;
     setState(() => _scripts = merged);
+  }
+
+  Future<void> _syncHistory() async {
+    final c = widget.runtime.controller;
+    final next = c != null && await c.canGoBack();
+    if (!mounted || next == _canGoBack) return;
+    setState(() => _canGoBack = next);
+  }
+
+  Future<void> _onSystemBack() async {
+    final c = widget.runtime.controller;
+    final decision = await WebViewBackHandler.handle(
+      c == null ? null : InAppWebViewHistoryPort(c),
+    );
+    if (!mounted) return;
+    if (decision == SystemBackDecision.navigateBack) {
+      await _syncHistory();
+      return;
+    }
+    await SystemNavigator.pop();
   }
 
   Future<void> _openExternal(Uri uri) async {
@@ -90,35 +118,58 @@ class _PopmundoWebViewState extends State<PopmundoWebView> {
       );
     }
 
-    return InAppWebView(
-      initialUrlRequest: URLRequest(url: WebUri(widget.initialUrl)),
-      initialSettings: PopmundoWebSettings.defaults(),
-      initialUserScripts: scripts,
-      onWebViewCreated: widget.runtime.attach,
-      onLoadStart: (controller, url) {
-        if (url != null) widget.runtime.onNativeNavigation(url);
+    return PopScope<void>(
+      canPop: WebViewBackHandler.allowRoutePop(webViewCanGoBack: _canGoBack),
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        await _onSystemBack();
       },
-      onUpdateVisitedHistory: (controller, url, isReload) {
-        if (url != null) widget.runtime.onNativeNavigation(url);
-      },
-      onReceivedError: (controller, request, error) {},
-      shouldOverrideUrlLoading: (controller, action) async {
-        final uri = action.request.url;
-        if (uri == null) return NavigationActionPolicy.ALLOW;
-        if (ObservePolicy.decideNavigation(uri) == NavDecision.openExternal) {
-          await _openExternal(uri);
-          return NavigationActionPolicy.CANCEL;
-        }
-        widget.runtime.onNativeNavigation(uri);
-        return NavigationActionPolicy.ALLOW;
-      },
-      shouldInterceptFetchRequest: (controller, request) async => request,
-      shouldInterceptAjaxRequest: (controller, request) async => request,
-      shouldInterceptRequest: (controller, request) async =>
-          ObservePolicy.observeOnlyResourceResponse(),
-      onConsoleMessage: (controller, message) {
-        widget.runtime.onNativeConsole(message);
-      },
+      child: InAppWebView(
+        initialUrlRequest: URLRequest(url: WebUri(widget.initialUrl)),
+        initialSettings: PopmundoWebSettings.defaults(),
+        initialUserScripts: scripts,
+        onWebViewCreated: (controller) {
+          widget.runtime.attach(controller);
+          _syncHistory();
+        },
+        onLoadStart: (controller, url) {
+          if (url != null) widget.runtime.onNativeNavigation(url);
+          _syncHistory();
+        },
+        onLoadStop: (controller, url) {
+          _syncHistory();
+        },
+        onUpdateVisitedHistory: (controller, url, isReload) {
+          if (url != null) widget.runtime.onNativeNavigation(url);
+          _syncHistory();
+        },
+        onReceivedError: (controller, request, error) {},
+        shouldOverrideUrlLoading: (controller, action) async {
+          final uri = action.request.url;
+          if (uri == null) return NavigationActionPolicy.ALLOW;
+          if (ObservePolicy.decideNavigation(uri) == NavDecision.openExternal) {
+            await _openExternal(uri);
+            return NavigationActionPolicy.CANCEL;
+          }
+          // Re-seed GM value snapshots before allowing navigation to proceed,
+          // so the destination page's document-start/end scripts see the
+          // latest persisted GM_setValue writes instead of the snapshot baked
+          // in when this UserScript was first registered.
+          await widget.runtime.refreshGmSnapshots(
+            enabledScripts: widget.enabledUserScripts,
+            valueStore: widget.gmValueStore,
+          );
+          widget.runtime.onNativeNavigation(uri);
+          return NavigationActionPolicy.ALLOW;
+        },
+        shouldInterceptFetchRequest: (controller, request) async => request,
+        shouldInterceptAjaxRequest: (controller, request) async => request,
+        shouldInterceptRequest: (controller, request) async =>
+            ObservePolicy.observeOnlyResourceResponse(),
+        onConsoleMessage: (controller, message) {
+          widget.runtime.onNativeConsole(message);
+        },
+      ),
     );
   }
 }

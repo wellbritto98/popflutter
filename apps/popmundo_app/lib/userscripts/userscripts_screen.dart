@@ -8,6 +8,7 @@ class UserScriptsScreen extends StatefulWidget {
     required this.catalog,
     required this.importer,
     required this.onApply,
+    this.onScriptDeleted,
   });
 
   final UserScriptCatalog catalog;
@@ -16,6 +17,10 @@ class UserScriptsScreen extends StatefulWidget {
   /// Called after a successful catalog mutation with the full catalog snapshot.
   /// Host should sync WebView UserScripts and reload.
   final Future<void> Function(List<InstalledUserScript> catalog) onApply;
+
+  /// Called with the deleted script's id after removal, so the host can clear
+  /// any orphaned per-script data (e.g. GM_setValue storage).
+  final Future<void> Function(String id)? onScriptDeleted;
 
   @override
   State<UserScriptsScreen> createState() => _UserScriptsScreenState();
@@ -118,6 +123,7 @@ class _UserScriptsScreenState extends State<UserScriptsScreen> {
     );
     if (confirmed != true || !mounted) return;
     await widget.catalog.remove(script.id);
+    await widget.onScriptDeleted?.call(script.id);
     final next = await widget.catalog.list();
     await widget.onApply(next);
     if (!mounted) return;

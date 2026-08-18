@@ -74,7 +74,14 @@ class UserScriptParser {
   );
   static final _headerRe = RegExp(r'^//\s*@(\S+)(?:\s+(.*))?$');
 
-  static const _allowedGrants = {'none', 'unsafewindow', 'unwrap'};
+  static const _allowedGrants = {
+    'none', 'unsafewindow', 'unwrap',
+    // GM "Core" polyfill — legacy sync form.
+    'gm_getvalue', 'gm_setvalue', 'gm_deletevalue', 'gm_listvalues',
+    'gm_addstyle', 'gm_log', 'gm_info',
+    // GM "Core" polyfill — modern namespaced/Promise form.
+    'gm.getvalue', 'gm.setvalue', 'gm.deletevalue', 'gm.listvalues', 'gm.info',
+  };
   static const _allowedRunAt = {'document-start', 'document-end', 'document-idle'};
 
   static ParsedUserScript parse(String raw) {

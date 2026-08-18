@@ -163,6 +163,33 @@ void main() {
     expect(find.byKey(const Key('userscripts-empty')), findsOneWidget);
   });
 
+  testWidgets('delete confirm calls onScriptDeleted with the removed id',
+      (tester) async {
+    await catalog.add(seed());
+    final deletedIds = <String>[];
+    await tester.pumpWidget(
+      MaterialApp(
+        home: UserScriptsScreen(
+          catalog: catalog,
+          importer: importer(),
+          onApply: (list) async {
+            applyCalls.add(List.of(list));
+          },
+          onScriptDeleted: (id) async {
+            deletedIds.add(id);
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('userscript-delete-a')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('userscript-delete-confirm')));
+    await tester.pumpAndSettle();
+
+    expect(deletedIds, ['a']);
+  });
+
   testWidgets('disables add while an import is in progress', (tester) async {
     const url = 'https://cdn.example.com/slow.user.js';
     final gate = Completer<String>();

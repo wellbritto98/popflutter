@@ -41,6 +41,7 @@ class InAppPopmundoRuntime implements PopmundoRuntime {
   Future<void> syncUserScripts({
     required Iterable<String> previouslyEnabledIds,
     required Iterable<InstalledUserScript> nextCatalog,
+    required GmValueStore valueStore,
   }) async {
     final c = controller;
     if (c == null) {
@@ -50,6 +51,23 @@ class InAppPopmundoRuntime implements PopmundoRuntime {
       port: InAppUserScriptWebViewPort(c),
       previouslyEnabledIds: previouslyEnabledIds,
       nextCatalog: nextCatalog,
+      valueStore: valueStore,
+    );
+  }
+
+  /// Re-seeds GM value snapshots for [enabledScripts] before a navigation is
+  /// allowed to proceed — see [UserScriptInjector.refreshGmSnapshots]. No-op
+  /// if the WebView isn't attached yet (nothing registered to refresh).
+  Future<void> refreshGmSnapshots({
+    required Iterable<InstalledUserScript> enabledScripts,
+    required GmValueStore valueStore,
+  }) async {
+    final c = controller;
+    if (c == null) return;
+    await UserScriptInjector.refreshGmSnapshots(
+      port: InAppUserScriptWebViewPort(c),
+      enabledScripts: enabledScripts,
+      valueStore: valueStore,
     );
   }
 

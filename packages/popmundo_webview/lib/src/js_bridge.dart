@@ -43,6 +43,15 @@ class PopmundoJsBridge {
             message: '${payload['message'] ?? ''}',
           ),
         );
+      case 'gmValue':
+        runtime.events.emitGmValue(
+          GmValueEvent(
+            scriptId: '${payload['scriptId'] ?? ''}',
+            action: '${payload['action'] ?? 'set'}',
+            key: '${payload['key'] ?? ''}',
+            value: payload['value'],
+          ),
+        );
     }
   }
 }

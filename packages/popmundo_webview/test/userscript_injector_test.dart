@@ -39,6 +39,7 @@ InstalledUserScript _script({
   UserScriptRunAt runAt = UserScriptRunAt.documentEnd,
   bool forMainFrameOnly = false,
   String source = '1;',
+  List<String> grants = const [],
 }) {
   return InstalledUserScript(
     id: id,
@@ -48,11 +49,23 @@ InstalledUserScript _script({
     source: source,
     headers: {
       'name': [id],
+      if (grants.isNotEmpty) 'grant': grants,
     },
     installedAt: DateTime.utc(2026, 8, 17),
     runAt: runAt,
     forMainFrameOnly: forMainFrameOnly,
   );
+}
+
+GmValueStore _store([Map<String, Object?>? seed]) {
+  final kv = MemoryKeyValueStore();
+  final store = GmValueStore(kv);
+  if (seed != null) {
+    for (final entry in seed.entries) {
+      kv.set(GmValueStore.keyFor(entry.key), entry.value);
+    }
+  }
+  return store;
 }
 
 void main() {
@@ -78,19 +91,20 @@ void main() {
     expect(us.forMainFrameOnly, isFalse);
   });
 
-  test('mergeInitial appends only enabled catalog scripts after builtins', () {
+  test('mergeInitial appends only enabled catalog scripts after builtins', () async {
     final builtin = [
       UserScript(
         source: 'builtin;',
         injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
       ),
     ];
-    final merged = UserScriptInjector.mergeInitial(
+    final merged = await UserScriptInjector.mergeInitial(
       builtin: builtin,
       enabled: [
         _script(id: 'a'),
         _script(id: 'b'),
       ],
+      valueStore: _store(),
     );
     expect(merged, hasLength(3));
     expect(merged.first.source, 'builtin;');
@@ -104,6 +118,7 @@ void main() {
       port: port,
       previouslyEnabledIds: const [],
       nextCatalog: [_script(id: 'a')],
+      valueStore: _store(),
     );
     expect(port.added, hasLength(1));
     expect(port.added.single.groupName, 'userscript:a');
@@ -120,10 +135,78 @@ void main() {
         _script(id: 'a', enabled: false),
         _script(id: 'b'),
       ],
+      valueStore: _store(),
     );
     expect(port.removedGroups, ['userscript:a']);
     expect(port.added, isEmpty);
     expect(port.reloadCount, 1);
+  });
+
+  test('toUserScript wraps source with GM shim when a Core grant is present', () {
+    final us = UserScriptInjector.toUserScript(
+      InstalledUserScript(
+        id: 'gm1',
+        sourceUrl: 'https://example.com/gm1.user.js',
+        name: 'GM Script',
+        enabled: true,
+        source: 'window.__usm = GM_getValue("x", 0);',
+        headers: {
+          'name': ['GM Script'],
+          'grant': ['GM_getValue', 'GM_setValue'],
+        },
+        installedAt: DateTime.utc(2026, 8, 17),
+        runAt: UserScriptRunAt.documentEnd,
+        forMainFrameOnly: false,
+      ),
+      initialGmValues: {'x': 5},
+    );
+    expect(us.source, contains('GM_getValue'));
+    expect(us.source, contains('"x":5'));
+    expect(us.source, contains('window.__usm = GM_getValue("x", 0);'));
+    expect(us.source, endsWith('})();'));
+  });
+
+  test('toUserScript leaves grant-less script source untouched', () {
+    final us = UserScriptInjector.toUserScript(_script(id: 'plain', source: 'window.x=1;'));
+    expect(us.source, 'window.x=1;');
+  });
+
+  test('refreshGmSnapshots re-registers only value-grant scripts with fresh values', () async {
+    final port = _FakePort();
+    final kv = MemoryKeyValueStore();
+    final store = GmValueStore(kv);
+    await store.setValue('a', 'x', 42);
+
+    await UserScriptInjector.refreshGmSnapshots(
+      port: port,
+      enabledScripts: [
+        _script(id: 'a', grants: const ['GM_getValue', 'GM_setValue']),
+        _script(id: 'b', grants: const ['GM_addStyle']),
+        _script(id: 'c'),
+      ],
+      valueStore: store,
+    );
+
+    expect(port.removedGroups, ['userscript:a']);
+    expect(port.added, hasLength(1));
+    expect(port.added.single.groupName, 'userscript:a');
+    expect(port.added.single.source, contains('"x":42'));
+    expect(port.reloadCount, 0);
+  });
+
+  test('refreshGmSnapshots is a no-op when nothing has a value grant', () async {
+    final port = _FakePort();
+    await UserScriptInjector.refreshGmSnapshots(
+      port: port,
+      enabledScripts: [
+        _script(id: 'a', grants: const ['GM_addStyle']),
+        _script(id: 'b'),
+      ],
+      valueStore: _store(),
+    );
+    expect(port.removedGroups, isEmpty);
+    expect(port.added, isEmpty);
+    expect(port.reloadCount, 0);
   });
 
   test('injector source never calls removeAllUserScripts', () {

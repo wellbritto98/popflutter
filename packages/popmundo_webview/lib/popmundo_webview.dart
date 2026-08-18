@@ -6,3 +6,4 @@ export 'src/popmundo_webview_widget.dart';
 export 'src/user_scripts.dart';
 export 'src/userscript_injector.dart';
 export 'src/web_settings.dart';
+export 'src/webview_back_navigation.dart';

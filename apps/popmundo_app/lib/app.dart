@@ -56,11 +56,13 @@ class _PopmundoHomeState extends State<PopmundoHome> {
     catalog: catalog,
     httpGet: fetchUserScriptUrl,
   );
+  late final gmValueStore = GmValueStore(widget.store);
 
   @override
   void initState() {
     super.initState();
     widget.runtime.events.navigation.listen((_) => _refreshCookies());
+    widget.runtime.events.gmValue.listen((e) => gmValueStore.applyEvent(e));
     _refreshCookies();
     _bootstrapUserScripts();
   }
@@ -97,6 +99,7 @@ class _PopmundoHomeState extends State<PopmundoHome> {
       await widget.runtime.syncUserScripts(
         previouslyEnabledIds: _previouslyEnabledIds,
         nextCatalog: next,
+        valueStore: gmValueStore,
       );
     } on PopmundoRuntimeException {
       // WebView may not be attached yet (e.g. still loading builtins).
@@ -116,6 +119,7 @@ class _PopmundoHomeState extends State<PopmundoHome> {
           catalog: catalog,
           importer: importer,
           onApply: _applyUserScripts,
+          onScriptDeleted: gmValueStore.clearForScript,
         ),
       ),
     );
@@ -143,6 +147,7 @@ class _PopmundoHomeState extends State<PopmundoHome> {
                   onClose: () => setState(() => _debugPanelVisible = false),
                   child: PopmundoWebView(
                     runtime: widget.runtime,
+                    gmValueStore: gmValueStore,
                     enabledUserScripts: _enabledUserScripts,
                   ),
                 ),

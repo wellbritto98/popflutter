@@ -84,11 +84,11 @@
 
 ## Handoff
 
-- **Feature**: userscript-manager / `.specs/features/userscript-manager`
-- **Phase / Task**: Execute complete (T1–T7) + Verifier PASS + gap-fix tests
-- **Completed**: T1–T7, Verifier pass (`.specs/features/userscript-manager/validation.md`), fix commit `05e8818`
+- **Feature**: webview-back-navigation / `.specs/features/webview-back-navigation`
+- **Phase / Task**: Execute complete + Verifier PASS
+- **Completed**: PopScope intercepts system back; `WebViewBackHandler` + unit tests; validation.md PASS (21 tests, 3/3 mutants killed)
 - **In-progress**: none
-- **Next step**: Optional device UAT — import a real `.user.js`, toggle/delete, confirm WebView reload applies scripts
+- **Next step**: Device UAT — navigate in-game, press/swipe back, confirm previous page; first page should still exit. Commit when requested.
 - **Blockers**: none
-- **Uncommitted files**: check git status for validation.md / lessons if any
+- **Uncommitted files**: webview back-navigation implementation + spec + validation.md
 - **Branch**: master

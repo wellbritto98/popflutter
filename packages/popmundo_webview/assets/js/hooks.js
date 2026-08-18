@@ -108,6 +108,7 @@
   });
 
   window.__popmundo = window.__popmundo || {};
+  window.__popmundo.post = post;
   window.__popmundo.fetch = function (url, options) {
     if (!originalFetch) return Promise.reject(new Error('fetch unavailable'));
     return originalFetch(url, options || {}).then(function (res) {
