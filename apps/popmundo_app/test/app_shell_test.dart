@@ -74,6 +74,52 @@ void main() {
 
     expect(find.byKey(const Key('app-sidebar')), findsOneWidget);
   });
+
+  testWidgets('tapping outside the open drawer closes it (MENU-01 AC4)', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: AppShell(
+        items: const [
+          AppMenuItem(id: 'debug', icon: Icons.bug_report, label: 'Debug panel', onTap: _noop),
+        ],
+        body: const SizedBox.shrink(),
+      ),
+    ));
+
+    await tester.tap(find.byKey(const Key('menu-toggle')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('app-sidebar')), findsOneWidget);
+
+    // Tap the scrim outside the drawer's own width.
+    await tester.tapAt(const Offset(700, 300));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('app-sidebar')), findsNothing);
+  });
+
+  testWidgets(
+    'popping the navigator (Android back) closes the open drawer without touching WebView content (MENU-01 AC4)',
+    (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: AppShell(
+          items: const [
+            AppMenuItem(id: 'debug', icon: Icons.bug_report, label: 'Debug panel', onTap: _noop),
+          ],
+          body: const Text('webview-body'),
+        ),
+      ));
+
+      await tester.tap(find.byKey(const Key('menu-toggle')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('app-sidebar')), findsOneWidget);
+
+      final popped = await Navigator.of(tester.element(find.byType(Scaffold))).maybePop();
+      await tester.pumpAndSettle();
+
+      expect(popped, isTrue);
+      expect(find.byKey(const Key('app-sidebar')), findsNothing);
+      expect(find.text('webview-body'), findsOneWidget);
+    },
+  );
 }
 
 void _noop() {}
