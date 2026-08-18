@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 
+import 'background/background_status.dart';
+
 class CookieSummary {
   const CookieSummary({required this.name, required this.domain});
 
@@ -15,6 +17,7 @@ class DebugOverlay extends StatefulWidget {
     required this.events,
     required this.evaluate,
     this.cookies = const [],
+    this.backgroundStatus,
     this.visible = false,
     this.onClose,
     this.child,
@@ -24,10 +27,10 @@ class DebugOverlay extends StatefulWidget {
   final PopmundoEventBus events;
   final Future<String?> Function(String source) evaluate;
   final List<CookieSummary> cookies;
+  final BackgroundStatus? backgroundStatus;
   final bool visible;
   final VoidCallback? onClose;
   final Widget? child;
-
   @override
   State<DebugOverlay> createState() => _DebugOverlayState();
 }
@@ -120,6 +123,7 @@ class _DebugOverlayState extends State<DebugOverlay> {
             ],
           ),
         ),
+        if (widget.backgroundStatus != null) ..._backgroundLines(widget.backgroundStatus!),
         if (widget.cookies.isNotEmpty)
           Wrap(
             spacing: 4,
@@ -162,5 +166,28 @@ class _DebugOverlayState extends State<DebugOverlay> {
           ),
       ],
     );
+  }
+
+  List<Widget> _backgroundLines(BackgroundStatus bg) {
+    const style = TextStyle(color: Colors.white70, fontSize: 12);
+    return [
+      Text('bg: ${bg.bgLabel}', key: const Key('debug-bg-service'), style: style),
+      Text('notif: ${bg.notifLabel}', key: const Key('debug-bg-notif'), style: style),
+      Text(
+        'battery: ${bg.batteryLabel}',
+        key: const Key('debug-bg-battery'),
+        style: style,
+      ),
+      Text(
+        'lifecycle: ${bg.lifecycleLabel}',
+        key: const Key('debug-bg-lifecycle'),
+        style: style,
+      ),
+      Text(
+        'heartbeat: ${bg.heartbeatLabel()}',
+        key: const Key('debug-bg-heartbeat'),
+        style: style,
+      ),
+    ];
   }
 }
