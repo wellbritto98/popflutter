@@ -8,6 +8,8 @@ import 'package:popmundo_webview/popmundo_webview.dart';
 import 'app_shell.dart';
 import 'autologin/auto_login_screen.dart';
 import 'autologin/secure_secret_store.dart';
+import 'background/background_keepalive.dart';
+import 'background/background_status.dart';
 import 'debug_overlay.dart';
 import 'menu/app_menu_registry.dart';
 import 'userscripts/userscript_http.dart';
@@ -19,11 +21,13 @@ class PopmundoApp extends StatelessWidget {
     required this.runtime,
     required this.store,
     this.secretStore,
+    this.keepalive,
   });
 
   final InAppPopmundoRuntime runtime;
   final KeyValueStore store;
   final SecretStore? secretStore;
+  final BackgroundKeepalive? keepalive;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +38,7 @@ class PopmundoApp extends StatelessWidget {
         runtime: runtime,
         store: store,
         secretStore: secretStore ?? FlutterSecureSecretStore(),
+        keepalive: keepalive,
       ),
     );
   }
@@ -45,23 +50,27 @@ class PopmundoHome extends StatefulWidget {
     required this.runtime,
     required this.store,
     required this.secretStore,
+    this.keepalive,
   });
 
   final InAppPopmundoRuntime runtime;
   final KeyValueStore store;
   final SecretStore secretStore;
+  final BackgroundKeepalive? keepalive;
 
   @override
   State<PopmundoHome> createState() => _PopmundoHomeState();
 }
 
-class _PopmundoHomeState extends State<PopmundoHome> {
+class _PopmundoHomeState extends State<PopmundoHome>
+    with WidgetsBindingObserver {
   var _cookies = const <CookieSummary>[];
   var _debugPanelVisible = false;
   var _bootstrapReady = false;
   var _enabledUserScripts = <InstalledUserScript>[];
   var _previouslyEnabledIds = <String>{};
   String? _initialUrl;
+  BackgroundStatus? _backgroundStatus;
 
   late final storage = StorageService(widget.store);
   late final catalog = UserScriptCatalog(widget.store);
@@ -86,18 +95,40 @@ class _PopmundoHomeState extends State<PopmundoHome> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _navSub = widget.runtime.events.navigation.listen(_onNavigation);
     widget.runtime.events.gmValue.listen((e) => gmValueStore.applyEvent(e));
     _refreshCookies();
     autoLogin.start();
     _bootstrap();
+    final keepalive = widget.keepalive;
+    if (keepalive != null) {
+      _backgroundStatus = keepalive.status.value;
+      keepalive.status.addListener(_onKeepaliveStatus);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        unawaited(keepalive.bootstrap());
+      });
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    widget.keepalive?.status.removeListener(_onKeepaliveStatus);
     _navSub?.cancel();
     unawaited(autoLogin.dispose());
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    widget.keepalive?.onLifecycle(state);
+  }
+
+  void _onKeepaliveStatus() {
+    final keepalive = widget.keepalive;
+    if (keepalive == null || !mounted) return;
+    setState(() => _backgroundStatus = keepalive.status.value);
   }
 
   Future<void> _onNavigation(NavigationEvent event) async {
@@ -195,6 +226,7 @@ class _PopmundoHomeState extends State<PopmundoHome> {
                   events: widget.runtime.events,
                   evaluate: widget.runtime.evaluate,
                   cookies: _cookies,
+                  backgroundStatus: _backgroundStatus,
                   visible: _debugPanelVisible,
                   onClose: () => setState(() => _debugPanelVisible = false),
                   child: PopmundoWebView(
