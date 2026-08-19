@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:popmundo_app/l10n.dart';
 
@@ -66,6 +68,20 @@ void main() {
     expect(source.contains('locale: context.locale'), isTrue);
     expect(source.contains("title: 'app.title'.tr()"), isTrue);
   });
+
+  testWidgets(
+      'missing PT key displays the English value and never the raw key',
+      (tester) async {
+    await pumpLocalized(
+      tester,
+      probe(),
+      startLocale: const Locale('pt'),
+      assetLoader: const _PtMissingMenuEmptyLoader(),
+    );
+    expect(find.text('No options available.'), findsOneWidget);
+    expect(find.text('menu.empty'), findsNothing);
+    expect(find.text('Nenhuma opção disponível.'), findsNothing);
+  });
 }
 
 Locale _localeForLanguageCode(String languageCode) {
@@ -81,4 +97,22 @@ String _open(List<String> candidates) {
     if (file.existsSync()) return file.readAsStringSync();
   }
   throw StateError('Missing ${candidates.first}');
+}
+
+/// Serves the real catalogs except `menu.empty` is stripped from PT so
+/// I18N-05 can assert EN fallback (never the raw key).
+class _PtMissingMenuEmptyLoader extends RootBundleAssetLoader {
+  const _PtMissingMenuEmptyLoader();
+
+  @override
+  Future<Map<String, dynamic>?> load(String path, Locale locale) async {
+    final localePath = getLocalePath(path, locale);
+    final data = json.decode(
+      await rootBundle.loadString(localePath, cache: false),
+    ) as Map<String, dynamic>;
+    if (locale.languageCode == 'pt') {
+      (data['menu'] as Map).remove('empty');
+    }
+    return data;
+  }
 }

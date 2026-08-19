@@ -38,6 +38,7 @@ Future<void> pumpLocalized(
   WidgetTester tester,
   Widget child, {
   Locale startLocale = const Locale('en'),
+  AssetLoader? assetLoader,
 }) async {
   SharedPreferences.setMockInitialValues({});
   await EasyLocalization.ensureInitialized();
@@ -48,7 +49,7 @@ Future<void> pumpLocalized(
       fallbackLocale: fallbackAppLocale,
       useOnlyLangCode: true,
       useFallbackTranslations: true,
-      assetLoader: const _NoCacheTestAssetLoader(),
+      assetLoader: assetLoader ?? const _NoCacheTestAssetLoader(),
       saveLocale: false,
       startLocale: startLocale,
       child: Builder(
