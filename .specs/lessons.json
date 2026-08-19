@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 18,
+  "next_id": 21,
   "lessons": [
     {
       "id": "L-001",
@@ -310,6 +310,60 @@
       ],
       "created": "2026-08-19T01:27:39Z",
       "last_seen": "2026-08-19T01:27:39Z"
+    },
+    {
+      "id": "L-018",
+      "key": "surviving_mutant::assert translated copy on the production widget under the non default locale not only on a probe text key tr",
+      "text": "Assert translated copy on the production widget under the non-default locale, not only on a probe Text(key.tr()).",
+      "signal": "surviving_mutant",
+      "scope": "app-shell",
+      "status": "candidate",
+      "features": [
+        "app-i18n"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "app_sidebar.dart:28 mutant 3 (app-shell)"
+      ],
+      "created": "2026-08-19T02:23:59Z",
+      "last_seen": "2026-08-19T02:23:59Z"
+    },
+    {
+      "id": "L-019",
+      "key": "ac_gap::an independent test that names a production widget must pump that widget not a stand in that calls the same translation key",
+      "text": "An Independent Test that names a production widget must pump that widget, not a stand-in that calls the same translation key.",
+      "signal": "ac_gap",
+      "scope": "app-shell",
+      "status": "candidate",
+      "features": [
+        "app-i18n"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "P1 AC1 localization_boot_test.dart:29-32 (app-shell)"
+      ],
+      "created": "2026-08-19T02:23:59Z",
+      "last_seen": "2026-08-19T02:23:59Z"
+    },
+    {
+      "id": "L-020",
+      "key": "ac_gap::when a spec requires fallback to english for a missing catalog key assert the english value and the absence of the raw key at runtime not only that a library flag appears in source",
+      "text": "When a spec requires fallback-to-English for a missing catalog key, assert the English value and the absence of the raw key at runtime, not only that a library flag appears in source.",
+      "signal": "ac_gap",
+      "scope": "app-shell",
+      "status": "candidate",
+      "features": [
+        "app-i18n"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "I18N-05 localization_boot_test.dart:48 (app-shell)"
+      ],
+      "created": "2026-08-19T02:23:59Z",
+      "last_seen": "2026-08-19T02:23:59Z"
     }
   ]
 }

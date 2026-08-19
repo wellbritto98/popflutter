@@ -49,7 +49,7 @@ This step ALWAYS runs — there is no precondition. Decide which of two paths to
 
 Before sampling tests or inferring anything, scan the project for documented quality and testing standards. Stack-agnostic sources to check (illustrative, not exhaustive):
 
-- Agent/AI instructions: `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/**`, `.github/copilot-instructions.md`
+- Agent/AI instructions: `AGENTS.md`, `CLAUDE.md`, `.agents/rules/**`, `.github/copilot-instructions.md`
 - Contributor guides: `CONTRIBUTING.md`, `docs/` (testing, quality, or standards subdocs), README testing section
 - Tool configuration: coverage thresholds in the test runner config (e.g., `jest.config.*`, `vitest.config.*`, `pytest.ini`, `.nycrc`, `Makefile` coverage targets, CI coverage gates)
 

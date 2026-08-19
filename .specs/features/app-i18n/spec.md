@@ -6,11 +6,11 @@ Every user-visible string in the app shell (sidebar menu, Userscripts screen, Au
 
 ## Goals
 
-- [ ] All release-visible app-shell strings resolve from translation catalogs (EN + PT); zero hardcoded literals remain in release-visible UI code
-- [ ] Device locale drives the initial language (pt\* → PT, anything else → EN fallback)
-- [ ] User can manually switch EN/PT from the sidebar; the choice persists across app restarts
-- [ ] Android keepalive notification title/text are localized
-- [ ] Existing test suite stays green with a reusable localized-test harness
+- [x] All release-visible app-shell strings resolve from translation catalogs (EN + PT); zero hardcoded literals remain in release-visible UI code
+- [x] Device locale drives the initial language (pt\* → PT, anything else → EN fallback)
+- [x] User can manually switch EN/PT from the sidebar; the choice persists across app restarts
+- [x] Android keepalive notification title/text are localized
+- [x] Existing test suite stays green with a reusable localized-test harness
 
 ## Out of Scope
 
@@ -112,13 +112,13 @@ Every ambiguity is resolved or recorded here — nothing is left silently unclea
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| I18N-01 | P1: PT shell | Execute | Implementing |
-| I18N-02 | P1: PT shell | Execute | Implementing |
-| I18N-03 | P1: Selector | Execute | Implementing |
-| I18N-04 | P2: Notification | Execute | Implementing |
-| I18N-05 | P1: PT shell | Execute | Implementing |
-| I18N-06 | P1: PT shell + Selector | Execute | Implementing |
-| I18N-07 | P1: PT shell | Execute | Implementing |
+| I18N-01 | P1: PT shell | Execute | Verified |
+| I18N-02 | P1: PT shell | Execute | Verified |
+| I18N-03 | P1: Selector | Execute | Verified |
+| I18N-04 | P2: Notification | Execute | Verified |
+| I18N-05 | P1: PT shell | Execute | Verified |
+| I18N-06 | P1: PT shell + Selector | Execute | Verified |
+| I18N-07 | P1: PT shell | Execute | Verified |
 
 **ID format:** `I18N-[NUMBER]`
 
@@ -130,11 +130,11 @@ Every ambiguity is resolved or recorded here — nothing is left silently unclea
 
 ## Success Criteria
 
-- [ ] A pt-locale device renders the entire release-visible shell in Portuguese; en and unsupported locales render English
-- [ ] Selector switches EN↔PT live and the choice survives app restart
-- [ ] Grep sweep finds zero hardcoded user-visible literals left in release-visible shell UI
-- [ ] `flutter analyze` clean on all three packages; `dart test` (utils) and `flutter test` (webview, app) all green
-- [ ] `platform_config_test` asserts `CFBundleLocalizations` = [en, pt]
+- [x] A pt-locale device renders the entire release-visible shell in Portuguese; en and unsupported locales render English
+- [x] Selector switches EN↔PT live and the choice survives app restart
+- [x] Grep sweep finds zero hardcoded user-visible literals left in release-visible shell UI
+- [x] `flutter analyze` clean on all three packages; `dart test` (utils) and `flutter test` (webview, app) all green
+- [x] `platform_config_test` asserts `CFBundleLocalizations` = [en, pt]
 
 ---
 

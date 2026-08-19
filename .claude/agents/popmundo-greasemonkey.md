@@ -52,7 +52,7 @@ Responda em ptbr.
 2. Em `UserScriptGmShim.build`: nova flag `hasXxx` a partir de `grants.contains(...)`, e só emitir o binding JS quando concedido.
 3. Se precisar de round-trip com o Dart (rede, clipboard, abas): decidir se cabe no padrão existente (snapshot + fire-and-forget) ou se precisa de um novo `case` em `js_bridge.dart` + método no `InAppPopmundoRuntime`. Se envolver rede saindo do device, lembrar do AD-003 (nunca via `shouldIntercept*`) e do AD-006 (`TimedFetch` só se o alvo for o próprio jogo — request pra domínio de terceiros do userscript não precisa do throttle de 750ms).
 4. Testes: parser aceita o grant; shim emite só quando concedido (e não emite quando não concedido); se mudar timing/injeção, cobrir em `userscript_injector_test.dart`.
-5. Atualizar este arquivo (e `.cursor/agents/popmundo-greasemonkey.md`) se o fluxo mudar.
+5. Atualizar este arquivo (e `.agents/agents/popmundo-greasemonkey.md`) se o fluxo mudar.
 
 ## Fluxo
 

@@ -11,7 +11,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 ## Test Coverage Matrix
 
-> Guidelines found: `CLAUDE.md` / `AGENTS.md` / `.cursor/agents/popmundo-app-shell.md` (flutter test in `apps/popmundo_app`; widget tests with fakes; no live popmundo.com e2e; platform_config_test for manifest/plist).
+> Guidelines found: `CLAUDE.md` / `AGENTS.md` / `.agents/agents/popmundo-app-shell.md` (flutter test in `apps/popmundo_app`; widget tests with fakes; no live popmundo.com e2e; platform_config_test for manifest/plist).
 
 | Code Layer | Required Test Type | Coverage Expectation | Location Pattern | Run Command |
 | ---------- | ------------------ | -------------------- | ---------------- | ----------- |
