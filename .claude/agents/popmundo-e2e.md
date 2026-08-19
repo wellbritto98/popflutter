@@ -31,11 +31,6 @@ Você existe para que essa classe de bug falhe num teste. Se um teste seu nunca 
 
 A sessão de agente **não roda Gradle**. Qualquer JDK 17+ aqui falha em `Selector.open()` com `IOException: Unable to establish loopback connection` (`sun.nio.ch.UnixDomainSockets.connect0`) — reproduzido com um programa Java de 5 linhas, fora do Gradle e do Patrol. Um terminal humano na mesma máquina (java 17.0.12) constrói normalmente.
 
-| Você faz sozinho | Precisa de terminal humano |
-| --- | --- |
-| escrever/editar testes, `flutter analyze`, `flutter test`, `dart test`, `git`, ler XML de resultado e `adb logcat` | `patrol test`, `flutter build apk`, qualquer coisa com Gradle |
-
-Então: leve o código até `analyze` limpo, entregue **um** comando pronto pra colar, e diagnostique o resultado pelos artefatos. Não peça execução sem ter passado o gate local.
 
 ## Diagnóstico — leia isto antes de teorizar
 

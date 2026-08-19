@@ -116,6 +116,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: commits 315c27d, dacb11c, 45771fd (T3/T4/T5, T6/T7/T8, T9/T10 merges) (patrol)
 - last seen: 2026-08-19T01:27:39Z
 
+### L-018 — Assert translated copy on the production widget under the non-default locale, not only on a probe Text(key.tr()).
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `app-shell` · harmful: 0
+- features: app-i18n
+- evidence: app_sidebar.dart:28 mutant 3 (app-shell)
+- last seen: 2026-08-19T02:23:59Z
+
+### L-019 — An Independent Test that names a production widget must pump that widget, not a stand-in that calls the same translation key.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `app-shell` · harmful: 0
+- features: app-i18n
+- evidence: P1 AC1 localization_boot_test.dart:29-32 (app-shell)
+- last seen: 2026-08-19T02:23:59Z
+
+### L-020 — When a spec requires fallback-to-English for a missing catalog key, assert the English value and the absence of the raw key at runtime, not only that a library flag appears in source.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `app-shell` · harmful: 0
+- features: app-i18n
+- evidence: I18N-05 localization_boot_test.dart:48 (app-shell)
+- last seen: 2026-08-19T02:23:59Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

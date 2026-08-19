@@ -127,10 +127,10 @@
 ## Handoff
 
 - **Feature**: app-i18n / `.specs/features/app-i18n`
-- **Phase / Task**: Execute complete (T1–T8 committed); **Verifier pending**
-- **Completed**: spec.md, design.md, tasks.md, context.md; T1 `262911b`, T2 `ea1c58b`, T3 `e3a6b3d`, T4 `767f76d`, T5 `c3a4dc7`, T6 `6c7ef5f`, T7 `ebb817e`. T8 gate: analyze ×3 clean; `dart test` utils 102; `flutter test` webview 24; `flutter test` app 68.
-- **In-progress**: none
-- **Next step**: dispatch the independent Verifier (author ≠ verifier) to write `.specs/features/app-i18n/validation.md`
+- **Phase / Task**: Execute complete; Verifier **PASS** (iteration 2/3). I18N-01..07 Verified.
+- **Completed**: T1 `262911b`, T2 `ea1c58b`, T3 `e3a6b3d`, T4 `767f76d`, T5 `c3a4dc7`, T6 `6c7ef5f`, T7 `ebb817e`, T8 `0d4269a`, fix `c86d5d2`. Gate 197 passed (utils 102, webview 24, app 71). Sensor 3/3 killed. Report: `.specs/features/app-i18n/validation.md`.
+- **In-progress**: Interactive UAT (user-facing)
+- **Next step**: walk the user through UAT (sidebar PT, language selector live-switch, keepalive notification)
 - **Blockers**: none
-- **Uncommitted files**: unrelated repo-wide `.cursor/agents/` → `.agents/agents/` rename and skill copies — **not this feature's**
+- **Uncommitted files**: spec status + this Handoff + `validation.md` (docs); unrelated `.agents/` rename — **not this feature's**
 - **Branch**: master
