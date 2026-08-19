@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
@@ -32,7 +33,10 @@ class PopmundoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Popmundo',
+      title: 'app.title'.tr(),
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       theme: ThemeData(colorSchemeSeed: Colors.deepPurple, useMaterial3: true),
       home: PopmundoHome(
         runtime: runtime,
