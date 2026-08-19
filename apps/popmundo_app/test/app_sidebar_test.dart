@@ -128,6 +128,21 @@ void main() {
     expect(find.text('No options available.'), findsOneWidget);
     expect(find.byType(ListTile), findsNothing);
   });
+
+  testWidgets(
+      'PT locale renders catalog empty-state copy on the real AppSidebar',
+      (tester) async {
+    await pumpLocalized(
+      tester,
+      _harness(const []),
+      startLocale: const Locale('pt'),
+    );
+    await _openDrawer(tester);
+
+    expect(find.byKey(const Key('menu-empty')), findsOneWidget);
+    expect(find.text('Nenhuma opção disponível.'), findsOneWidget);
+    expect(find.text('No options available.'), findsNothing);
+  });
 }
 
 void _noop() {}

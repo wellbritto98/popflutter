@@ -133,4 +133,26 @@ void main() {
     expect(callCount, 1);
     expect(items.firstWhere((e) => e.id == 'language').label, 'Language');
   });
+
+  testWidgets('PT locale resolves registry labels from the catalog',
+      (tester) async {
+    await pumpLocalized(
+      tester,
+      const SizedBox(),
+      startLocale: const Locale('pt'),
+    );
+    final items = buildAppMenuItems(
+      onOpenDebugPanel: () {},
+      onOpenUserScripts: () {},
+      onOpenAutoLogin: () {},
+      onOpenLanguage: () {},
+      includeDebugItem: false,
+    );
+
+    expect(
+      items.firstWhere((e) => e.id == 'auto-login').label,
+      'Login automático',
+    );
+    expect(items.firstWhere((e) => e.id == 'language').label, 'Idioma');
+  });
 }
