@@ -21,7 +21,9 @@
     "empty": "Nenhuma opção disponível."
   },
   "language": {
-    "dialogTitle": "Escolher idioma"
+    "dialogTitle": "Escolher idioma",
+    "en": "English",
+    "pt": "Português"
   },
   "userscripts": {
     "title": "Userscripts",

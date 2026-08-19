@@ -12,6 +12,7 @@ import 'autologin/secure_secret_store.dart';
 import 'background/background_keepalive.dart';
 import 'background/background_status.dart';
 import 'debug_overlay.dart';
+import 'language/language_selector.dart';
 import 'menu/app_menu_registry.dart';
 import 'userscripts/userscript_http.dart';
 import 'userscripts/userscripts_screen.dart';
@@ -211,6 +212,10 @@ class _PopmundoHomeState extends State<PopmundoHome>
     );
   }
 
+  void _openLanguage() {
+    unawaited(showLanguageDialog(context));
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopmundoScope(
@@ -221,6 +226,7 @@ class _PopmundoHomeState extends State<PopmundoHome>
           onOpenDebugPanel: () => setState(() => _debugPanelVisible = true),
           onOpenUserScripts: _openUserScripts,
           onOpenAutoLogin: _openAutoLogin,
+          onOpenLanguage: _openLanguage,
         ),
         body: SafeArea(
           child: !_bootstrapReady

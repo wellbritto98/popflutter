@@ -12,10 +12,11 @@ void main() {
       onOpenDebugPanel: () {},
       onOpenUserScripts: () {},
       onOpenAutoLogin: () {},
+      onOpenLanguage: () {},
       includeDebugItem: false,
     );
 
-    expect(items.map((e) => e.id), ['auto-login', 'userscripts']);
+    expect(items.map((e) => e.id), ['auto-login', 'userscripts', 'language']);
     expect(items.first.label, 'Auto Login');
     expect(
       items.first.subtitle,
@@ -31,13 +32,17 @@ void main() {
       onOpenDebugPanel: () {},
       onOpenUserScripts: () {},
       onOpenAutoLogin: () {},
+      onOpenLanguage: () {},
       includeDebugItem: true,
     );
 
-    expect(items.map((e) => e.id), ['auto-login', 'userscripts', 'debug']);
-    expect(items[2].label, 'Debug panel');
     expect(
-      items[2].subtitle,
+      items.map((e) => e.id),
+      ['auto-login', 'userscripts', 'language', 'debug'],
+    );
+    expect(items[3].label, 'Debug panel');
+    expect(
+      items[3].subtitle,
       'Inspect host, network, console and eval JS',
     );
   });
@@ -50,6 +55,7 @@ void main() {
       onOpenDebugPanel: () => callCount++,
       onOpenUserScripts: () {},
       onOpenAutoLogin: () {},
+      onOpenLanguage: () {},
       includeDebugItem: true,
     );
 
@@ -67,6 +73,7 @@ void main() {
       onOpenDebugPanel: () {},
       onOpenUserScripts: () => callCount++,
       onOpenAutoLogin: () {},
+      onOpenLanguage: () {},
       includeDebugItem: false,
     );
 
@@ -84,6 +91,7 @@ void main() {
       onOpenDebugPanel: () {},
       onOpenUserScripts: () {},
       onOpenAutoLogin: () => callCount++,
+      onOpenLanguage: () {},
       includeDebugItem: false,
     );
 
@@ -99,10 +107,30 @@ void main() {
       onOpenDebugPanel: () {},
       onOpenUserScripts: () {},
       onOpenAutoLogin: () {},
+      onOpenLanguage: () {},
     );
 
     expect(items.any((e) => e.id == 'auto-login'), isTrue);
     expect(items.any((e) => e.id == 'userscripts'), isTrue);
+    expect(items.any((e) => e.id == 'language'), isTrue);
     expect(items.any((e) => e.id == 'debug'), kDebugMode);
+  });
+
+  testWidgets("the language item's onTap invokes onOpenLanguage exactly once",
+      (tester) async {
+    await pumpLocalized(tester, const SizedBox());
+    var callCount = 0;
+    final items = buildAppMenuItems(
+      onOpenDebugPanel: () {},
+      onOpenUserScripts: () {},
+      onOpenAutoLogin: () {},
+      onOpenLanguage: () => callCount++,
+      includeDebugItem: false,
+    );
+
+    items.firstWhere((e) => e.id == 'language').onTap();
+
+    expect(callCount, 1);
+    expect(items.firstWhere((e) => e.id == 'language').label, 'Language');
   });
 }

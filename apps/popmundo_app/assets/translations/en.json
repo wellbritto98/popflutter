@@ -21,7 +21,9 @@
     "empty": "No options available."
   },
   "language": {
-    "dialogTitle": "Choose language"
+    "dialogTitle": "Choose language",
+    "en": "English",
+    "pt": "Português"
   },
   "userscripts": {
     "title": "Userscripts",
