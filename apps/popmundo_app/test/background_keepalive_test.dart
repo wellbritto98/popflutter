@@ -24,6 +24,11 @@ void main() {
     expect(platform.batteryRequestCount, 1);
     expect(platform.initCount, 1);
     expect(platform.startCount, 1);
+    expect(platform.lastNotificationTitle, 'Popmundo is running');
+    expect(
+      platform.lastNotificationText,
+      'Keeping your session alive in the background.',
+    );
     expect(keepalive.status.value.notificationGranted, isTrue);
     expect(keepalive.status.value.batteryUnrestricted, isTrue);
     expect(keepalive.status.value.serviceRunning, isTrue);
@@ -156,6 +161,53 @@ void main() {
 
     expect(keepalive.status.value.serviceRunning, isFalse);
     expect(keepalive.status.value.bgLabel, 'stopped');
+
+    keepalive.dispose();
+  });
+
+  testWidgets('injected translator supplies catalog strings to startService', (
+    tester,
+  ) async {
+    final platform = FakeBackgroundPlatform();
+    final keepalive = BackgroundKeepalive(
+      platform: platform,
+      translator: (key) {
+        return switch (key) {
+          'keepalive.notificationTitle' => 'Popmundo está em execução',
+          'keepalive.notificationText' =>
+            'Mantendo sua sessão ativa em segundo plano.',
+          _ => key,
+        };
+      },
+    );
+
+    await keepalive.bootstrap();
+
+    expect(platform.lastNotificationTitle, 'Popmundo está em execução');
+    expect(
+      platform.lastNotificationText,
+      'Mantendo sua sessão ativa em segundo plano.',
+    );
+
+    keepalive.dispose();
+  });
+
+  testWidgets('unresolved translator key falls back to English defaults', (
+    tester,
+  ) async {
+    final platform = FakeBackgroundPlatform();
+    final keepalive = BackgroundKeepalive(
+      platform: platform,
+      translator: (key) => key,
+    );
+
+    await keepalive.bootstrap();
+
+    expect(platform.lastNotificationTitle, 'Popmundo is running');
+    expect(
+      platform.lastNotificationText,
+      'Keeping your session alive in the background.',
+    );
 
     keepalive.dispose();
   });

@@ -68,11 +68,14 @@ class FlutterForegroundTaskPlatform implements BackgroundPlatform {
   }
 
   @override
-  Future<void> startService() async {
+  Future<void> startService({
+    required String notificationTitle,
+    required String notificationText,
+  }) async {
     final result = await FlutterForegroundTask.startService(
       serviceTypes: const [ForegroundServiceTypes.dataSync],
-      notificationTitle: 'Popmundo is running',
-      notificationText: 'Keeping your session alive in the background.',
+      notificationTitle: notificationTitle,
+      notificationText: notificationText,
       callback: keepaliveStartCallback,
     );
     if (result is ServiceRequestFailure) {

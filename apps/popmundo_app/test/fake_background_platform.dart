@@ -36,6 +36,8 @@ class FakeBackgroundPlatform implements BackgroundPlatform {
   int batteryRequestCount = 0;
   int initCount = 0;
   int startCount = 0;
+  String? lastNotificationTitle;
+  String? lastNotificationText;
 
   final listeners = <void Function(Object)>[];
 
@@ -82,8 +84,13 @@ class FakeBackgroundPlatform implements BackgroundPlatform {
   }
 
   @override
-  Future<void> startService() async {
+  Future<void> startService({
+    required String notificationTitle,
+    required String notificationText,
+  }) async {
     startCount++;
+    lastNotificationTitle = notificationTitle;
+    lastNotificationText = notificationText;
     if (throwOnStart) {
       throw StateError('start failed');
     }

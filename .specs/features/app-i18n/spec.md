@@ -115,7 +115,7 @@ Every ambiguity is resolved or recorded here — nothing is left silently unclea
 | I18N-01 | P1: PT shell | Execute | Implementing |
 | I18N-02 | P1: PT shell | Execute | Implementing |
 | I18N-03 | P1: Selector | Execute | Implementing |
-| I18N-04 | P2: Notification | Design | Pending |
+| I18N-04 | P2: Notification | Execute | Implementing |
 | I18N-05 | P1: PT shell | Execute | Implementing |
 | I18N-06 | P1: PT shell + Selector | Execute | Implementing |
 | I18N-07 | P1: PT shell | Execute | Implementing |
