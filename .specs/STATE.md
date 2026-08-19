@@ -107,13 +107,21 @@
 - **Date**: 2026-08-18
 - **Status**: active
 
+### AD-014
+- **Decision**: A i18n da shell nativa usa `easy_localization` (^3.0.8) com catálogos JSON em `apps/popmundo_app/assets/translations/{en,pt}.json` (`useOnlyLangCode`, `fallbackLocale: en`, `useFallbackTranslations`). Locale inicial segue o dispositivo; escolha manual EN/PT persistida. Toda nova string de UI visível em release no `apps/popmundo_app` DEVE passar pelos catálogos (`.tr()`). `popmundo_utils`/`popmundo_webview` permanecem sem locale (mensagens de exceção seguem detalhes técnicos em inglês); o DebugOverlay permanece em inglês.
+- **Reason**: Escolha do usuário (Easy Localization); modelo JSON por asset sem codegen para uma shell de 2 idiomas; packages precisam continuar Flutter-free (AD-002).
+- **Trade-off**: Dependência runtime adicional (easy_logger/intl via lib); erros de import de userscripts exibidos em inglês nos snackbars.
+- **Scope**: `apps/popmundo_app` (lib, assets, testes); todas as futuras strings nativas da shell
+- **Date**: 2026-08-18
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: background-keepalive / `.specs/features/background-keepalive`
-- **Phase / Task**: Execute done; **Verifier PASS** (see `validation.md`); post-verify bug fix applied (AD-013)
-- **Completed**: spec.md, context.md, design.md, tasks.md, AD-012, T1–T7 (T8 gate via Verifier), validation.md, AD-013 `stopWithTask` fix + regression test in `platform_config_test.dart`
-- **In-progress**: none
-- **Next step**: Device UAT — open app, grant notif/battery, background the app (both home-press AND swipe-from-Recents) and confirm the FGS notification survives; iOS confirm notif prompt + honest suspend
-- **Blockers**: none
-- **Uncommitted files**: AndroidManifest.xml, flutter_foreground_task_platform.dart, platform_config_test.dart, STATE.md (pending commit)
+- **Feature**: mobile-e2e-tests / `.specs/features/mobile-e2e-tests`
+- **Phase / Task**: Execute, Phase 1 — T1 done, **T2 BLOCKED** (environment, not product)
+- **Completed**: spec.md, design.md, tasks.md (11 tasks / 5 phases / 21 requirements); T1 `f43805c` (patrol ^4.9.0 dep + `patrol:` pubspec config). Spike result: Patrol exposes **no** read-only notification API — KA-05 must assert via `tapOnNotificationBySelector` (recorded in design.md Risks row 1)
+- **In-progress**: T2 — code written but deliberately **uncommitted** (gate never passed, per Execution Protocol). Files: `apps/popmundo_app/android/app/build.gradle.kts` (modified), `apps/popmundo_app/android/app/src/androidTest/**` (new), `apps/popmundo_app/integration_test/smoke_test.dart` (new)
+- **Next step**: Run `cd apps/popmundo_app && patrol test --target integration_test/smoke_test.dart -d 0090995435` from a **real terminal outside the agent session**, then report the result so T2 can be gated and committed and T3–T5 can proceed
+- **Blockers**: **Any JDK 17+ in the agent session cannot open an NIO `Selector`** — `java.io.IOException: Unable to establish loopback connection` → `SocketException: Invalid argument: connect` at `sun.nio.ch.UnixDomainSockets.connect0`. Reproduced independently with a bare 5-line `Selector.open()` program on Android Studio's bundled JBR 21.0.9, outside Gradle and Patrol entirely. JDK 21's `PipeImpl` hardcodes `preferAfUnix=true` on Windows and AF_UNIX loopback is unavailable to JVMs spawned in this sandbox. JDK 11 works but Gradle 9.3.1 requires JVM 17+. **Consequence: no Gradle/Android build of any kind can run from the agent session — this blocks T2–T10 wholesale, and would block a plain `integration_test` tier identically. It is not a Patrol-specific problem.**
+- **Uncommitted files**: T2's three files above; plus unrelated in-flight repo-wide rename `.cursor/agents/` → `.agents/agents/` (5 deletions, `.agents/` untracked, 4 one-line path references in `CLAUDE.md`, `.claude/agents/popmundo-greasemonkey.md`, `.claude/skills/.../tasks.md`, `.specs/features/background-keepalive/tasks.md`) — **not made by this feature's work**; also `apps/popmundo_app/patrol_test/` (Patrol-generated bundle, likely wants a .gitignore entry)
 - **Branch**: master
