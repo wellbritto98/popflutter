@@ -1,3 +1,181 @@
+# Session Heartbeat (AD-019)
+
+**Date**: 2026-08-19
+**Spec**: `.specs/features/auto-login/spec.md` — story *P1: Heartbeat de sessão no host sticky* (HB-01…HB-10) + heartbeat Edge Cases
+**Decision**: AD-019
+**Diff range**: `f4c18eb^..HEAD` (`f4c18eb` … `c3599b1`)
+**Verifier**: independent sub-agent (author ≠ verifier)
+**Overall**: ❌ Not Ready
+
+---
+
+## Task Completion
+
+| Task | Status | Notes |
+| ---- | ------ | ----- |
+| T1 CookieSource | ✅ Done | `602017f` |
+| T2 AuthSession.probe / seed | ✅ Done | `055bf2c` |
+| T3 Controller `checkSession` | ✅ Done | `bf8eb20` |
+| T4 `InAppCookieSink.read` / `gameCookieFromInApp` | ✅ Done | `60c3a34` |
+| T5 Wiring + docs | ✅ Done | `c3599b1` — `apps/popmundo_app/lib/app.dart` passes the same `InAppCookieSink` as `cookieSink` and `cookieSource` |
+
+`tasks.md` Done-when checkboxes are still unchecked; commits exist for every task.
+
+---
+
+## Spec-Anchored Acceptance Criteria
+
+### P1: Heartbeat de sessão no host sticky
+
+| Criterion (WHEN X THEN Y) | Spec-defined outcome | `file:line` + assertion | Result |
+| ------------------------- | -------------------- | ----------------------- | ------ |
+| HB-01 — GET `{currentOrigin}/World/Popmundo.aspx/Character` once per 60 s (first after `waitUntilReady`) | Native GET to that exact URL; interval **60 s** | `auto_login_controller_test.dart:513-517` — `expect(server.seen.first.url.toString(), characterUrl)` with `characterUrl == 'https://75.popmundo.com/World/Popmundo.aspx/Character'`. **60 s / first-after-ready**: no assertion. Default is constructor `heartbeatInterval = const Duration(seconds: 60)` (`auto_login_controller.dart:45`); tests inject `Duration(days: 1)` and call `checkSession()` directly. A mutant changing the default to 5 s would survive. | ⚠️ Spec-precision gap (cadence) / GET ✅ |
+| HB-02 — seed WebView cookies, WebView UA, `followRedirects` off | Cookie header from WebView jar; UA from WebView; exactly one hop | `auth_session_test.dart:245-249` — `expect(response.status, 302)`, `expect(server.seen.length, 1)`, `expect(server.seen.single.url.toString(), character)`; `auth_session_test.dart:275-276` — `expect(..., contains('popmundo.com=AUTH'))`, `isNot(contains('WWW'))`; `auto_login_controller_test.dart:518` — `expect(server.seen.first.headers['Cookie'], contains('OLDSESSION'))`. UA: probe uses `_headersFor` (`auth_http.dart:129,199`); no Character-GET assertion of `User-Agent`. Handshake group asserts UA on `_headersFor` (`auth_session_test.dart:145-149`). Adapter: `in_app_cookie_sink_test.dart:32-36` — `expect(cookie.isHostOnly, isTrue)`, `expect(cookie.host, '75.popmundo.com')`. | ✅ PASS (UA inferred from shared `_headersFor`) |
+| HB-03 — 3xx whose resolved `Location` is `/` or `/Default.aspx` starts the silent cycle | Same handshake, snackbars, `loadUrl` `{assignedHost}/World/Popmundo.aspx` | `auto_login_controller_test.dart:524-527` — `expect(server.postTo('75.popmundo.com/Default.aspx'), isNotNull)` and `expect(runtime.loadUrlCalls.map(...), ['https://75.popmundo.com/World/Popmundo.aspx'])`; `auto_login_controller_test.dart:519-523` — `expect(server.seen.any((r) => r.url.host == 'www.popmundo.com'), isFalse)`. Snackbars not asserted on this path; cycle is `_runLoginCycle` (status stream evidenced at `auto_login_controller_test.dart:280-285` for the navigation trigger). | ✅ PASS |
+| HB-04 — 200 = healthy (body ignored, no write/nav); throw/timeout/4xx/5xx ≠ logout | No cycle, wait next tick | `auto_login_controller_test.dart:536-539` — `expect(server.seen.length, 1)`, `expect(runtime.loadUrlCalls, isEmpty)`, `expect(statuses, isEmpty)` on 200; `:586-587` network (unrouted GET → `AuthHttpException`) `loadUrlCalls`/`statuses` empty; `:594-596` 503 same. 4xx shares the non-redirect branch (`checkSession` `status == 200` / `_isLogoutRedirect`); not separately asserted. | ✅ PASS |
+| HB-05 — tick no-op when www **OR** disabled **OR** credentials missing **OR** inFlight | No Character GET | www: `auto_login_controller_test.dart:567` — `expect(server.seen, isEmpty)`. Disabled: `:580` — `expect(server.seen, isEmpty)`. inFlight: `:653` — `expect(characterGets, 1)`. **Credentials missing** (empty username / character / password): **no heartbeat test**. Navigation `guards` (`:366-377`) exercise `_onNavigation`, not `checkSession`. Deleting only the `checkSession` password/username/character guard would survive. | ❌ GAP |
+| HB-06 — URL is `currentOrigin.replace(path: '/World/Popmundo.aspx/Character')` | No `HostTracker.resolve` (trailing slash), no literal www, no stored origin | `auto_login_controller_test.dart:513-517` — exact `characterUrl` with reason `HB-06: path from currentOrigin.replace, no trailing slash`. Sensor M4 (`resolve` → trailing `/`) killed this assertion. | ✅ PASS |
+| HB-07 — Android background: timer on main isolate; FGS isolate SHALL NOT GET / read cookies / `loadUrl` | Probe timer ≠ FGS 5 s tick | Implementation: `Timer.periodic` in `AutoLoginController._armHeartbeat` (`auto_login_controller.dart:110-112`). FGS `keepalive_task_handler.dart:15-18` only `sendDataToMain({'heartbeat': …})` — no `AuthSession` / `CookieSource` / `loadUrl`. **No test assertion** that the FGS isolate does not probe, nor that Android background keeps the Dart timer firing. | ⚠️ Spec-precision gap |
+| HB-08 — iOS suspend MAY pause probes; SHALL NOT be treated as logout | Pause ≠ logout | No iOS test, no simulated process-suspend fixture. Implementation does not map a missed tick to `_runLoginCycle`. | ⚠️ Spec-precision gap |
+| HB-09 — heartbeat-triggered cycle in flight ⇒ navigation trigger and next heartbeat tick ignored | Shared `inFlight` | Next tick: `auto_login_controller_test.dart:653` — `expect(characterGets, 1)` while first probe is held. Concurrent **navigation** during a heartbeat cycle: not a dedicated pairing; `_onNavigation` checks `_inFlight` (`auto_login_controller.dart:162-164`) and AUTH-07 (`auto_login_controller_test.dart:380`) covers two navigation triggers. | ✅ PASS (navigation pairing inferred from shared flag) |
+| HB-10 — sequential native calls (probe **then** handshake, or handshake hops) ≥ 750 ms (AD-006) | ≥ 750 ms between Character GET and login GET | Handshake hops: `auth_session_test.dart:157-158` — `greaterThanOrEqualTo(750 * 2)` on one `AuthSession`. Sequential probes: `auth_session_test.dart:287-288` — `greaterThanOrEqualTo(750)` on the **same** session. **Probe then handshake: no assertion.** Production uses **two** `AuthSession` instances (`auto_login_controller.dart:228` probe, `:305` handshake), each initializing `_lastCall = now - delay` (`auth_http.dart:86`), so the login GET after a 302 probe has **no** shared cooldown. Controller tests also `sleep: (_) async {}`. | ❌ GAP |
+
+**Status**: ❌ Gaps present (HB-05 missing-credentials clause; HB-10 probe→handshake 750 ms) + ⚠️ spec-precision gaps (HB-01 cadence, HB-07, HB-08)
+
+---
+
+## Edge Cases
+
+- [x] Character GET 302 → `/Default.aspx` is not followed as part of the probe — `auth_session_test.dart:247` `expect(server.seen.length, 1)`; `auto_login_controller_test.dart:554` `expect(server.seen.length, 1, reason: 'non-login 302 is not logout')` (non-login Location); 302-to-login follow-through is the cycle, not a probe hop
+- [x] Character GET 302 to a non-login path is not logout — `auto_login_controller_test.dart:554-555` `Location: '/World/Popmundo.aspx/Other'` → `seen.length == 1`, `loadUrlCalls` empty
+- [x] CookieManager/`CookieSource` throw skips the tick, not logout — `auto_login_controller_test.dart:620-621` `expect(server.seen, isEmpty)`, `expect(runtime.loadUrlCalls, isEmpty)`
+- [x] Sticky `75.popmundo.com` Character URL; www host-only cookies MUST NOT be sent — `cookie_source_test.dart:46` `expect(on75.map((c) => c.value), ['N75'])`; `auth_session_test.dart:276` `isNot(contains('WWW'))`; `in_app_cookie_sink_test.dart:50-53` host-only `matches(www)` is false
+- [ ] Keepalive FGS ticks every 5 s SHALL NOT cause a Character GET every 5 s — timer is `heartbeatInterval` (tests use days:1); **no assertion** that FGS `onRepeatEvent` does not call `checkSession`. Structural review of `keepalive_task_handler.dart` only. ⚠️ Spec-precision
+- [x] No hardcoded `www.popmundo.com` on the sticky-host probe path — heartbeat 302 test asserts first URL is the 75 Character URL and no request host is www
+- [x] `HostTracker.resolve` not used for Character URL — HB-06 + sensor M4
+- [ ] Missing credentials on the **heartbeat** tick (username / character / password) — not evidenced (HB-05)
+
+---
+
+## Discrimination Sensor
+
+Scratch: `git worktree add /tmp/popflutter-hb-sensor HEAD`. Real working tree never mutated. Restored after each mutant (`git checkout --` in the worktree). Worktree removed after the run.
+
+| # | Mutation | File:line | Description | Killed? |
+| - | -------- | --------- | ----------- | ------- |
+| 1 | `auth_http.dart:124-134` | `probe` calls `_run` (follows 302) instead of a single GET | ✅ Killed — `auth_session_test.dart:245` expected 302 got 200; controller `seen.length` 1→2 on non-login 302; 302-renew test lost the login POST |
+| 2 | `auto_login_controller.dart:236` | Treat HTTP 200 as logout (`_runLoginCycle`) | ✅ Killed — `200 means the session is healthy` expected `seen.length == 1`, actual 2 |
+| 3 | `auto_login_controller.dart:193` | Remove `www.popmundo.com` skip | ✅ Killed — `www host is not probed` expected empty `server.seen` |
+| 4 | `auto_login_controller.dart:224` | Build URL with `HostTracker.resolve` (trailing slash) | ✅ Killed — expected `…/Character`, actual `…/Character/` (HB-06 reason) |
+| 5 | `cookie_sink.dart:40` + `auth_http.dart:216` | Drop `matches` filter (www host-only cookies sent to 75) | ✅ Killed — `cookie_source_test.dart:46` expected `['N75']` got `['WWW','N75']`; `auth_session_test.dart:276` Cookie header contained `WWW` |
+
+**Sensor depth**: P0-full (auth path, ≥5 manual mutations; no language mutation tool in-repo)
+**Result**: 5/5 killed — PASS ✅ for the injected faults. Does **not** discriminate HB-05 missing-credentials, HB-10 probe→handshake cooldown, or the 60 s default (those mutants were not in the required set and would likely survive).
+
+Worktree and main tree confirmed clean after restore.
+
+---
+
+## Interactive UAT Results
+
+Not performed. Heartbeat is a background native GET; no new user-facing chrome. Snackbars reuse the AD-018 cycle. Device/iOS suspend is out of the unit-test tier (AD-015: `dart test` never hits popmundo.com).
+
+---
+
+## Code Quality
+
+| Principle | Status |
+| --------- | ------ |
+| Minimum code | ✅ CookieSource sibling of CookieSink; `probe` is one hop; timer is `Timer.periodic` not `_sleep` |
+| Surgical changes | ✅ Diff is autologin + `InAppCookieSink.read` + composition + docs |
+| No scope creep | ✅ |
+| Matches patterns | ✅ Ports in utils, adapter in webview, wiring in app; fake `AuthHttpSend` |
+| Spec-anchored outcome check | ❌ HB-05 / HB-10 asserted values missing; HB-01 60 s not asserted |
+| Per-layer Coverage Expectation met | ⚠️ Domain covers happy 302/200/www/disabled/inFlight; adapter maps host-only; missing-credentials + probe→handshake throttle not 1:1 |
+| Every test maps to a spec requirement — no unclaimed tests | ✅ In-scope tests map to HB-* / listed edge cases |
+| Documented guidelines followed | ✅ `CLAUDE.md`: `dart test` / `flutter test` never load popmundo.com; FakePopmundoRuntime + scripted `_FakeServer` |
+| Would senior engineer approve? | ⚠️ Two `AuthSession` instances reset AD-006 cooldown between probe and handshake |
+
+`AutoLoginController` is already well over the 200–300 line local guideline; heartbeat added `checkSession` in-place (design accepted this).
+
+---
+
+## Gate Check
+
+- **Gate command** (as specified for this verification):
+  1. `cd packages/popmundo_utils && dart test`
+  2. `cd packages/popmundo_webview && flutter test test/in_app_cookie_sink_test.dart`
+  3. `cd /home/wellbritto/Documentos/Projetos/popflutter && flutter analyze packages/popmundo_utils packages/popmundo_webview apps/popmundo_app`
+- **Result**: 187 + 6 passed, 0 failed, 0 skipped; analyzer **No issues found** (3 packages, 5.2s)
+- **Test count before feature**: 172 (`popmundo_utils` dart test, AD-018 cleanup historical report in this file)
+- **Test count after feature**: 187 (`popmundo_utils` dart test this run)
+- **Delta**: +15 utils tests (`cookie_source_test.dart` 3; `auth_session_test.dart` probe group 3; `auto_login_controller_test.dart` heartbeat group 9). Webview `gameCookieFromInApp` group +3 (file total 6 in this scoped run).
+- **Skipped tests**: none
+- **Failures**: none
+- **Test integrity**: no tests deleted or weakened in `f4c18eb^..HEAD`
+
+---
+
+## Fix Plans
+
+### Fix 1: HB-10 — share cooldown between probe and handshake
+
+- **Root cause**: `checkSession` constructs an `AuthSession` for `probe`, then `_runNativeHandshake` constructs a **second** `AuthSession`. Each sets `_lastCall = now - delay`, so the Character GET and the following login GET are not 750 ms apart.
+- **Fix task**: Use one `AuthSession` (or one shared cooldown clock) for probe + handshake; add a virtual-clock test that asserts `clock.now` gap ≥ 750 ms between the Character GET and the next native call. Keep `sleep: (_) async {}` out of that test.
+- **Verify**: `cd packages/popmundo_utils && dart test test/auto_login_controller_test.dart --name "session heartbeat"` plus the new throttle test; mutant that splits sessions again must fail.
+- **Done when**: HB-10 assertion targets ≥ 750 ms probe→handshake; sensor kill documented.
+- **Priority**: Major (AD-006 throttle / logout risk)
+
+### Fix 2: HB-05 — heartbeat skip when credentials are missing
+
+- **Root cause**: `checkSession` copies the armed-settings guard, but tests only cover www / disabled / inFlight on that path. Missing username/character/password is tested only on `_onNavigation`.
+- **Fix task**: Three heartbeat cases (empty username, empty character, deleted password) with sticky `75.` + 302 route wired — `expect(server.seen, isEmpty)`.
+- **Verify**: mutant that removes only the `checkSession` credential guard fails those tests and still passes navigation guards.
+- **Done when**: HB-05 four skip clauses each have `file:line` evidence on the heartbeat path.
+- **Priority**: Major
+
+### Fix 3: HB-01 cadence / HB-07 / HB-08 — spec-precision (non-blocking if 1–2 land)
+
+- **HB-01**: `expect(AutoLoginController(...).heartbeatInterval, const Duration(seconds: 60))` (or equivalent) so a 5 s default cannot survive. Do not wait 60 s in unit tests.
+- **HB-07**: Unit-assert `KeepaliveTaskHandler.onRepeatEvent` payload is only a timestamp key (no Character URL). Device proof that the Dart timer fires in Android background remains UAT.
+- **HB-08**: Leave as documented limitation / iOS UAT; do not invent a unit test that cannot suspend the process.
+- **Priority**: Minor (HB-01) / Cosmetic-to-Minor (HB-07, HB-08)
+
+---
+
+## Requirement Traceability Update
+
+| Requirement | Previous Status | New Status |
+| ----------- | --------------- | ---------- |
+| HB-01 | Execute / Done | ⚠️ Verified with spec-precision gap (60 s default untested) |
+| HB-02 | Execute / Done | ✅ Verified |
+| HB-03 | Execute / Done | ✅ Verified |
+| HB-04 | Execute / Done | ✅ Verified |
+| HB-05 | Execute / Done | ❌ Needs Fix (missing credentials on heartbeat path) |
+| HB-06 | Execute / Done | ✅ Verified |
+| HB-07 | Execute / Done | ⚠️ Spec-precision gap |
+| HB-08 | Execute / Done | ⚠️ Spec-precision gap |
+| HB-09 | Execute / Done | ✅ Verified |
+| HB-10 | Execute / Done | ❌ Needs Fix (probe→handshake 750 ms) |
+
+---
+
+## Summary
+
+**Overall**: ❌ Not Ready
+
+**Spec-anchored check**: 5/10 ACs fully matched spec outcome | 3 spec-precision gaps (HB-01 cadence, HB-07, HB-08) | 2 AC gaps (HB-05, HB-10)
+**Sensor**: 5/5 injected mutants killed
+**Gate**: 193 tests passed (187 utils + 6 webview scoped), analyzer clean, 0 failed
+
+**What works**: Sticky-host Character GET; 302 `/Default.aspx` starts one silent cycle on **75** (not www); 200 / network / 5xx are not logout; probe does not follow the 302; www skip; host-only www cookies are not sent to 75; `currentOrigin.replace` (no trailing slash); `inFlight` drops a second probe tick; CookieSource throw skips the tick; `gameCookieFromInApp` preserves host-only vs `.popmundo.com`.
+
+**Issues found**: (1) Probe and handshake do not share AD-006 cooldown. (2) Heartbeat path has no missing-credentials skip test. (3) 60 s default, FGS-does-not-probe, and iOS suspend≠logout have no spec-anchored assertions.
+
+**Next steps**: Fix tasks 1–2, then re-verify (iteration 1 of 3). HB-08 stays a flagged limitation unless iOS UAT is added.
+
+---
+
 # Auto Login Validation (rework: full-name matching + silent cycle)
 
 **Date**: 2026-08-19

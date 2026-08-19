@@ -164,6 +164,36 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: dart:io jar is separate from the WebView jar (AD-018) (packages/popmundo_utils/autologin)
 - last seen: 2026-08-19T17:12:30Z
 
+### L-026 — Sequential native calls that share a game throttle must use one cooldown clock, and tests must assert the gap between probe and handshake not only between two probes
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `packages/popmundo_utils/autologin` · harmful: 0
+- features: auto-login
+- evidence: HB-10 auto_login_controller.dart:228+305 (packages/popmundo_utils/autologin)
+- last seen: 2026-08-19T19:09:21Z
+
+### L-027 — A skip-guard copied onto a second trigger path needs its own test on that path; covering the guard on navigation does not discriminate a heartbeat-only deletion
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `packages/popmundo_utils/autologin` · harmful: 0
+- features: auto-login
+- evidence: HB-05 checkSession credential guard (packages/popmundo_utils/autologin)
+- last seen: 2026-08-19T19:09:21Z
+
+### L-028 — Platform-suspend behavior that unit tests cannot exercise must be flagged as a spec-precision gap, not counted as covered
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `autologin-heartbeat` · harmful: 0
+- features: auto-login
+- evidence: HB-08 iOS suspend (autologin-heartbeat)
+- last seen: 2026-08-19T19:09:21Z
+
+### L-029 — A production default interval that tests override still needs one assertion of that default so a shorter cadence cannot survive
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `packages/popmundo_utils/autologin` · harmful: 0
+- features: auto-login
+- evidence: HB-01 heartbeatInterval default (packages/popmundo_utils/autologin)
+- last seen: 2026-08-19T19:09:21Z
+
+### L-030 — An isolate-boundary must-not-call requirement needs an assertion on that isolate entrypoint, not only a README
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `apps/popmundo_app/background` · harmful: 0
+- features: auto-login
+- evidence: HB-07 FGS isolate (apps/popmundo_app/background)
+- last seen: 2026-08-19T19:09:21Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

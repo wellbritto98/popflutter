@@ -220,18 +220,18 @@ O ciclo de Auto Login continua **silencioso e fora da WebView**: handshake em HT
 | FDBK-02 | One snackbar per status | Execute | Done |
 | FDBK-03 | Name/message interpolation | Execute | Done |
 | FDBK-04 | EN/PT catalog coverage | Execute | Done |
-| HB-01 | Probe 60 s on sticky host Character URL | Execute | Done |
-| HB-02 | Seed WebView jar; do not follow redirect | Execute | Done |
-| HB-03 | 302 → login path starts Auto Login cycle | Execute | Done |
-| HB-04 | 200 = healthy; network/5xx ≠ logout | Execute | Done |
-| HB-05 | Skip www / disabled / missing / inFlight | Execute | Done |
-| HB-06 | URL from currentOrigin, not resolve/www | Execute | Done |
-| HB-07 | Main-isolate timer; FGS isolate does not probe | Execute | Done |
-| HB-08 | iOS suspend ≠ logout | Execute | Done |
-| HB-09 | Dual trigger + inFlight | Execute | Done |
-| HB-10 | 750 ms between probe and handshake | Execute | Done |
+| HB-01 | Probe 60 s on sticky host Character URL | Execute | ⚠️ Verified (60 s default untested) |
+| HB-02 | Seed WebView jar; do not follow redirect | Execute | ✅ Verified |
+| HB-03 | 302 → login path starts Auto Login cycle | Execute | ✅ Verified |
+| HB-04 | 200 = healthy; network/5xx ≠ logout | Execute | ✅ Verified |
+| HB-05 | Skip www / disabled / missing / inFlight | Execute | ❌ Needs Fix |
+| HB-06 | URL from currentOrigin, not resolve/www | Execute | ✅ Verified |
+| HB-07 | Main-isolate timer; FGS isolate does not probe | Execute | ⚠️ Spec-precision |
+| HB-08 | iOS suspend ≠ logout | Execute | ⚠️ Spec-precision |
+| HB-09 | Dual trigger + inFlight | Execute | ✅ Verified |
+| HB-10 | 750 ms between probe and handshake | Execute | ❌ Needs Fix |
 
-**Coverage:** 34 total, 34 mapped to tests, 0 unmapped
+**Coverage:** 34 total, 32 mapped to tests, 2 unmapped (HB-05 missing-credentials on heartbeat path; HB-10 probe→handshake 750 ms) — see `.specs/features/auto-login/validation.md` Session Heartbeat (AD-019)
 
 ---
 

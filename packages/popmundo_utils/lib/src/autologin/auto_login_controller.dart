@@ -8,6 +8,7 @@ import '../events.dart';
 import '../host_tracker.dart';
 import '../popmundo_runtime.dart';
 import '../secret_store.dart';
+import '../timed_fetch.dart' show ClockNow;
 import 'aspnet_form.dart';
 import 'aspnet_form_data.dart';
 import 'auth_http.dart';
@@ -41,10 +42,12 @@ class AutoLoginController {
     this.cookieSource,
     AutoLoginTrace? trace,
     Future<void> Function(Duration)? sleep,
+    ClockNow? now,
     this.authSend,
     this.heartbeatInterval = const Duration(seconds: 60),
   })  : _trace = trace ?? defaultAutoLoginTrace,
-        _sleep = sleep ?? Future<void>.delayed;
+        _sleep = sleep ?? Future<void>.delayed,
+        _now = now ?? DateTime.now;
 
   static const chooseCharacterPath = '/World/Popmundo.aspx/ChooseCharacter';
   static const worldHomePath = '/World/Popmundo.aspx';
@@ -69,6 +72,7 @@ class AutoLoginController {
 
   final AutoLoginTrace _trace;
   final Future<void> Function(Duration) _sleep;
+  final ClockNow _now;
   IoAuthHttpSender? _ioSender;
 
   AuthHttpSend get _send {
@@ -229,6 +233,7 @@ class AutoLoginController {
         send: _send,
         userAgent: await _readUserAgent(),
         sleep: _sleep,
+        now: _now,
       );
       session.seed(jar);
       final response = await session.probe(url);
@@ -236,7 +241,7 @@ class AutoLoginController {
       if (response.status == 200) return;
       if (!_isLogoutRedirect(url, response)) return;
       _trace('heartbeat: logged out — starting cycle');
-      await _runLoginCycle(loginPath: '/Default.aspx');
+      await _runLoginCycle(loginPath: '/Default.aspx', session: session);
     } on AuthHttpException catch (e) {
       _trace('heartbeat network error: $e');
     } finally {
@@ -252,7 +257,10 @@ class AutoLoginController {
     return AspNetForm.isLoginPath(path);
   }
 
-  Future<void> _runLoginCycle({required String loginPath}) async {
+  Future<void> _runLoginCycle({
+    required String loginPath,
+    AuthSession? session,
+  }) async {
     final settings = await settingsStore.load();
     final password =
         await secretStore.read(AutoLoginSettingsStore.passwordSecretKey);
@@ -285,6 +293,7 @@ class AutoLoginController {
         loginPath: loginPath,
         settings: settings,
         password: password,
+        session: session,
       );
     } on AuthHttpException catch (e) {
       _trace('native handshake failed: $e');
@@ -297,15 +306,17 @@ class AutoLoginController {
     required String loginPath,
     required AutoLoginSettings settings,
     required String password,
+    AuthSession? session,
   }) async {
     final loginUrl = runtime.host.currentOrigin.replace(path: loginPath);
     final userAgent = await _readUserAgent();
     _trace('native handshake from $loginUrl (ua=$userAgent)');
 
-    final session = AuthSession(
+    session ??= AuthSession(
       send: _send,
       userAgent: userAgent,
       sleep: _sleep,
+      now: _now,
     );
 
     _emit(const AutoLoginStatus(AutoLoginPhase.authenticating));

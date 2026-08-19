@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 26,
+  "next_id": 31,
   "lessons": [
     {
       "id": "L-001",
@@ -454,6 +454,96 @@
       ],
       "created": "2026-08-19T17:12:30Z",
       "last_seen": "2026-08-19T17:12:30Z"
+    },
+    {
+      "id": "L-026",
+      "key": "ac_gap::sequential native calls that share a game throttle must use one cooldown clock and tests must assert the gap between probe and handshake not only between two probes",
+      "text": "Sequential native calls that share a game throttle must use one cooldown clock, and tests must assert the gap between probe and handshake not only between two probes",
+      "signal": "ac_gap",
+      "scope": "packages/popmundo_utils/autologin",
+      "status": "candidate",
+      "features": [
+        "auto-login"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "HB-10 auto_login_controller.dart:228+305 (packages/popmundo_utils/autologin)"
+      ],
+      "created": "2026-08-19T19:09:21Z",
+      "last_seen": "2026-08-19T19:09:21Z"
+    },
+    {
+      "id": "L-027",
+      "key": "ac_gap::a skip guard copied onto a second trigger path needs its own test on that path covering the guard on navigation does not discriminate a heartbeat only deletion",
+      "text": "A skip-guard copied onto a second trigger path needs its own test on that path; covering the guard on navigation does not discriminate a heartbeat-only deletion",
+      "signal": "ac_gap",
+      "scope": "packages/popmundo_utils/autologin",
+      "status": "candidate",
+      "features": [
+        "auto-login"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "HB-05 checkSession credential guard (packages/popmundo_utils/autologin)"
+      ],
+      "created": "2026-08-19T19:09:21Z",
+      "last_seen": "2026-08-19T19:09:21Z"
+    },
+    {
+      "id": "L-028",
+      "key": "spec_precision_gap::platform suspend behavior that unit tests cannot exercise must be flagged as a spec precision gap not counted as covered",
+      "text": "Platform-suspend behavior that unit tests cannot exercise must be flagged as a spec-precision gap, not counted as covered",
+      "signal": "spec_precision_gap",
+      "scope": "autologin-heartbeat",
+      "status": "candidate",
+      "features": [
+        "auto-login"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "HB-08 iOS suspend (autologin-heartbeat)"
+      ],
+      "created": "2026-08-19T19:09:21Z",
+      "last_seen": "2026-08-19T19:09:21Z"
+    },
+    {
+      "id": "L-029",
+      "key": "spec_precision_gap::a production default interval that tests override still needs one assertion of that default so a shorter cadence cannot survive",
+      "text": "A production default interval that tests override still needs one assertion of that default so a shorter cadence cannot survive",
+      "signal": "spec_precision_gap",
+      "scope": "packages/popmundo_utils/autologin",
+      "status": "candidate",
+      "features": [
+        "auto-login"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "HB-01 heartbeatInterval default (packages/popmundo_utils/autologin)"
+      ],
+      "created": "2026-08-19T19:09:21Z",
+      "last_seen": "2026-08-19T19:09:21Z"
+    },
+    {
+      "id": "L-030",
+      "key": "spec_precision_gap::an isolate boundary must not call requirement needs an assertion on that isolate entrypoint not only a readme",
+      "text": "An isolate-boundary must-not-call requirement needs an assertion on that isolate entrypoint, not only a README",
+      "signal": "spec_precision_gap",
+      "scope": "apps/popmundo_app/background",
+      "status": "candidate",
+      "features": [
+        "auto-login"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "HB-07 FGS isolate (apps/popmundo_app/background)"
+      ],
+      "created": "2026-08-19T19:09:21Z",
+      "last_seen": "2026-08-19T19:09:21Z"
     }
   ]
 }

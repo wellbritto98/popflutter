@@ -460,6 +460,16 @@ void main() {
     const characterUrl =
         'https://75.popmundo.com/World/Popmundo.aspx/Character';
 
+    test('interval defaults to 60 seconds', () async {
+      final fresh = AutoLoginController(
+        runtime: runtime,
+        settingsStore: settingsStore,
+        secretStore: secrets,
+      );
+      expect(fresh.heartbeatInterval, const Duration(seconds: 60));
+      await fresh.dispose();
+    });
+
     void onGameHost() {
       runtime.host.onNavigation(
           Uri.parse('https://75.popmundo.com/World/Popmundo.aspx'));
@@ -527,6 +537,43 @@ void main() {
       ]);
     });
 
+    test('probe then handshake waits at least 750ms', () async {
+      final clock = _HbClock();
+      final seenAt = <String, DateTime>{};
+      await controller.dispose();
+      controller = AutoLoginController(
+        runtime: runtime,
+        settingsStore: settingsStore,
+        secretStore: secrets,
+        cookieSink: cookies,
+        cookieSource: cookies,
+        trace: trace.add,
+        now: () => clock.now,
+        sleep: clock.sleep,
+        heartbeatInterval: const Duration(days: 1),
+        authSend: (req) async {
+          seenAt[req.url.toString()] = clock.now;
+          return server.call(req);
+        },
+      );
+      statuses = [];
+      controller.status.listen(statuses.add);
+      controller.start();
+      for (var i = 0; i < 10; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      onGameHost();
+      wireLogoutOn75();
+      await controller.checkSession();
+
+      final characterAt = seenAt[characterUrl];
+      final loginAt = seenAt['https://75.popmundo.com/Default.aspx'];
+      expect(characterAt, isNotNull);
+      expect(loginAt, isNotNull);
+      expect(loginAt!.difference(characterAt!).inMilliseconds,
+          greaterThanOrEqualTo(750));
+    });
+
     test('200 means the session is healthy', () async {
       onGameHost();
       server.routes['GET $characterUrl'] =
@@ -574,6 +621,41 @@ void main() {
           username: 'troyfournier',
           characterName: 'Deon Drinkwater',
           status: 0));
+      server.routes['GET $characterUrl'] =
+          const AuthHttpResponse(status: 302, body: '', location: '/Default.aspx');
+      await controller.checkSession();
+      expect(server.seen, isEmpty);
+    });
+
+    test('missing username does not GET Character', () async {
+      onGameHost();
+      await settingsStore.save(const AutoLoginSettings(
+          enabled: true,
+          username: '',
+          characterName: 'Deon Drinkwater',
+          status: 0));
+      server.routes['GET $characterUrl'] =
+          const AuthHttpResponse(status: 302, body: '', location: '/Default.aspx');
+      await controller.checkSession();
+      expect(server.seen, isEmpty);
+    });
+
+    test('missing character name does not GET Character', () async {
+      onGameHost();
+      await settingsStore.save(const AutoLoginSettings(
+          enabled: true,
+          username: 'troyfournier',
+          characterName: '',
+          status: 0));
+      server.routes['GET $characterUrl'] =
+          const AuthHttpResponse(status: 302, body: '', location: '/Default.aspx');
+      await controller.checkSession();
+      expect(server.seen, isEmpty);
+    });
+
+    test('missing password does not GET Character', () async {
+      onGameHost();
+      await secrets.delete(AutoLoginSettingsStore.passwordSecretKey);
       server.routes['GET $characterUrl'] =
           const AuthHttpResponse(status: 302, body: '', location: '/Default.aspx');
       await controller.checkSession();
@@ -662,4 +744,9 @@ class _ThrowingCookies implements CookieSource {
   Future<List<GameCookie>> read(Uri url) async {
     throw StateError('CookieManager unavailable');
   }
+}
+
+class _HbClock {
+  DateTime now = DateTime.utc(2026, 1, 1);
+  Future<void> sleep(Duration d) async => now = now.add(d);
 }
