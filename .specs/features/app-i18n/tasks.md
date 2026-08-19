@@ -206,10 +206,10 @@ T8
 
 **Done when**:
 
-- [ ] No literal UI copy remains in the screen
-- [ ] All 5 existing autologin tests green through harness (status dropdown EN labels still asserted)
-- [ ] Gate check passes: quick gate
-- [ ] Test count: unchanged vs T5 (conversions only)
+- [x] No literal UI copy remains in the screen
+- [x] All existing autologin tests green through harness (status dropdown EN labels still asserted)
+- [x] Gate check passes: quick gate
+- [x] Test count: 66 (unchanged vs T5; conversions only)
 
 **Tests**: widget
 **Gate**: quick
