@@ -79,11 +79,11 @@ T8
 
 **Done when**:
 
-- [ ] `flutter pub get` resolves the workspace with easy_localization 3.0.8
-- [ ] Both JSON files parse; key sets identical across en/pt (verify with a throwaway Dart/pwsh comparison — not committed)
-- [ ] PT copy follows spec assumptions (status terms per A5; endonyms identical)
-- [ ] Gate check passes: build gate — `flutter analyze apps/popmundo_app` clean
-- [ ] Test count: 55 app tests still pass (no behavior change yet)
+- [x] `flutter pub get` resolves the workspace with easy_localization 3.0.8
+- [x] Both JSON files parse; key sets identical across en/pt (verify with a throwaway Dart/pwsh comparison — not committed)
+- [x] PT copy follows spec assumptions (status terms per A5; endonyms identical)
+- [x] Gate check passes: build gate — `flutter analyze apps/popmundo_app` clean
+- [x] Test count: 55 app tests still pass (no behavior change yet)
 
 **Tests**: none (asset/config layer — render-validated by T2 boot smoke)
 **Gate**: build
@@ -104,12 +104,12 @@ T8
 
 **Done when**:
 
-- [ ] App boots through the EasyLocalization wrapper (harness proves catalogs load)
-- [ ] Boot smoke: EN probe 'No options available.' and PT probe 'Nenhuma opção disponível.' both render via `menu.empty`
-- [ ] Unsupported-locale edge covered: startLocale e.g. `Locale('fr')` renders EN fallback
-- [ ] Info.plist declares CFBundleLocalizations; platform_config_test asserts it
-- [ ] Gate check passes: `cd apps/popmundo_app && flutter test`
-- [ ] Test count: 58 tests pass (55 baseline + 2 boot smoke + 1 config; no deletions)
+- [x] App boots through the EasyLocalization wrapper (harness proves catalogs load)
+- [x] Boot smoke: EN probe 'No options available.' and PT probe 'Nenhuma opção disponível.' both render via `menu.empty`
+- [x] Unsupported-locale edge covered: `startLocale: Locale('fr')` is a library override (loads `fr.json`), not the device path — covered via omitted `startLocale` + `fallbackLocale` + supported-list contract (`fr` → `en`)
+- [x] Info.plist declares CFBundleLocalizations; platform_config_test asserts it
+- [x] Gate check passes: `cd apps/popmundo_app && flutter test`
+- [x] Test count: 61 tests pass (55 baseline + 2 boot smoke + 1 config + 3 AC2/AC4 wiring; no deletions)
 
 **Tests**: widget (boot smoke) + unit (platform config)
 **Gate**: quick

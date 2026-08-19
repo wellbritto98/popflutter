@@ -60,6 +60,16 @@ void main() {
     expect(plist.contains('NSIncludesSubdomains'), isTrue);
   });
 
+  test('iOS Info.plist declares the app shell supported localizations', () {
+    final plist = _open([
+      'ios/Runner/Info.plist',
+      'apps/popmundo_app/ios/Runner/Info.plist',
+    ]);
+    expect(plist.contains('CFBundleLocalizations'), isTrue);
+    expect(plist.contains('<string>en</string>'), isTrue);
+    expect(plist.contains('<string>pt</string>'), isTrue);
+  });
+
   test('iOS Info.plist declares background fetch for foreground_task', () {
     final plist = _open([
       'ios/Runner/Info.plist',
