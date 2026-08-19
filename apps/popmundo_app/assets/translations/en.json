@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Popmundo"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
+    "import": "Import",
+    "url": "URL"
+  },
+  "menu": {
+    "autoLogin": "Auto Login",
+    "autoLoginSubtitle": "Credentials and character for TimedFetch login",
+    "userscripts": "Userscripts",
+    "userscriptsSubtitle": "Import, enable and remove .user.js scripts",
+    "debugPanel": "Debug panel",
+    "debugPanelSubtitle": "Inspect host, network, console and eval JS",
+    "language": "Language",
+    "languageSubtitle": "English or Português",
+    "empty": "No options available."
+  },
+  "language": {
+    "dialogTitle": "Choose language"
+  },
+  "userscripts": {
+    "title": "Userscripts",
+    "add": "Add userscript",
+    "empty": "No userscripts yet",
+    "imported": "Imported '{}'",
+    "deleteTitle": "Delete userscript?",
+    "deleteConfirm": "Delete '{}'? This cannot be undone."
+  },
+  "autologin": {
+    "title": "Auto Login",
+    "enabled": "Enabled",
+    "enabledSubtitle": "POST login via TimedFetch when the login page appears",
+    "username": "Username",
+    "password": "Password",
+    "passwordKeep": "Leave blank to keep the stored password",
+    "passwordRequired": "Required for Auto Login",
+    "clearPassword": "Clear stored password",
+    "character": "Character name",
+    "characterHelp": "Must match Choose / Escolher button label",
+    "status": "Status",
+    "saved": "Auto Login settings saved",
+    "saveFailed": "Save failed: {}",
+    "statusNormal": "Normal",
+    "statusBusy": "Busy",
+    "statusMobile": "Mobile",
+    "statusAway": "Away",
+    "statusDrunk": "Drunk"
+  },
+  "keepalive": {
+    "notificationTitle": "Popmundo is running",
+    "notificationText": "Keeping your session alive in the background."
+  }
+}

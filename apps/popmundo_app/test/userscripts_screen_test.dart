@@ -195,7 +195,7 @@ void main() {
     final gate = Completer<String>();
     Future<String> slowGet(Uri requested, {Duration? timeout}) async {
       if (requested.toString() != url) {
-        throw UserScriptImportException('unexpected ${requested}');
+        throw UserScriptImportException('unexpected $requested');
       }
       return gate.future;
     }

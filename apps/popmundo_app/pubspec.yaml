@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  easy_localization: ^3.0.8
   popmundo_utils:
     path: ../../packages/popmundo_utils
   popmundo_webview:
@@ -57,6 +58,11 @@ dev_dependencies:
 
 patrol:
   app_name: Popmundo
+  # NOTE: emit_test_manifest was tried and does NOT help. It generates one real
+  # @Test per Dart test, but AndroidJUnitRunner still runs them in a single app
+  # process, so Patrol's single-shot PatrolAppService still fails every test
+  # after the first (upstream issues 2005 / 2380). The working constraint is
+  # one patrolTest per file — see the header of integration_test/keepalive_test.dart.
   android:
     package_name: com.popmundo.popmundo_app
   ios:
@@ -72,6 +78,7 @@ flutter:
 
   assets:
     - assets/popflutter_logo.png
+    - assets/translations/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

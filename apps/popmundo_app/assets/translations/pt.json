@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Popmundo"
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "save": "Salvar",
+    "import": "Importar",
+    "url": "URL"
+  },
+  "menu": {
+    "autoLogin": "Login automático",
+    "autoLoginSubtitle": "Credenciais e personagem para login via TimedFetch",
+    "userscripts": "Userscripts",
+    "userscriptsSubtitle": "Importe, ative e remova scripts .user.js",
+    "debugPanel": "Painel de debug",
+    "debugPanelSubtitle": "Inspecione host, rede, console e eval JS",
+    "language": "Idioma",
+    "languageSubtitle": "English ou Português",
+    "empty": "Nenhuma opção disponível."
+  },
+  "language": {
+    "dialogTitle": "Escolher idioma"
+  },
+  "userscripts": {
+    "title": "Userscripts",
+    "add": "Adicionar userscript",
+    "empty": "Nenhum userscript ainda",
+    "imported": "'{}' importado",
+    "deleteTitle": "Excluir userscript?",
+    "deleteConfirm": "Excluir '{}'? Isso não pode ser desfeito."
+  },
+  "autologin": {
+    "title": "Login automático",
+    "enabled": "Ativado",
+    "enabledSubtitle": "Faz POST de login via TimedFetch quando a página de login aparecer",
+    "username": "Usuário",
+    "password": "Senha",
+    "passwordKeep": "Deixe em branco para manter a senha armazenada",
+    "passwordRequired": "Obrigatório para o login automático",
+    "clearPassword": "Limpar senha armazenada",
+    "character": "Nome do personagem",
+    "characterHelp": "Deve corresponder ao rótulo do botão Choose / Escolher",
+    "status": "Status",
+    "saved": "Configurações de login automático salvas",
+    "saveFailed": "Falha ao salvar: {}",
+    "statusNormal": "Normal",
+    "statusBusy": "Ocupado",
+    "statusMobile": "Celular",
+    "statusAway": "Ausente",
+    "statusDrunk": "Bêbado"
+  },
+  "keepalive": {
+    "notificationTitle": "Popmundo está em execução",
+    "notificationText": "Mantendo sua sessão ativa em segundo plano."
+  }
+}
