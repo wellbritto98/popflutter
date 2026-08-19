@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 15,
+  "next_id": 18,
   "lessons": [
     {
       "id": "L-001",
@@ -256,6 +256,60 @@
       ],
       "created": "2026-08-19T01:10:56Z",
       "last_seen": "2026-08-19T01:10:56Z"
+    },
+    {
+      "id": "L-015",
+      "key": "spec_precision_gap::when a test injects a short timeout to keep itself bounded assert the elapsed wall clock time is within that bound not just the resulting exception s type and message",
+      "text": "When a test injects a short timeout to keep itself bounded, assert the elapsed wall-clock time is within that bound, not just the resulting exception's type and message.",
+      "signal": "spec_precision_gap",
+      "scope": "apps/popmundo_app",
+      "status": "candidate",
+      "features": [
+        "mobile-e2e-tests"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "apps/popmundo_app/integration_test/userscripts_test.dart:120-130 (US-04) (apps/popmundo_app)"
+      ],
+      "created": "2026-08-19T01:27:26Z",
+      "last_seen": "2026-08-19T01:27:26Z"
+    },
+    {
+      "id": "L-016",
+      "key": "spec_precision_gap::an idempotency criterion no duplicate action on repeat call needs an assertion on the action s call count or side effect not just that the end state boolean stays true afterward",
+      "text": "An idempotency criterion (no duplicate action on repeat call) needs an assertion on the action's call count or side effect, not just that the end-state boolean stays true afterward.",
+      "signal": "spec_precision_gap",
+      "scope": "apps/popmundo_app",
+      "status": "candidate",
+      "features": [
+        "mobile-e2e-tests"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "apps/popmundo_app/integration_test/keepalive_test.dart:79-89 (KA-04) (apps/popmundo_app)"
+      ],
+      "created": "2026-08-19T01:27:32Z",
+      "last_seen": "2026-08-19T01:27:32Z"
+    },
+    {
+      "id": "L-017",
+      "key": "spec_deviation::patrol leancodepl patrol runs exactly one dart test per app process per install design device test task breakdowns as one patroltest per file from the start not one task per acceptance criterion",
+      "text": "Patrol (leancodepl/patrol) runs exactly one Dart test per app process per install -- design device-test task breakdowns as one patrolTest per file from the start, not one task per acceptance criterion.",
+      "signal": "spec_deviation",
+      "scope": "patrol",
+      "status": "candidate",
+      "features": [
+        "mobile-e2e-tests"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "commits 315c27d, dacb11c, 45771fd (T3/T4/T5, T6/T7/T8, T9/T10 merges) (patrol)"
+      ],
+      "created": "2026-08-19T01:27:39Z",
+      "last_seen": "2026-08-19T01:27:39Z"
     }
   ]
 }
