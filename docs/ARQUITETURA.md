@@ -1,48 +1,58 @@
 # Arquitetura do Sistema — Popflutter
 
-> Documento gerado por análise estática do código-fonte real (imports, chamadas, configs) e dos artefatos de spec-driven development em `.specs/features/popmundo-wrapper/` e `.specs/STATE.md`. Onde a análise exigiu inferência sem confirmação direta no código, o trecho está marcado como **Hipótese**.
+> Documento gerado por análise estática do código-fonte real (imports, chamadas, configs) e dos artefatos em `.specs/STATE.md` e `.specs/features/`. Onde a análise exigiu inferência sem confirmação direta no código, o trecho está marcado como **Hipótese**.
 >
-> Última atualização: 2026-08-17.
+> Última atualização: 2026-08-19.
 
 ---
 
 ## 1. Visão arquitetural do projeto
 
-Popflutter é um monorepo Flutter (workspace via `pubspec.yaml` + `melos.yaml`, ver `AD-001` em `.specs/STATE.md`) com três unidades de deploy/publicação:
+Popflutter é um monorepo Flutter (workspace via `pubspec.yaml` da raiz + `melos.yaml` só com globs de pacote, `AD-001`) com três unidades:
 
 ```
-apps/popmundo_app       -> shell Flutter (Android + iOS), composition root, overlay de debug
-packages/popmundo_webview -> adapter Flutter para flutter_inappwebview + JS bridge
-packages/popmundo_utils   -> Dart puro (sem Flutter), contrato + helpers
+apps/popmundo_app        → shell Flutter (Android + iOS), composition root, UI nativa
+packages/popmundo_webview → adapter Flutter para flutter_inappwebview + JS bridge
+packages/popmundo_utils   → Dart puro (sem Flutter), contrato + regras de negócio
 ```
 
-A UI principal do produto **é a própria página web do Popmundo**, renderizada dentro de um `InAppWebView`. O app Flutter não reimplementa a UI do jogo; ele:
+A UI principal do produto **é a própria página web do Popmundo**, renderizada dentro de um `InAppWebView`. O app Flutter não reimplementa a UI do jogo. Ele:
 
-1. hospeda o WebView em tela cheia;
+1. hospeda o WebView em tela cheia (`PopmundoWebView` dentro de `AppShell`);
 2. observa (sem alterar) tráfego de rede, console e navegação da página;
-3. expõe, em Dart, uma "fundação" de utilitários equivalente ao `common/` do projeto de referência [Popmundo-Utils](https://github.com/ilpersi/Popmundo-Utils) (GPL-3), para que features futuras possam ser construídas sem reimplementar a extensão Chrome original;
-4. oferece um overlay de debug nativo (FAB + painel) para inspecionar host atual, eventos de rede/console e rodar `evaluateJavascript` ad-hoc.
+3. persiste cookies da sessão (não incógnito) e, se configurado, reautentica em silêncio (Auto Login via HTTP nativo + sync de cookies);
+4. injeta UserScripts do jogador e um polyfill `GM_*`/`GM.*`;
+5. mantém um keepalive de processo em segundo plano (Foreground Service no Android);
+6. expõe, em Dart, uma fundação equivalente ao `common/` do [Popmundo-Utils](https://github.com/ilpersi/Popmundo-Utils) (GPL-3).
 
-A camada `popmundo_utils` é isolada do Flutter/WebView por um contrato (`PopmundoRuntime`), permitindo testar toda a lógica de negócio com um runtime falso, sem dispositivo/emulador.
+A camada `popmundo_utils` é isolada do Flutter/WebView pelo contrato `PopmundoRuntime`. Lógica de negócio é testável com `FakePopmundoRuntime`, sem dispositivo.
 
 ```mermaid
 graph TD
   Player[Jogador] --> App[popmundo_app]
   App --> Shell[AppShell]
-  Shell --> Sidebar[AppSidebar]
-  Registry[buildAppMenuItems] --> Sidebar
+  Registry[buildAppMenuItems] --> Sidebar[AppSidebar]
+  GmReg[GmMenuRegistry] --> Sidebar
+  Shell --> Sidebar
   Shell --> Overlay[DebugOverlay controlado]
-  Overlay --> Widget[PopmundoWebView]
+  Overlay --> GmNotif[GmNotificationOverlay]
+  GmNotif --> Widget[PopmundoWebView]
   Widget --> WV[InAppWebView]
   WV --> Site["*.popmundo.com"]
   Widget --> Runtime[InAppPopmundoRuntime]
-  Hooks[UserScripts hooks.js/helpers.js] --> Handler["callHandler 'popmundo'"]
-  Handler --> Runtime
+  Hooks[UserScripts hooks.js/helpers.js + catalog] --> Handler["callHandler 'popmundo'"]
+  Handler --> Bridge[PopmundoJsBridge]
+  Bridge --> Runtime
   Runtime --> Bus[PopmundoEventBus]
   Overlay --> Bus
+  AutoLogin[AutoLoginController] --> Auth[AuthSession dart:io]
+  Auth --> CookieSink[CookieSink / InAppCookieSink]
+  CookieSink --> CookieMgr[CookieManager WebView]
+  AutoLogin --> Runtime
+  GmHost[GmHostHandler] --> Bus
+  GmHost --> TimedFetch
   TimedFetch --> Runtime
-  Utils_Notifications_Storage --> Runtime
-  Utils_Notifications_Storage --> Store[KeyValueStore]
+  Keepalive[BackgroundKeepalive] --> FGS[flutter_foreground_task]
 ```
 
 ---
@@ -51,43 +61,54 @@ graph TD
 
 | Padrão | Onde | Evidência no código |
 | ------ | ---- | -------------------- |
-| **Porta/Adapter (Ports & Adapters)** | `PopmundoRuntime` (porta, em `popmundo_utils`) vs. `InAppPopmundoRuntime` (adapter, em `popmundo_webview`) | `packages/popmundo_utils/lib/src/popmundo_runtime.dart` declara a `abstract class`; `packages/popmundo_webview/lib/src/in_app_runtime.dart` implementa |
-| **Composition root** | `apps/popmundo_app/lib/main.dart` monta `InAppPopmundoRuntime()` + `SharedPreferencesStore(prefs)` e injeta em `PopmundoApp` | Nenhum outro ponto do código instancia o runtime concreto |
-| **Facade** | `Utils`, `Notifications`, `Scoring`, `CssSelectorHelper`, `XPathHelper` — encapsulam chamadas `runtime.evaluate(...)` para funções JS de `window.__popmundo.*` | `packages/popmundo_utils/lib/src/{utils,notifications,scoring,css_selector}.dart` |
-| **Event Bus / Observer** | `PopmundoEventBus` com streams broadcast (`network`, `console`, `navigation`) | `packages/popmundo_utils/lib/src/events.dart` |
-| **Repository mínimo / Strategy de storage** | `KeyValueStore` (contrato) → `MemoryKeyValueStore` (testes, em `popmundo_utils`) e `SharedPreferencesStore` (produção, em `popmundo_app`) | `packages/popmundo_utils/lib/src/storage.dart`, `apps/popmundo_app/lib/prefs_store.dart` |
-| **Fila serial / rate limiter** | `TimedFetch` encadeia `Future` anterior + espera por `delay` antes de cada fetch | `packages/popmundo_utils/lib/src/timed_fetch.dart` |
-| **Injeção de dependência manual (sem framework de DI)** | Construtores recebem `PopmundoRuntime`, `KeyValueStore`, `TimedFetch` explicitamente | Em todos os arquivos de `popmundo_utils` |
-| **Fila de mensagens até bridge pronto (client-side buffering)** | `hooks.js` guarda mensagens em `queue` até `flutterInAppWebViewPlatformReady` disparar | `packages/popmundo_webview/assets/js/hooks.js:3-22` |
-| **InheritedWidget para contexto compartilhado** | `PopmundoScope` expõe `runtime`/`storage` para a árvore de widgets do app | `apps/popmundo_app/lib/app.dart:89-112` |
+| **Porta/Adapter** | `PopmundoRuntime` vs. `InAppPopmundoRuntime`; `CookieSink` vs. `InAppCookieSink`; `SecretStore` vs. `FlutterSecureSecretStore`; `KeyValueStore` vs. `SharedPreferencesStore` / `MemoryKeyValueStore`; `UserScriptWebViewPort` vs. `InAppUserScriptWebViewPort`; `BackgroundPlatform` vs. `FlutterForegroundTaskPlatform` | Contratos em `popmundo_utils` (e `background_platform.dart` no app); implementações no adapter/app |
+| **Composition root** | `apps/popmundo_app/lib/main.dart` monta runtime, store, keepalive e `EasyLocalization`; `PopmundoHome` monta catalog, TimedFetch, AutoLogin, GM host | Nenhum outro ponto instancia `InAppPopmundoRuntime()` |
+| **Facade** | `Utils`, `Notifications`, `Scoring`, `CssSelectorHelper`, `XPathHelper` — `runtime.evaluate('window.__popmundo.<fn>(...)')` | `packages/popmundo_utils/lib/src/{utils,notifications,scoring,css_selector}.dart` |
+| **Event Bus** | `PopmundoEventBus` com streams `network`, `console`, `navigation`, `gmValue`, `gmCall` | `packages/popmundo_utils/lib/src/events.dart` |
+| **Fila serial / rate limiter** | `TimedFetch` (in-page) e `AuthSession` (HTTP nativo do Auto Login) — delay padrão 750 ms | `timed_fetch.dart`, `auth_http.dart` |
+| **DI manual** | Construtores recebem portas explicitamente; sem framework de DI | Todo `popmundo_utils` e o composition root |
+| **Buffer até bridge pronto** | `hooks.js` enfileira até `flutterInAppWebViewPlatformReady` | `packages/popmundo_webview/assets/js/hooks.js` |
+| **InheritedWidget** | `PopmundoScope` expõe `runtime`/`storage` | `apps/popmundo_app/lib/app.dart` — **nenhum** `PopmundoScope.of` no repositório |
+| **Registro de menu** | `buildAppMenuItems` é a única fonte da lista fixa do sidebar | `apps/popmundo_app/lib/menu/app_menu_registry.dart` |
+| **Polyfill por prelude JS** | `UserScriptGmShim` gera closure por script; host APIs voltam pelo canal `type: 'gm'` | `userscript_gm_shim.dart`, `js_bridge.dart`, `gm_host_handler.dart` |
 
 ---
 
 ## 3. Regras arquiteturais
 
-Estas regras são impostas pelo código e/ou registradas como decisões em `.specs/STATE.md` (AD-001 a AD-008):
+Registradas em `.specs/STATE.md` (AD-001 a AD-018; AD-011 e AD-017 **superseded**):
 
-1. **`popmundo_utils` não pode depender de Flutter nem de `flutter_inappwebview`.** O `pubspec.yaml` do pacote não declara `flutter` como dependência; toda a lógica é testável com `dart test` puro (ver `packages/popmundo_utils/test/*`, todos usam `FakePopmundoRuntime`).
-2. **Interceptação de rede é somente-observação.** `shouldInterceptFetchRequest`/`shouldInterceptAjaxRequest` sempre retornam o `request` original inalterado; `shouldInterceptRequest` (Android) sempre retorna `null` via `ObservePolicy.observeOnlyResourceResponse()`. Nenhum caminho do código constrói um `WebResourceResponse` substituto (AD-003).
-3. **Host sticky nunca é hardcoded após o primeiro load.** `HostTracker` é a única fonte de verdade para o host atual; `TimedFetch._absoluteUrl` e `Utils.getServerLink` sempre resolvem contra `runtime.host.currentOrigin`/`resolve()`, nunca contra a string literal `www.popmundo.com` (AD-007).
-4. **Sessão nunca é incógnita.** `PopmundoWebSettings.defaults()` fixa `incognito: false` (AD-004).
-5. **Um único canal de comunicação JS→Dart.** Todo evento da página passa pelo handler nomeado `'popmundo'` com payload `{type, payload}`; o roteamento por `type` acontece em Dart (`PopmundoJsBridge.handle`), não em múltiplos handlers.
-6. **`Scoring` nunca roda automaticamente no load da página.** `Scoring.autoApplyOnLoad` é uma constante `false` documentada; nenhum `UserScript` chama `applyScoringNumbers()` sozinho — é uma API que o desenvolvedor invoca.
-7. **Licenciamento GPL-3 é uma restrição de arquitetura, não só legal.** Como os pacotes derivam de um port do `common/` do Popmundo-Utils (GPL-3), APIs `chrome.*` são reimplementadas em Dart do zero (nunca copiadas), e o repositório inteiro herda GPL-3.0-or-later (AD-005, ver `LICENSE`/`NOTICE`).
-8. **Cookies nunca expõem valor na UI de debug.** `DebugOverlay`/`CookieSummary` só carregam `name`+`domain` (`apps/popmundo_app/lib/app.dart:53-67`), nunca `cookie.value`.
-9. **Nenhum widget do shell nativo pode instalar um reconhecedor de gesto sobre a área do WebView.** `AppShell` fixa `drawerEnableOpenDragGesture: false` (AD-009) para que o gesto de abrir o `Drawer` arrastando da borda esquerda nunca capture toques horizontais destinados ao jogo — qualquer novo controle nativo sobre `PopmundoWebView` deve preservar essa regra.
+1. **`popmundo_utils` não depende de Flutter nem de `flutter_inappwebview`.** Pode usar Dart puro (`html`, `dart:io` só em `auth_http_io.dart`). Testes padrão: `dart test` (globa `test/`).
+2. **Interceptação de rede é somente-observação (AD-003).** `shouldInterceptFetchRequest`/`shouldInterceptAjaxRequest` devolvem o request original; `shouldInterceptRequest` (Android) devolve `null` via `ObservePolicy.observeOnlyResourceResponse()`. Nenhum caminho constrói `WebResourceResponse` substituto.
+3. **Host sticky nunca é hardcoded após o primeiro load (AD-007).** `HostTracker` é a fonte da origem; `TimedFetch` e `Utils.getServerLink` resolvem contra `currentOrigin`. Auto Login, depois do handshake, resolve contra o host em que o POST realmente aterrissou (`landed.finalUrl.host`), não contra um origin guardado (AD-018).
+4. **Sessão nunca é incógnita (AD-004).** `PopmundoWebSettings.defaults()` fixa `incognito: false`.
+5. **Um único canal JS→Dart.** Handler `'popmundo'`, payload `{type, payload}`. `type` ∈ `ready` \| `network` \| `console` \| `gmValue` \| `gm`. Navegação **não** passa por esse handler — vem de callbacks nativos (`onLoadStart`, `onUpdateVisitedHistory`, `shouldOverrideUrlLoading`).
+6. **`Scoring` nunca auto-roda no load.** `Scoring.autoApplyOnLoad` é `false`.
+7. **GPL-3.0-or-later (AD-005).** Equivalentes de `chrome.*` são reimplementados em Dart, nunca copiados.
+8. **Cookies nunca expõem valor na UI de debug.** Overlay mostra `name@domain`.
+9. **Nenhum gesto nativo sobre a área do WebView (AD-009).** `AppShell` fixa `drawerEnableOpenDragGesture: false`.
+10. **UserScripts do jogador nunca chamam `removeAllUserScripts` (AD-010).** Grupos `userscript:<id>`; builtins `hooks.js`/`helpers.js` permanecem.
+11. **Download de `.user.js` / `@require` / `@resource` não usa TimedFetch (AD-010).** Fetcher HTTP do app (`userscript_http.dart`).
+12. **Keepalive não toca WebView nem TimedFetch (AD-012).** Isolate do FGS só emite heartbeat. `stopWithTask` é `false` (AD-013).
+13. **i18n da shell (AD-014).** `easy_localization`, catálogos `en`/`pt`. `popmundo_utils`/`popmundo_webview` e o DebugOverlay permanecem em inglês.
+14. **Dois tiers de teste no app (AD-015).** `flutter test` (fakes) vs. Patrol em `integration_test/` (device-real, **nunca** carrega popmundo.com). Exatamente um `patrolTest` por arquivo.
+15. **Auto Login autentica fora da WebView (AD-018).** `AuthSession` em `dart:io`, redirects manuais, cookies copiados via `CookieSink`. Sem fallback de `form.submit()`. Observe-only (AD-003) permanece.
+16. **Senha só em `SecretStore`.** Settings não-secretos em `autologin.v1`. Nunca gravar senha em `KeyValueStore`.
+17. **System-back consome histórico do WebView** antes de sair do app (`WebViewBackHandler` + `PopScope` em `PopmundoWebView`).
 
 ---
 
 ## 4. Convenções técnicas
 
-- **Nomenclatura de pacote interno**: `window.__popmundo` é o namespace JS único injetado por `helpers.js`/`hooks.js`; todas as facades Dart (`Utils`, `Notifications`, `CssSelectorHelper`, `Scoring`) chamam funções desse namespace via `runtime.evaluate('window.__popmundo.<fn>(...)')`.
-- **Serialização JS↔Dart**: argumentos sempre passam por `jsonEncode`/`jsonDecode` explícito nas facades (nunca interpolação de string crua de valores do usuário), e.g. `notifications.dart:29-30`, `css_selector.dart:12-13`.
-- **Testabilidade sem device**: todo pacote/app tem um "fake" de canto: `FakePopmundoRuntime` (`popmundo_utils/test/fake_runtime.dart`), `MemoryKeyValueStore` (produção, reaproveitada em testes), streams fake nos testes de widget do overlay.
-- **Assets JS versionados como parte do pacote**: `hooks.js`/`helpers.js` ficam em `packages/popmundo_webview/assets/js/` e são declarados em `pubspec.yaml` (`flutter: assets:`), carregados com fallback de path (`user_scripts.dart:10-16`) para funcionar tanto consumido como dependência quanto dentro do próprio pacote (testes).
-- **Convenção de `Key` do shell nativo**: kebab-case, prefixado pelo widget dono — `app-sidebar` (a `Drawer`), `menu-toggle` (o FAB que a abre), `menu-item-<id>` (um item por entrada de `buildAppMenuItems`), `menu-empty` (estado vazio do sidebar); `debug-panel`, `debug-host`, `debug-clear`, `debug-close`, `debug-eval-input`, `debug-eval-run`, `debug-eval-result` (o painel de debug, agora controlado por `visible`/`onClose` em vez de dono do próprio FAB).
-- **Erros tipados por camada**: `PopmundoRuntimeException` (contrato/adapter), `TimedFetchException` (fila de fetch) — nunca `Exception` genérica nos pontos de falha esperados.
-- **Workspace/versionamento**: `resolution: workspace` em todos os `pubspec.yaml`, coordenado pelo `pubspec.yaml`/`melos.yaml` da raiz (AD-001).
+- **Namespace JS:** `window.__popmundo` (`helpers.js` DOM/QoL; `hooks.js` interceptação, `fetch`, `gmReply`).
+- **Serialização JS↔Dart:** `jsonEncode`/`jsonDecode` nas facades; sem interpolar input cru em JS.
+- **Fakes por camada:** `FakePopmundoRuntime`, `MemoryKeyValueStore`, `MemorySecretStore`, `MemoryCookieSink`, `FakeBackgroundPlatform`.
+- **Assets JS** em `packages/popmundo_webview/assets/js/`, com fallback de path em `user_scripts.dart`.
+- **Keys de widget:** kebab-case (`menu-toggle`, `menu-item-<id>`, `debug-panel`, `autologin-status-<phase>`, `language-dialog`, …).
+- **Erros tipados:** `PopmundoRuntimeException`, `TimedFetchException`, `AuthHttpException`, `UserScriptParseException`, `UserScriptImportException`, `UserScriptCatalogException`.
+- **Workspace:** `resolution: workspace` em todos os `pubspec.yaml`. `melos.yaml` só lista globs — **não há scripts Melos**.
+- **Chaves de storage (produção, via `KeyValueStore`):** `userscripts.v1`, `autologin.v1`, `userscript:<id>:gmvalues`, `userscript:<id>:gmresources`. Senha: `autologin.password` no `SecretStore`.
+- **UserScripts nativos:** `groupName: 'userscript:<id>'`, `ContentWorld.PAGE`.
 
 ---
 
@@ -95,10 +116,12 @@ Estas regras são impostas pelo código e/ou registradas como decisões em `.spe
 
 | Módulo | Responsabilidade | Não faz |
 | ------ | ----------------- | ------- |
-| `packages/popmundo_utils` | Contrato `PopmundoRuntime`; regras de negócio puras (host sticky, throttle, storage, parsing de notificações, políticas de navegação); modelos de evento | Não sabe renderizar UI, não importa `flutter_inappwebview`, não persiste em disco por conta própria (delega a `KeyValueStore` injetado) |
-| `packages/popmundo_webview` | Implementação concreta do runtime sobre `InAppWebView`; ponte JS↔Dart; injeção de `UserScripts`; política de settings do WebView; widget `PopmundoWebView` | Não define regras de negócio (host sticky, cache, storage) — reusa o que vem de `popmundo_utils`; não decide layout de app |
-| `apps/popmundo_app` | Composition root (instancia runtime + store concretos); shell de UI (`MaterialApp`); menu lateral componentizado (`lib/menu/`); overlay de debug; leitura de cookies via `CookieManager` | Não implementa lógica de parsing/negócio (delega às facades de `popmundo_utils`); não deveria falar diretamente com `flutter_inappwebview` fora do que `PopmundoWebView`/`InAppPopmundoRuntime` expõem — mas hoje importa `CookieManager`/`WebUri` diretamente em `app.dart` (ver seção 7, acoplamento) |
-| `packages/popmundo_webview/assets/js` | Hooks de `fetch`/`XHR`/`console` e helpers de DOM (`getMyID`, `createNotification`, seletores) executando **na página do jogo** | Não decide política de rede — só captura e repassa via `callHandler` |
+| `packages/popmundo_utils` | Contrato `PopmundoRuntime`; host sticky; TimedFetch; parsing ASP.NET; Auto Login (orquestração + HTTP abstrato); catálogo/parser/shim GM; storage lógico; eventos | Não renderiza UI; não importa Flutter; persistência de disco é injetada (`KeyValueStore`/`SecretStore`); `CookieManager` fica atrás de `CookieSink` |
+| `packages/popmundo_webview` | `InAppPopmundoRuntime`; widget `PopmundoWebView`; JS bridge; UserScripts builtins + injector; `InAppCookieSink`; back navigation; settings do WebView | Não decide throttle, parsing de login, catálogo persistido, i18n, FGS |
+| `apps/popmundo_app` | Composition root; shell (`AppShell`/sidebar); telas Auto Login / UserScripts / idioma; `GmHostHandler`; keepalive; i18n; `SharedPreferencesStore` / `FlutterSecureSecretStore` | Não implementa parsing de form ASP.NET nem política de host; **ainda** importa `flutter_inappwebview` em `app.dart` para ler nomes de cookies |
+| `packages/popmundo_webview/assets/js` | Hooks de `fetch`/`XHR`/`console` e helpers DOM **na página** | Não decide política — só captura e `callHandler` |
+| `apps/popmundo_app/integration_test` | Tier device-real (Patrol): FGS, Keystore, prefs, sockets loopback | Não constrói `PopmundoApp` / `InAppPopmundoRuntime`; não carrega o jogo |
+| `packages/popmundo_utils/test_live` | Suite **opt-in** contra o site real (credenciais em env); `dart test` **não** a executa | Não substitui o tier fake; não é CI |
 
 ---
 
@@ -107,35 +130,60 @@ Estas regras são impostas pelo código e/ou registradas como decisões em `.spe
 ### 6.1 Página → Dart (eventos observados)
 
 ```
-página (fetch/XHR/console) 
-  -> hooks.js intercepta e chama post({type, payload})
-  -> window.flutter_inappwebview.callHandler('popmundo', msg)
-  -> InAppPopmundoRuntime.attach() registrou addJavaScriptHandler('popmundo', bridge.handleArguments)
-  -> PopmundoJsBridge.handle(message) roteia por 'type': 'ready' | 'network' | 'console'
-  -> runtime.events.emitNetwork/emitConsole(...)
-  -> PopmundoEventBus streams -> DebugOverlay (setState) e qualquer outro listener
+página (fetch/XHR/console/GM)
+  → hooks.js post({type, payload})  [fila até flutterInAppWebViewPlatformReady]
+  → callHandler('popmundo', msg)
+  → PopmundoJsBridge.handle  type: ready | network | console | gmValue | gm
+  → PopmundoEventBus
+  → DebugOverlay / GmValueStore.applyEvent / GmHostHandler.handle
 ```
 
-Navegação segue caminho separado, via callbacks nativos do `InAppWebView` (`onLoadStart`, `onUpdateVisitedHistory`, `shouldOverrideUrlLoading`) chamando `runtime.onNativeNavigation(uri)` diretamente — **não** passa pelo handler JS `'popmundo'`.
+Navegação: callbacks nativos → `InAppPopmundoRuntime.onNativeNavigation` → `HostTracker.onNavigation` + `events.emitNavigation`. Auto Login e o sidebar GM escutam esse stream (GM limpa comandos a cada navegação).
 
 ### 6.2 Dart → página (comandos)
 
 ```
-Utils/Notifications/Scoring/CssSelectorHelper
-  -> runtime.evaluate('window.__popmundo.<fn>(args...)')
-  -> InAppPopmundoRuntime.evaluate() chama controller.evaluateJavascript
-  -> resultado (String/JSON) decodificado de volta em Dart
+Utils / Notifications / Scoring / CssSelectorHelper
+  → runtime.evaluate('window.__popmundo.<fn>(...)')
+TimedFetch / fetchInPage
+  → callAsyncJavaScript → window.__popmundo.fetch (fetch real na página)
+GM host reply
+  → runtime.evaluate('window.__popmundo.gmReply(...)')
+Navegação de documento
+  → runtime.loadUrl(uri)  (WebView.loadUrl)
 ```
 
-`TimedFetch`/`fetchInPage` usam um caminho paralelo com `callAsyncJavaScript`, chamando `window.__popmundo.fetch(url, options)` (que roda `fetch` real no contexto da página, preservando cookies/same-origin), e devolvem `{ok, status, text}`.
+### 6.3 Auto Login (AD-018)
 
-### 6.3 Prontidão do bridge
+```
+navegação para / ou /Default.aspx
+  → AutoLoginController (enabled + credenciais)
+  → AuthSession (dart:io, followRedirects=false, cooldown 750 ms)
+      GET form → POST #aspnetForm inteiro + overrides
+      hop www → N.popmundo.com (Set-Cookie no último hop)
+      POST ChooseCharacter (match por <h2> nome completo)
+  → CookieSink.write(jar) → CookieManager da WebView
+  → runtime.loadUrl(https://{host_final}/World/Popmundo.aspx)
+  → Stream AutoLoginStatus → snackbars EN/PT
+```
 
-`hooks.js` enfileira mensagens até o evento `flutterInAppWebViewPlatformReady`; ao disparar, drena a fila e envia `{type: 'ready'}`, que completa `InAppPopmundoRuntime._ready`. `TimedFetch.fetch` e qualquer chamada que dependa do bridge aguardam `runtime.waitUntilReady(timeout: 30s)` antes de prosseguir; timeout lança `PopmundoRuntimeException`.
+O User-Agent do cliente nativo é lido de `navigator.userAgent` na WebView (fallback Android Chrome string se o evaluate falhar).
 
-### 6.4 Origem sticky
+### 6.4 UserScripts + GM
 
-`HostTracker.onNavigation(uri)` é chamado tanto pelos callbacks nativos de navegação quanto pelo fluxo de `shouldOverrideUrlLoading`; qualquer chamada subsequente de `TimedFetch`/`Utils.getServerLink` resolve contra `host.currentOrigin`, nunca contra a URL inicial fixa.
+```
+UserScriptsScreen → UserScriptImporter (HTTP app, não TimedFetch)
+  → UserScriptCatalog (userscripts.v1)
+  → InAppPopmundoRuntime.syncUserScripts → UserScriptInjector (add/remove por groupName + reload)
+GM_setValue na página → type gmValue → GmValueStore
+GM.xmlHttpRequest / openInTab / … → type gm → GmHostHandler
+  Popmundo URLs: TimedFetch; terceiros: HttpClient sem cookies do jogo; @connect em runtime
+GM.registerMenuCommand → GmMenuRegistry → seção extra no AppSidebar (limpa na navegação)
+```
+
+### 6.5 Keepalive
+
+`main()` chama `FlutterForegroundTask.initCommunicationPort()`. `BackgroundKeepalive.bootstrap()` pede notificação + isenção de bateria (Android) e sobe o FGS. O isolate só manda heartbeat; o WebView não é tocado. Lifecycle do app (`WidgetsBindingObserver`) atualiza o status visível no overlay de debug.
 
 ---
 
@@ -143,43 +191,77 @@ Utils/Notifications/Scoring/CssSelectorHelper
 
 | Dependência | Tipo | Onde | Criticidade |
 | ----------- | ---- | ---- | ----------- |
-| `flutter_inappwebview: ^6.1.5` | pacote externo | `popmundo_webview`, `popmundo_app` | Alta — toda a superfície de WebView, cookies, JS bridge e interceptação depende da API 6.x; upgrade de major version pode quebrar `in_app_runtime.dart`, `popmundo_webview_widget.dart` e `web_settings.dart` simultaneamente |
-| `popmundo_utils` → `popmundo_webview` → `popmundo_app` | dependência interna (path) | `pubspec.yaml` de cada pacote | Alta — cadeia estritamente unidirecional (ver AD-002); nenhuma dependência circular encontrada |
-| `shared_preferences: ^2.5.3` | pacote externo | apenas `apps/popmundo_app` (`prefs_store.dart`) | Média — única implementação real de `KeyValueStore` em produção; se trocada, `SharedPreferencesStore` precisa ser reescrita, mas o contrato em `popmundo_utils` não muda |
-| `url_launcher: ^6.3.1` | pacote externo | `popmundo_webview` (abrir links externos) | Média — se falhar silenciosamente, links fora de `*.popmundo.com` não abrem (sem fallback visível no código) |
-| Endpoint `POST /WebServices/A/Open.asmx/GetPageNotifications` (site real) | dependência externa de domínio | `notifications.dart:48-60` | Alta — contrato JSON (`wrapper['d']`, `Status`/`Text`) é assumido a partir do `common/` original; qualquer mudança no backend do Popmundo quebra `parsePageNotifications` sem aviso em compile-time |
-| Seletores DOM (`div.idHolder`, `#ppm-content > div.box.ofauto.charPresBox > h2`, `#notifications`, `a[href*="Scoring"]`, `div[class*="rogressBar"]`) | dependência externa de domínio | `packages/popmundo_webview/assets/js/helpers.js` | Alta — todo `getMyID`/`getMyName`/`createNotification`/`Scoring` depende de marcação HTML específica do site que o time não controla |
+| `flutter_inappwebview: ^6.1.5` | pub.dev | `popmundo_webview`, `popmundo_app` | Alta — WebView, cookies, UserScripts, JS handler |
+| `popmundo_utils` → `popmundo_webview` → `popmundo_app` | path | pubspecs | Alta — cadeia unidirecional (AD-002); sem ciclo encontrado |
+| `html: ^0.15.6` | pub.dev | `popmundo_utils` | Alta para Auto Login — parse de `#aspnetForm` / `div.box` |
+| `shared_preferences: ^2.5.3` | pub.dev | app | Média — `KeyValueStore` de produção |
+| `flutter_secure_storage: ^9.2.4` | pub.dev | app | Alta para Auto Login — senha |
+| `flutter_foreground_task: ^11.0.0` | pub.dev | app | Alta para keepalive Android (`dataSync`, `stopWithTask=false`) |
+| `easy_localization: ^3.0.8` | pub.dev | app | Média — strings de release da shell |
+| `url_launcher: ^6.3.1` | pub.dev | webview + app | Média — links externos e `GM.openInTab` |
+| `patrol: ^4.9.0` + `patrol_cli` | pub.dev / global | app `dev_dependencies` | Média — só o tier device-real |
+| `POST /WebServices/A/Open.asmx/GetPageNotifications` | domínio | `notifications.dart` | Alta para a facade Notifications; **o Auto Login atual não chama este endpoint** (veredicto de escolha = path ainda em ChooseCharacter) |
+| Formulário ASP.NET (`#aspnetForm`, `ucLogin`, ChooseCharacter `div.box > h2`) | domínio | `autologin/` | Alta — Auto Login |
+| Seletores DOM em `helpers.js` | domínio | `getMyID` / `getMyName` / Scoring | Alta — o time não controla o HTML do jogo |
+
+`dart:io` em `popmundo_utils` está **confinado** a `auth_http_io.dart` (transporte real do handshake). O restante do Auto Login injeta `AuthHttpSend` nos testes.
 
 ---
 
 ## 8. Riscos técnicos e acoplamentos importantes
 
-Extraído de `.specs/features/popmundo-wrapper/design.md` ("Risks & Concerns") e confirmado/ampliado na leitura do código:
-
 | Risco/acoplamento | Local | Impacto | Mitigação existente |
 | ------------------ | ----- | ------- | -------------------- |
-| iOS não tem `shouldInterceptRequest` nativo | `web_settings.dart` / `popmundo_webview_widget.dart` | Stream de rede não captura 100% dos resources nativos (imagens/CSS) no iOS como faria no Android | Hooks JS de `fetch`/`XHR`/`console` cobrem o que interessa ao produto (chamadas ao backend); spec não exige paridade total de assets |
-| Body de POST nativo no Android é limitado em `shouldInterceptRequest` | Não é usado como fonte (sempre `null`) | N/A — decisão AD-003 já evita depender disso | Body vem sempre do wrap JS (`hooks.js` `captureBody`) |
-| `callHandler` pode ser chamado antes do bridge existir | `hooks.js:1-22` | Eventos do primeiro paint poderiam se perder | Fila (`queue`) até `flutterInAppWebViewPlatformReady` |
-| Acoplamento direto de `apps/popmundo_app/lib/app.dart` a `flutter_inappwebview` (`CookieManager`, `WebUri`) | `app.dart:53-67` | O app (camada de composição) importa a lib de terceiros diretamente em vez de passar só pelo `PopmundoWebView`/`InAppPopmundoRuntime` — quebra parcialmente a separação de responsabilidades da seção 5 | Nenhuma; é acoplamento real hoje. **Observação, não um bug.** |
-| `StorageService.toggleExclusion` faz `int.parse(myCharKey)` sem tratamento de erro | `storage.dart:72` | `FormatException` não capturada se `myCharKey` não for numérico | Nenhuma validação de entrada visível; caller precisa garantir formato |
-| `isInspectable: true` fixo em `PopmundoWebSettings.defaults()` | `web_settings.dart:12` | WebView inspecionável via Safari/Chrome DevTools também em builds de release, não só debug | Nenhuma flag de build (`kReleaseMode`) diferencia isso hoje — **Hipótese**: pode ser intencional dado que o app é declarado como "ferramenta de desenvolvedor" (`context.md`), mas aumenta a superfície de inspeção em produção |
-| Parsing de `GetPageNotifications` assume forma exata da resposta ASP.NET (`{d: ...}`) | `notifications.dart:62-83` | Mudança no backend quebra silenciosamente (retorna notificação vazia default, não erro) | Fallback para `PageNotification(status: 'normal', text: '')` quando a forma não bate — falha silenciosa, não crash |
-| Licença GPL-3 herdada (AD-005) | Todo o repositório | Não é possível relicenciar para MIT/Apache enquanto código derivado de `common/` existir | `LICENSE` + `NOTICE` no repositório |
-| Testes sem device real (webview) | `packages/popmundo_webview/test/`, `.specs/spec.md` Out of Scope | CI não cobre e2e contra `www.popmundo.com` (instável, exige auth real, ToS) | Lógica de negócio isolada em `popmundo_utils` com fakes; widget tests do overlay usam streams fake |
-| Cache do `TimedFetch` é só em memória de processo | `timed_fetch.dart:33` | Reinício do app perde cache; não é um risco de corretude, é trade-off documentado (AD-006) | Aceito por design — paridade com o comportamento do `TimedFetch` original em JS |
+| iOS sem `shouldInterceptRequest` nativo | `web_settings.dart` / widget | Stream de assets nativos incompleto no iOS | Hooks JS cobrem fetch/XHR/console |
+| `app.dart` importa `CookieManager`/`WebUri` | `apps/popmundo_app/lib/app.dart` | Shell acoplada ao plugin, fora do adapter | Documentado; overlay só lê name+domain |
+| `app` também importa `url_launcher` | `gm_host_handler.dart` | Segunda call site além de `popmundo_webview` | `GM.openInTab` vive no app porque usa clipboard/UI |
+| Cookie sync nativo → WebView | `InAppCookieSink` | Sessão "quase" válida se host-only ganhar `domain=` | Testes de `GameCookie` + 6 mutações registradas no spec; código omite `domain` quando o servidor não enviou |
+| Cliente HTTP fora do browser | `AuthSession` | Servidor pode distinguir o handshake da WebView | Escolha explícita (AD-018); UA copiado da WebView |
+| `isInspectable: true` fixo | `web_settings.dart` | DevTools também em release | Nenhuma flag `kReleaseMode`. **Hipótese:** aceitável por ser ferramenta de desenvolvedor |
+| `StorageService.toggleExclusion` → `int.parse` | `storage.dart` | `FormatException` se a chave não for numérica | Sem validação no pacote |
+| `Notifications.parsePageNotifications` | `notifications.dart` | Backend muda → fallback silencioso para notificação vazia | Não usado pelo Auto Login atual |
+| GPL-3 herdada | repositório | Sem relicenciar enquanto houver código derivado | `LICENSE` / `NOTICE` |
+| Patrol: um teste Dart por processo | `integration_test/` | Segundo `patrolTest` no mesmo arquivo falha 500 | Um `patrolTest` por arquivo (AD-015) |
+| `test_live/` vs. política "sem e2e live" | `packages/popmundo_utils/test_live` | Suite opt-in **acessa** popmundo.com com credenciais de env; o `dart test` padrão **não** a inclui (`dart_test.yaml` globa só `test/`) | Não é CI; `.env` / `.envexample` não devem ser commitados com segredos. **Hipótese:** `.envexample` usa `TEST_*` enquanto o código lê `POPMUNDO_*` — nomes divergem |
+| `gm-host-apis` sem `validation.md` | `.specs/features/gm-host-apis/` | Só `spec.md` + `context.md`; Handoff pede smoke em device com `.user.js` real | Código e testes unitários existem; Verifier da feature não está no repo |
+| Spec Auto Login (Goals) ainda cita TimedFetch | `.specs/features/auto-login/spec.md` | Drift spec vs. AD-018 / controller | O código vigente é HTTP nativo |
+| `PopmundoScope` sem call sites | `app.dart` | InheritedWidget morto | Decisão de manter o menu agnóstico do runtime |
+| `packages/popmundo_utils/example/` | example | `main` só imprime `HostTracker.defaultOrigin` | Boilerplate; não é ponto de entrada do produto |
+| Cache TimedFetch só em memória | `timed_fetch.dart` | Perde ao matar o processo | AD-006, aceito |
+| Teto `dataSync` Android 15+ / iOS suspende JS | keepalive | Keepalive ≠ sessão eterna no iOS | Overlay mostra status; spec honesto |
 
 ---
 
 ## 9. Diretrizes para futuras implementações
 
-1. **Nunca adicionar lógica de negócio em `popmundo_webview` ou `apps/popmundo_app`.** Se uma nova regra não depende de `InAppWebView`/`Flutter`, ela pertence a `popmundo_utils` e deve ser testável via `FakePopmundoRuntime`.
-2. **Toda nova função exposta à página deve seguir o padrão Facade + `window.__popmundo.*`.** Adicionar a função JS em `helpers.js` (ou `hooks.js` se for interceptação), depois um método Dart em `popmundo_utils` que chama `runtime.evaluate(...)` com `jsonEncode` nos argumentos.
-3. **Não romper o contrato "observe-only".** Qualquer novo callback de interceptação deve retornar o request/response original ou `null`/`ALLOW`; nunca introduzir um `WebResourceResponse` customizado ou mutação de request.
-4. **Não hardcodar `www.popmundo.com` ou qualquer host fixo fora de `HostTracker.defaultOrigin`.** Toda URL de chamada auxiliar deve passar por `host.resolve(...)` ou pelo `origin` corrente.
-5. **Respeitar o rate limit do `TimedFetch`** para qualquer nova chamada de rede auxiliar ao jogo — não introduzir `fetch` paralelo fora da fila serial, sob risco de throttle/logout (AD-006).
-6. **Features de gameplay da extensão original (mass interact, call friends, autograph collector etc.) estão fora de escopo** por decisão explícita registrada em `spec.md` ("Out of Scope") — não devem ser adicionadas a este produto sem uma nova rodada de spec.
-7. **Manter a licença GPL-3.0-or-later** em qualquer novo arquivo derivado de `common/` do Popmundo-Utils; reescrever, nunca copiar, chamadas `chrome.*`.
-8. **Cobrir nova lógica com teste unitário puro em `popmundo_utils`** antes de (ou em vez de) teste de widget/integração — é o padrão já estabelecido em todos os arquivos de `test/`.
-9. **Se estender o app para importar `flutter_inappwebview` diretamente (como `app.dart` já faz para cookies)**, documentar a exceção — o padrão preferido é passar pelo `InAppPopmundoRuntime`/`PopmundoWebView`.
-10. **Novo item de menu = uma entrada em `buildAppMenuItems`** (`apps/popmundo_app/lib/menu/app_menu_registry.dart`). Nunca hardcodar um item novo dentro de `AppSidebar`/`AppShell` — ambos derivam sua lista visível inteiramente do registro, o que é o que os mantém agnósticos do runtime e escaláveis sem mudança estrutural.
+1. **Lógica de negócio nova vai para `popmundo_utils`**, testável com fakes. UI/plugin Flutter fica no app; adapter WebView só transporta.
+2. **Função de página = `window.__popmundo.*` + facade Dart com `jsonEncode`.**
+3. **Não romper observe-only (AD-003).**
+4. **Não hardcodar `www.popmundo.com` fora de `HostTracker.defaultOrigin`.**
+5. **Chamada auxiliar same-origin ao jogo passa por TimedFetch (750 ms).** Handshake de login é a exceção documentada (AD-018) e replica o cooldown em `AuthSession`.
+6. **Gameplay da extensão original (mass interact, call friends, etc.) continua fora de escopo** até nova spec.
+7. **GPL-3.0-or-later**; não copiar `chrome.*`.
+8. **Item de menu nativo = entrada em `buildAppMenuItems`.** Comandos GM são dinâmicos (`GmMenuRegistry`), limpos na navegação — não misturar os dois.
+9. **UserScript: nunca `removeAllUserScripts`.** Só `userscript:<id>`.
+10. **String de UI de release no app passa pelos catálogos EN/PT.** Overlay de debug permanece em inglês.
+11. **Patrol: um `patrolTest` por arquivo; harness mínimo; analyze antes do device.**
+12. **Senha nunca em `KeyValueStore`.**
+13. **Após mudança relevante, atualizar `docs/ARQUITETURA.md`, `docs/OBJETIVO.md` e o README do módulo** (ver `CLAUDE.md`, *Documentation maintenance*). Specs da feature em `.specs/features/<id>/` acompanham o comportamento real — se o código divergir, atualize o spec ou registre SPEC_DEVIATION; não deixe Goals obsoletos.
+
+---
+
+## 10. Mapa de features Spec Driven
+
+| Feature `.specs/features/` | Pacotes tocados | Decisão |
+| --------------------------- | --------------- | ------- |
+| `popmundo-wrapper` | utils, webview, app | AD-001…008 |
+| `app-sidebar-menu` | app | AD-009 |
+| `userscript-manager` | utils, webview, app | AD-010 |
+| `auto-login` | utils, webview, app | AD-018 (AD-011/017 superseded) |
+| `background-keepalive` | app | AD-012, AD-013 |
+| `app-i18n` | app | AD-014 |
+| `mobile-e2e-tests` | app `integration_test/` | AD-015 |
+| `gm-host-apis` | utils, webview, app | AD-016 |
+| `webview-back-navigation` | webview | — |
+
+Fonte de *porquê*: `.specs/STATE.md` Decisions. Fonte de *o quê* por feature: `spec.md` da pasta. Este documento descreve o sistema **como o código está hoje**.

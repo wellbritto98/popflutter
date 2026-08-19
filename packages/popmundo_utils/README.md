@@ -1,64 +1,73 @@
 # popmundo_utils
 
-> Gerado por análise do código-fonte real deste pacote. Ver também `docs/ARQUITETURA.md` e `docs/OBJETIVO.md` na raiz do repositório para a visão de sistema completa.
+> Análise do código deste pacote. Visão de sistema: `docs/ARQUITETURA.md` e `docs/OBJETIVO.md`.
 
 ## Objetivo do módulo
 
-Pacote **Dart puro** (sem dependência de Flutter) com o contrato `PopmundoRuntime` e toda a lógica de negócio do wrapper Popmundo: host sticky, fetch com throttle, storage, facades de personagem/notificações/seletores/scoring, política de navegação e bus de eventos. É a "fundação" equivalente ao `common/` do [Popmundo-Utils](https://github.com/ilpersi/Popmundo-Utils) (GPL-3), portada de JS/extensão Chrome para Dart.
+Pacote **Dart puro** (sem Flutter) com o contrato `PopmundoRuntime` e a lógica de negócio do wrapper: host sticky, fetch com throttle, Auto Login (orquestração + HTTP abstrato), catálogo/parser/shim de UserScripts e GM, storage, facades de personagem/notificações/seletores/scoring, política de navegação e bus de eventos. Equivale ao `common/` do [Popmundo-Utils](https://github.com/ilpersi/Popmundo-Utils) (GPL-3), portado para Dart.
 
 ## Responsabilidade principal
 
-Definir **o que** o wrapper faz (regras, decisões, parsing), sem saber **como** o WebView é renderizado. Todo o pacote é testável com `dart test`, sem emulador/dispositivo, usando um runtime falso.
+Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testável com `dart test` e `FakePopmundoRuntime`. Primeira dependência pub: `html` (parse ASP.NET). `dart:io` só em `auth_http_io.dart`.
 
 ## Funcionalidades existentes
 
-| Arquivo | Funcionalidade |
-| ------- | --------------- |
-| `src/popmundo_runtime.dart` | Contrato `PopmundoRuntime` (porta) que o adapter WebView implementa; `InPageFetchResult`; `PopmundoRuntimeException` |
-| `src/host_tracker.dart` | `HostTracker` — origem sticky (`https://www.popmundo.com` até o primeiro redirect para `*.popmundo.com`); `resolve(path)` |
-| `src/observe_policy.dart` | `ObservePolicy` — decisão pura `allowInWebView`/`openExternal`; helper que garante interceptação observe-only (`observeOnlyResourceResponse()` sempre `null`) |
-| `src/events.dart` | `NetworkEvent`, `ConsoleEvent`, `NavigationEvent`, `BodyCapture` (trunca corpo em 32 KiB), `PopmundoEventBus` (streams broadcast) |
-| `src/timed_fetch.dart` | `TimedFetch` — fila serial, delay padrão 750 ms, cache em memória `METHOD:URL`, erro em resposta não-2xx |
-| `src/utils.dart` | `Utils` — `getServerLink`, `getMyID`, `getMyName`, `getMyCharDetails` |
-| `src/notifications.dart` | `Notifications` — `createNotification`/`notifySuccess`/`notifyError`/`notifyNormal`, `getPageNotifications` (via `TimedFetch` contra `/WebServices/A/Open.asmx/GetPageNotifications`), parsing da resposta ASP.NET |
-| `src/css_selector.dart` | `CssSelectorHelper` (`getSingle`/`getAll`), `XPathHelper` (`getSingle`) — consultam o DOM da página via `window.__popmundo.query*`/`xpathSingle` |
-| `src/scoring.dart` | `Scoring` — `applyScoringNumbers`/`applyBarPercentage`; `autoApplyOnLoad = false` documentado (nunca roda sozinho) |
-| `src/storage.dart` | `KeyValueStore` (contrato) + `MemoryKeyValueStore` (fake); `StorageService` — `getExcludedIds`, `toggleExclusion`, `normalizeExcludeMap`, `excludeEntryId`, `cacheCharName`, `loadSyncedCharNames` |
-| `src/logger.dart` | `Logger` — ring buffer de 200 entradas para `warn`/`error` |
-| `popmundo_utils.dart` | Barrel file que exporta tudo acima |
+| Área | Arquivos | Função |
+| ---- | -------- | ------ |
+| Contrato | `src/popmundo_runtime.dart` | `PopmundoRuntime` (`evaluate`, `fetchInPage`, `loadUrl`, `waitUntilReady`); `InPageFetchResult` (inclui `headers`, `url`); `PopmundoRuntimeException` |
+| Host | `src/host_tracker.dart` | Origem sticky `https://www.popmundo.com`; `isPopmundoUri`; `resolve(path)` |
+| Política | `src/observe_policy.dart` | `allowInWebView` / `openExternal`; `observeOnlyResourceResponse()` = `null` |
+| Eventos | `src/events.dart` | `network`, `console`, `navigation`, `gmValue`, `gmCall`; `BodyCapture` 32 KiB |
+| Fetch | `src/timed_fetch.dart` | Fila serial, 750 ms, cache `METHOD:URL`, non-2xx → `TimedFetchException` |
+| Facades | `utils`, `notifications`, `css_selector`, `scoring` | DOM/`__popmundo.*`; Scoring `autoApplyOnLoad = false` |
+| Storage | `src/storage.dart`, `src/secret_store.dart` | `KeyValueStore` + `MemoryKeyValueStore`; `SecretStore` + `MemorySecretStore`; `StorageService` |
+| Logger | `src/logger.dart` | Ring buffer 200 (`warn`/`error`) |
+| Auto Login | `src/autologin/` | Ver [README do submódulo](lib/src/autologin/README.md) |
+| UserScripts / GM | `src/userscript/` | Ver [README do submódulo](lib/src/userscript/README.md) |
+| Barrel | `popmundo_utils.dart` | Único export público |
 
 ## Dependências internas e externas
 
-- **Internas**: nenhuma — é o pacote base do monorepo (folha da árvore de dependências).
-- **Externas (pub.dev)**: nenhuma em `dependencies` além do SDK Dart (`^3.13.0`); `dev_dependencies` são `lints` e `test`.
-- **Consumido por**: `packages/popmundo_webview` (implementa `PopmundoRuntime`) e `apps/popmundo_app` (usa facades, `KeyValueStore`, eventos) — ambos via `path:` no `pubspec.yaml`.
+- **Internas:** nenhuma (folha da árvore).
+- **Externas:** `html: ^0.15.6`. SDK `^3.13.0`. Dev: `lints`, `test`.
+- **Consumido por:** `popmundo_webview` e `popmundo_app` (`path:`).
 
 ## Módulos relacionados
 
-- `packages/popmundo_webview` — implementa `PopmundoRuntime` como `InAppPopmundoRuntime` e traduz o handler JS `'popmundo'` para os eventos definidos aqui.
-- `packages/popmundo_webview/assets/js/{hooks,helpers}.js` — contraparte JS: define `window.__popmundo.*`, que as facades deste pacote chamam via `runtime.evaluate(...)`.
-- `apps/popmundo_app` — implementa `KeyValueStore` como `SharedPreferencesStore` (produção) e consome `PopmundoEventBus` no overlay de debug.
+- `popmundo_webview` — implementa `PopmundoRuntime` e `CookieSink` (`InAppCookieSink`).
+- `popmundo_webview/assets/js` — `window.__popmundo.*` chamado pelas facades.
+- `popmundo_app` — `SharedPreferencesStore`, `FlutterSecureSecretStore`, composition do `AutoLoginController` / catalog / GM.
 
 ## Pontos de entrada
 
-- `lib/popmundo_utils.dart` — único ponto de import público (`export` de todos os `src/*.dart`).
-- Nenhum `main()`; é uma biblioteca, não um executável.
+- `lib/popmundo_utils.dart` — import público.
+- Sem `main()` de produto. `example/popmundo_utils_example.dart` só imprime a origin default (boilerplate).
 
 ## Fluxos importantes
 
-- **Resolução de host sticky**: `HostTracker.onNavigation(uri)` é chamado a cada navegação real do jogo; `resolve(path)`/`TimedFetch._absoluteUrl` sempre leem `currentOrigin` no momento da chamada, nunca um valor cacheado antigo.
-- **TimedFetch**: cada `fetch()` encadeia na fila (`_queue`) do anterior, espera o `delay` desde o último `_lastCall`, chama `runtime.waitUntilReady()` e só então `runtime.fetchInPage(...)`; erros não-2xx viram `TimedFetchException` e não populam o cache.
-- **Notifications.getPageNotifications**: sempre `useCache: false` (notificações não devem vir de cache); parsing tolera respostas ASP.NET envelopadas (`{d: ...}`) e strings JSON aninhadas.
+- **Host sticky:** `onNavigation` só para URI Popmundo http(s); leitores sempre usam `currentOrigin` no momento da chamada.
+- **TimedFetch:** enfileira, espera `delay` desde `_lastCall`, `waitUntilReady`, `fetchInPage`. Relativos resolvem no host atual.
+- **Auto Login:** ver submódulo; transporte injetável (`AuthHttpSend`) nos testes.
+- **GM values:** eventos `gmValue` aplicados em `GmValueStore` (o app assina o bus).
 
 ## Arquivos críticos
 
-- `src/popmundo_runtime.dart` — mudar essa interface impacta `popmundo_webview` inteiro e qualquer fake de teste.
-- `src/host_tracker.dart` e `src/timed_fetch.dart` — violar a regra de host sticky ou o rate limit pode causar deslogin no jogo real (ver `docs/ARQUITETURA.md`, seção 8).
-- `src/events.dart` — contrato de forma dos eventos consumido por `popmundo_webview` (bridge) e `popmundo_app` (overlay); mudança de campo é breaking change em dois outros pacotes.
+- `src/popmundo_runtime.dart` — mudar a porta quebra adapter e fakes.
+- `src/host_tracker.dart`, `src/timed_fetch.dart` — host sticky e throttle (deslogin no jogo real).
+- `src/events.dart` — forma dos eventos (webview + app).
+- `src/autologin/auto_login_controller.dart` — ciclo de sessão.
+- `src/userscript/userscript_parser.dart` — grants aceitos no import.
 
-## Observações técnicas e débitos identificados
+## Observações técnicas e débitos
 
-- `StorageService.toggleExclusion` faz `int.parse(myCharKey)` sem tratar `FormatException` — chamadores devem garantir que `myCharKey` seja uma string numérica válida (`storage.dart:72`).
-- `Notifications.parsePageNotifications` depende do formato exato da resposta do backend do Popmundo (`wrapper['d']`, campos `Status`/`Text`); se o backend mudar, o parsing falha silenciosamente para `PageNotification(status: 'normal', text: '')` em vez de lançar erro — não há log/alerta nesse caminho.
-- `CssSelectorHelper`/`Scoring`/`Utils.getMyID`/`getMyName` dependem de seletores CSS fixos definidos no lado JS (`helpers.js`), fora deste pacote — qualquer mudança de marcação no site quebra essas facades sem que o tipo Dart acuse erro em compile-time.
-- Testes cobrindo este pacote: `test/{css_scoring,events,host_tracker,logger,notifications,observe_policy,runtime,storage,timed_fetch,utils}_test.dart`, todos usando `test/fake_runtime.dart`.
+- `StorageService.toggleExclusion` faz `int.parse(myCharKey)` sem `try` (`storage.dart`).
+- `Notifications.parsePageNotifications` falha silenciosamente para notificação vazia se o JSON ASP.NET mudar. O Auto Login **não** usa este endpoint (veredicto = path ChooseCharacter).
+- Facades DOM dependem de seletores em `helpers.js` (fora deste pacote).
+- `test_live/` acessa o site real se o arquivo for passado ao `dart test`; o glob padrão **não** inclui essa pasta. Credenciais: `POPMUNDO_*`. Ver [test_live/README.md](test_live/README.md).
+- Testes em `test/` (24 arquivos, inclusive `fake_runtime.dart`). Gate: `dart test` neste pacote.
+
+## Testes
+
+```bash
+cd packages/popmundo_utils && dart test
+```
