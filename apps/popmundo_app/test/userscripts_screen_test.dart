@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:popmundo_app/userscripts/userscripts_screen.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 
+import 'localization_helpers.dart';
+
 void main() {
   late MemoryKeyValueStore store;
   late UserScriptCatalog catalog;
@@ -30,18 +32,16 @@ void main() {
       UserScriptImporter(catalog: catalog, httpGet: httpGet);
 
   Future<void> pumpScreen(WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: UserScriptsScreen(
-          catalog: catalog,
-          importer: importer(),
-          onApply: (list) async {
-            applyCalls.add(List.of(list));
-          },
-        ),
+    await pumpLocalized(
+      tester,
+      UserScriptsScreen(
+        catalog: catalog,
+        importer: importer(),
+        onApply: (list) async {
+          applyCalls.add(List.of(list));
+        },
       ),
     );
-    await tester.pumpAndSettle();
   }
 
   InstalledUserScript seed({
@@ -167,21 +167,19 @@ void main() {
       (tester) async {
     await catalog.add(seed());
     final deletedIds = <String>[];
-    await tester.pumpWidget(
-      MaterialApp(
-        home: UserScriptsScreen(
-          catalog: catalog,
-          importer: importer(),
-          onApply: (list) async {
-            applyCalls.add(List.of(list));
-          },
-          onScriptDeleted: (id) async {
-            deletedIds.add(id);
-          },
-        ),
+    await pumpLocalized(
+      tester,
+      UserScriptsScreen(
+        catalog: catalog,
+        importer: importer(),
+        onApply: (list) async {
+          applyCalls.add(List.of(list));
+        },
+        onScriptDeleted: (id) async {
+          deletedIds.add(id);
+        },
       ),
     );
-    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('userscript-delete-a')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('userscript-delete-confirm')));
@@ -200,18 +198,16 @@ void main() {
       return gate.future;
     }
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: UserScriptsScreen(
-          catalog: catalog,
-          importer: UserScriptImporter(catalog: catalog, httpGet: slowGet),
-          onApply: (list) async {
-            applyCalls.add(List.of(list));
-          },
-        ),
+    await pumpLocalized(
+      tester,
+      UserScriptsScreen(
+        catalog: catalog,
+        importer: UserScriptImporter(catalog: catalog, httpGet: slowGet),
+        onApply: (list) async {
+          applyCalls.add(List.of(list));
+        },
       ),
     );
-    await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('userscript-add')));
     await tester.pumpAndSettle();
