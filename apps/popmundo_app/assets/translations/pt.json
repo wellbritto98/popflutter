@@ -18,7 +18,8 @@
     "debugPanelSubtitle": "Inspecione host, rede, console e eval JS",
     "language": "Idioma",
     "languageSubtitle": "English ou Português",
-    "empty": "Nenhuma opção disponível."
+    "empty": "Nenhuma opção disponível.",
+    "gmCommands": "Comandos do script"
   },
   "language": {
     "dialogTitle": "Escolher idioma",

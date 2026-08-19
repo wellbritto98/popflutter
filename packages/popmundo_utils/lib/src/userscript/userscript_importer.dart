@@ -1,7 +1,14 @@
 import 'userscript_catalog.dart';
 import 'userscript_parser.dart';
+import 'gm_connect_policy.dart';
+import 'gm_resource_store.dart';
 
 typedef UserScriptHttpGet = Future<String> Function(
+  Uri url, {
+  Duration? timeout,
+});
+
+typedef UserScriptHttpGetBytes = Future<List<int>> Function(
   Uri url, {
   Duration? timeout,
 });
@@ -18,6 +25,8 @@ class UserScriptImporter {
   UserScriptImporter({
     required this.catalog,
     required this.httpGet,
+    this.httpGetBytes,
+    this.resourceStore,
     this.timeout = const Duration(seconds: 20),
     this.idGenerator,
     this.now,
@@ -25,6 +34,8 @@ class UserScriptImporter {
 
   final UserScriptCatalog catalog;
   final UserScriptHttpGet httpGet;
+  final UserScriptHttpGetBytes? httpGetBytes;
+  final GmResourceStore? resourceStore;
   final Duration timeout;
   final String Function()? idGenerator;
   final DateTime Function()? now;
@@ -68,9 +79,12 @@ class UserScriptImporter {
       }
     }
 
+    final scriptId = idGenerator?.call() ?? _defaultId(uri);
+    final resourceEntries = await _downloadResources(parsed.headers, scriptId);
+
     final source = parsed.buildInjectableSource(requiredSources: requiredSources);
     final script = InstalledUserScript(
-      id: idGenerator?.call() ?? _defaultId(uri),
+      id: scriptId,
       sourceUrl: uri.toString(),
       name: parsed.name,
       version: parsed.version,
@@ -84,10 +98,54 @@ class UserScriptImporter {
     );
 
     try {
-      return await catalog.add(script);
+      final added = await catalog.add(script);
+      if (resourceStore != null && resourceEntries.isNotEmpty) {
+        await resourceStore!.setAll(scriptId, resourceEntries);
+      }
+      return added;
     } on UserScriptCatalogException catch (e) {
       throw UserScriptImportException(e.message);
     }
+  }
+
+  Future<Map<String, GmResourceEntry>> _downloadResources(
+    Map<String, List<String>> headers,
+    String scriptId,
+  ) async {
+    final fetchBytes = httpGetBytes;
+    final store = resourceStore;
+    if (fetchBytes == null || store == null) return {};
+
+    final specs = UserScriptResourceParser.parseHeaders(headers['resource'] ?? const []);
+    if (specs.isEmpty) return {};
+
+    final result = <String, GmResourceEntry>{};
+    for (final entry in specs.entries) {
+      final resourceUri = Uri.tryParse(entry.value);
+      if (resourceUri == null ||
+          (resourceUri.scheme != 'http' && resourceUri.scheme != 'https')) {
+        throw UserScriptImportException('Invalid @resource URL: ${entry.value}');
+      }
+      try {
+        final bytes = await fetchBytes(resourceUri, timeout: timeout);
+        if (bytes.length > GmConnectPolicy.maxResourceBytes) {
+          throw UserScriptImportException(
+            'Resource "${entry.key}" exceeds ${GmConnectPolicy.maxResourceBytes} bytes',
+          );
+        }
+        result[entry.key] = GmResourceEntry(
+          mimeType: 'application/octet-stream',
+          base64: GmResourceStore.encodeBytes(bytes),
+        );
+      } on UserScriptImportException {
+        rethrow;
+      } catch (e) {
+        throw UserScriptImportException(
+          'Download failed for @resource ${entry.key} (${entry.value}): $e',
+        );
+      }
+    }
+    return result;
   }
 
   Uri _validateUrl(String rawUrl) {

@@ -128,5 +128,70 @@ void main() {
       expect(script['resources'], isEmpty);
       expect(shim, contains('var GM_info = __gmInfo;'));
     });
+
+    test('GM_info reflects @resource URLs in script.resources', () {
+      final shim = UserScriptGmShim.build(
+        script: _script(
+          grants: ['GM_info'],
+          extraHeaders: {
+            'resource': ['icon https://example.com/i.png'],
+          },
+        ),
+        initialValues: const {},
+      );
+      final match = RegExp(r'var __gmInfo = (\{.*?\});').firstMatch(shim!);
+      final info = jsonDecode(match!.group(1)!) as Map<String, dynamic>;
+      final script = info['script'] as Map<String, dynamic>;
+      expect(script['resources'], {'icon': 'https://example.com/i.png'});
+    });
+
+    test('GM_xmlhttpRequest grant emits xhr binding only', () {
+      final shim = UserScriptGmShim.build(
+        script: _script(grants: ['GM_xmlhttpRequest']),
+        initialValues: const {},
+      );
+      expect(shim, contains('var GM_xmlhttpRequest = function'));
+      expect(shim, contains("__gmPost('xmlHttpRequest'"));
+      expect(shim, isNot(contains('GM_getValue')));
+    });
+
+    test('GM.setClipboard grant emits modern binding', () {
+      final shim = UserScriptGmShim.build(
+        script: _script(grants: ['GM.setClipboard']),
+        initialValues: const {},
+      );
+      expect(shim, contains('GM.setClipboard = function'));
+      expect(shim, contains("__gmPost('setClipboard'"));
+    });
+
+    test('value grants auto-bundle legacy change listeners', () {
+      final shim = UserScriptGmShim.build(
+        script: _script(grants: ['GM_setValue']),
+        initialValues: const {},
+      );
+      expect(shim, contains('var GM_addValueChangeListener = __gmAddValueChangeListener;'));
+      expect(shim, contains('var GM_removeValueChangeListener = __gmRemoveValueChangeListener;'));
+      expect(shim, contains('__gmNotifyValueChangeListeners(key, oldVal, value, false);'));
+    });
+
+    test('modern value grants auto-bundle GM.addValueChangeListener', () {
+      final shim = UserScriptGmShim.build(
+        script: _script(grants: ['GM.setValue']),
+        initialValues: const {},
+      );
+      expect(shim, contains('GM.addValueChangeListener = function'));
+      expect(shim, contains('GM.removeValueChangeListener = function'));
+    });
+
+    test('explicit listener grant without value grant still activates shim', () {
+      final shim = UserScriptGmShim.build(
+        script: _script(grants: ['GM_addValueChangeListener']),
+        initialValues: const {},
+      );
+      expect(shim, isNotNull);
+      expect(shim, contains('__gmValueListeners = []'));
+      expect(shim, contains('var GM_addValueChangeListener = __gmAddValueChangeListener;'));
+      expect(shim, isNot(contains('var GM_setValue')));
+    });
   });
 }

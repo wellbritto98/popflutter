@@ -12,8 +12,12 @@ import 'autologin/secure_secret_store.dart';
 import 'background/background_keepalive.dart';
 import 'background/background_status.dart';
 import 'debug_overlay.dart';
+import 'gm/gm_host_handler.dart';
+import 'gm/gm_menu_registry.dart';
+import 'gm/gm_notification_overlay.dart';
 import 'language/language_selector.dart';
 import 'menu/app_menu_registry.dart';
+import 'menu/gm_menu_command_item.dart';
 import 'userscripts/userscript_http.dart';
 import 'userscripts/userscripts_screen.dart';
 
@@ -73,20 +77,34 @@ class _PopmundoHomeState extends State<PopmundoHome>
   var _debugPanelVisible = false;
   var _bootstrapReady = false;
   var _enabledUserScripts = <InstalledUserScript>[];
+  var _allUserScripts = <InstalledUserScript>[];
   var _previouslyEnabledIds = <String>{};
   String? _initialUrl;
   BackgroundStatus? _backgroundStatus;
 
   late final storage = StorageService(widget.store);
   late final catalog = UserScriptCatalog(widget.store);
-  late final importer = UserScriptImporter(
-    catalog: catalog,
-    httpGet: fetchUserScriptUrl,
-  );
   late final gmValueStore = GmValueStore(widget.store);
+  late final gmResourceStore = GmResourceStore(widget.store);
+  late final gmMenuRegistry = GmMenuRegistry();
+  late final gmNotificationController = GmNotificationController();
   late final settingsStore = AutoLoginSettingsStore(widget.store);
   late final lastUrlStore = LastUrlStore(widget.store);
   late final timedFetch = TimedFetch(widget.runtime);
+  late final importer = UserScriptImporter(
+    catalog: catalog,
+    httpGet: fetchUserScriptUrl,
+    httpGetBytes: fetchUserScriptBytes,
+    resourceStore: gmResourceStore,
+  );
+  late final gmHostHandler = GmHostHandler(
+    runtime: widget.runtime,
+    timedFetch: timedFetch,
+    resourceStore: gmResourceStore,
+    menuRegistry: gmMenuRegistry,
+    notificationController: gmNotificationController,
+    connectHeadersFor: _connectHeadersFor,
+  );
   late final autoLogin = AutoLoginController(
     runtime: widget.runtime,
     timedFetch: timedFetch,
@@ -96,6 +114,7 @@ class _PopmundoHomeState extends State<PopmundoHome>
   );
 
   StreamSubscription<NavigationEvent>? _navSub;
+  StreamSubscription<GmCallEvent>? _gmCallSub;
 
   @override
   void initState() {
@@ -103,6 +122,10 @@ class _PopmundoHomeState extends State<PopmundoHome>
     WidgetsBinding.instance.addObserver(this);
     _navSub = widget.runtime.events.navigation.listen(_onNavigation);
     widget.runtime.events.gmValue.listen((e) => gmValueStore.applyEvent(e));
+    _gmCallSub = widget.runtime.events.gmCall.listen((e) {
+      unawaited(gmHostHandler.handle(e));
+    });
+    gmMenuRegistry.addListener(_onGmMenuChanged);
     _refreshCookies();
     autoLogin.start();
     _bootstrap();
@@ -121,6 +144,8 @@ class _PopmundoHomeState extends State<PopmundoHome>
     WidgetsBinding.instance.removeObserver(this);
     widget.keepalive?.status.removeListener(_onKeepaliveStatus);
     _navSub?.cancel();
+    _gmCallSub?.cancel();
+    gmMenuRegistry.removeListener(_onGmMenuChanged);
     unawaited(autoLogin.dispose());
     super.dispose();
   }
@@ -137,8 +162,34 @@ class _PopmundoHomeState extends State<PopmundoHome>
   }
 
   Future<void> _onNavigation(NavigationEvent event) async {
+    gmMenuRegistry.clear();
     await lastUrlStore.record(event.url);
     await _refreshCookies();
+  }
+
+  void _onGmMenuChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  List<String> _connectHeadersFor(String scriptId) {
+    for (final script in _allUserScripts) {
+      if (script.id == scriptId) {
+        return script.headers['connect'] ?? const [];
+      }
+    }
+    return const [];
+  }
+
+  List<GmMenuCommandItem> get _gmMenuItems {
+    return [
+      for (final cmd in gmMenuRegistry.commands)
+        GmMenuCommandItem(
+          scriptId: cmd.scriptId,
+          commandId: cmd.commandId,
+          caption: cmd.caption,
+        ),
+    ];
   }
 
   Future<void> _bootstrap() async {
@@ -147,6 +198,7 @@ class _PopmundoHomeState extends State<PopmundoHome>
     final last = await lastUrlStore.read();
     if (!mounted) return;
     setState(() {
+      _allUserScripts = all;
       _enabledUserScripts = enabled;
       _previouslyEnabledIds = {for (final s in enabled) s.id};
       _initialUrl = last;
@@ -183,6 +235,7 @@ class _PopmundoHomeState extends State<PopmundoHome>
     final enabled = next.where((s) => s.enabled).toList();
     if (!mounted) return;
     setState(() {
+      _allUserScripts = next;
       _enabledUserScripts = enabled;
       _previouslyEnabledIds = {for (final s in enabled) s.id};
     });
@@ -195,7 +248,10 @@ class _PopmundoHomeState extends State<PopmundoHome>
           catalog: catalog,
           importer: importer,
           onApply: _applyUserScripts,
-          onScriptDeleted: gmValueStore.clearForScript,
+          onScriptDeleted: (scriptId) async {
+            await gmValueStore.clearForScript(scriptId);
+            await gmResourceStore.clearForScript(scriptId);
+          },
         ),
       ),
     );
@@ -228,22 +284,36 @@ class _PopmundoHomeState extends State<PopmundoHome>
           onOpenAutoLogin: _openAutoLogin,
           onOpenLanguage: _openLanguage,
         ),
+        gmMenuCommands: _gmMenuItems,
+        onGmMenuCommand: (cmd) {
+          unawaited(gmHostHandler.onMenuCommandTapped(
+            GmMenuCommand(
+              scriptId: cmd.scriptId,
+              commandId: cmd.commandId,
+              caption: cmd.caption,
+            ),
+          ));
+        },
         body: SafeArea(
           child: !_bootstrapReady
               ? const Center(child: CircularProgressIndicator())
-              : DebugOverlay(
-                  host: widget.runtime.host,
-                  events: widget.runtime.events,
-                  evaluate: widget.runtime.evaluate,
-                  cookies: _cookies,
-                  backgroundStatus: _backgroundStatus,
-                  visible: _debugPanelVisible,
-                  onClose: () => setState(() => _debugPanelVisible = false),
-                  child: PopmundoWebView(
-                    runtime: widget.runtime,
-                    gmValueStore: gmValueStore,
-                    enabledUserScripts: _enabledUserScripts,
-                    initialUrl: LastUrlStore.resolveInitialUrl(_initialUrl),
+              : GmNotificationOverlay(
+                  controller: gmNotificationController,
+                  onTap: (n) => unawaited(gmHostHandler.onNotificationTapped(n)),
+                  child: DebugOverlay(
+                    host: widget.runtime.host,
+                    events: widget.runtime.events,
+                    evaluate: widget.runtime.evaluate,
+                    cookies: _cookies,
+                    backgroundStatus: _backgroundStatus,
+                    visible: _debugPanelVisible,
+                    onClose: () => setState(() => _debugPanelVisible = false),
+                    child: PopmundoWebView(
+                      runtime: widget.runtime,
+                      gmValueStore: gmValueStore,
+                      enabledUserScripts: _enabledUserScripts,
+                      initialUrl: LastUrlStore.resolveInitialUrl(_initialUrl),
+                    ),
                   ),
                 ),
         ),
