@@ -110,6 +110,29 @@ class AuthSession {
     ];
   }
 
+  /// Copies cookies (typically from the WebView) into this session's jar.
+  void seed(Iterable<GameCookie> cookies) {
+    for (final c in cookies) {
+      _jar[c.key] = c;
+    }
+  }
+
+  /// One GET that does **not** follow redirects.
+  ///
+  /// The session heartbeat needs to see the 302 to `/Default.aspx` instead of
+  /// downloading the login page (AD-019).
+  Future<AuthHttpResponse> probe(Uri url) async {
+    await _cooldown();
+    final response = await send(AuthHttpRequest(
+      url: url,
+      method: 'GET',
+      headers: _headersFor(url, null, null),
+    ));
+    _lastCall = _now();
+    _absorb(response, url);
+    return response;
+  }
+
   /// GETs [url] and follows redirects, returning where it landed.
   Future<AuthExchange> get(Uri url) => _run(url, 'GET', null, null);
 
@@ -207,7 +230,7 @@ class AuthSession {
 
   /// Resolves a `Location`, which the game sends both absolute and relative —
   /// and sometimes with a doubled slash (`https://74.popmundo.com//Login.aspx`).
-  static Uri? _resolveLocation(Uri from, String location) {
+  static Uri? resolveLocation(Uri from, String location) {
     if (location.isEmpty) return null;
     final parsed = Uri.tryParse(location);
     if (parsed == null) return null;
@@ -215,6 +238,9 @@ class AuthSession {
     if (resolved.scheme != 'http' && resolved.scheme != 'https') return null;
     return resolved;
   }
+
+  static Uri? _resolveLocation(Uri from, String location) =>
+      resolveLocation(from, location);
 
   Future<void> _cooldown() async {
     final elapsed = _now().difference(_lastCall);

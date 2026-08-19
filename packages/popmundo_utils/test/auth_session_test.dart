@@ -222,4 +222,70 @@ void main() {
       expect(result.body, 'cached');
     });
   });
+
+  group('session probe (no redirect follow)', () {
+    const character =
+        'https://75.popmundo.com/World/Popmundo.aspx/Character';
+
+    test('returns the 302 and does not fetch Default.aspx', () async {
+      final server = _FakeServer({
+        'GET $character': const AuthHttpResponse(
+          status: 302,
+          body: '',
+          location: '/Default.aspx',
+        ),
+        'GET https://75.popmundo.com/Default.aspx': const AuthHttpResponse(
+          status: 200,
+          body: '<html>login</html>',
+        ),
+      });
+      final response =
+          await sessionFor(server).probe(Uri.parse(character));
+
+      expect(response.status, 302);
+      expect(response.location, '/Default.aspx');
+      expect(server.seen.length, 1);
+      expect(server.seen.single.method, 'GET');
+      expect(server.seen.single.url.toString(), character);
+    });
+
+    test('sends seeded host-only cookies on the Character GET', () async {
+      final server = _FakeServer({
+        'GET $character': const AuthHttpResponse(status: 200, body: 'ok'),
+      });
+      final session = sessionFor(server);
+      session.seed([
+        const GameCookie(
+          name: 'popmundo.com',
+          value: 'AUTH',
+          host: '75.popmundo.com',
+          httpOnly: true,
+          secure: true,
+        ),
+        const GameCookie(
+          name: 'popmundo.com',
+          value: 'WWW',
+          host: 'www.popmundo.com',
+          httpOnly: true,
+          secure: true,
+        ),
+      ]);
+      await session.probe(Uri.parse(character));
+
+      expect(server.seen.single.headers['Cookie'], contains('popmundo.com=AUTH'));
+      expect(server.seen.single.headers['Cookie'], isNot(contains('WWW')));
+    });
+
+    test('holds the 750ms cooldown between sequential probes', () async {
+      final server = _FakeServer({
+        'GET $character': const AuthHttpResponse(status: 200, body: 'ok'),
+      });
+      final session = sessionFor(server);
+      await session.probe(Uri.parse(character));
+      final afterFirst = clock.now;
+      await session.probe(Uri.parse(character));
+      expect(clock.now.difference(afterFirst).inMilliseconds,
+          greaterThanOrEqualTo(750));
+    });
+  });
 }
