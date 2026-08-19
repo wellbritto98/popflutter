@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'app_menu_item.dart';
@@ -21,11 +22,11 @@ class AppSidebar extends StatelessWidget {
           const _SidebarBrandHeader(),
           const Divider(height: 1),
           if (items.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(16),
+            Padding(
+              padding: const EdgeInsets.all(16),
               child: Text(
-                'No options available.',
-                key: Key('menu-empty'),
+                'menu.empty'.tr(),
+                key: const Key('menu-empty'),
               ),
             )
           else

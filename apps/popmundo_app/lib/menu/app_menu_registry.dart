@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -17,23 +18,23 @@ List<AppMenuItem> buildAppMenuItems({
     AppMenuItem(
       id: 'auto-login',
       icon: Icons.key,
-      label: 'Auto Login',
-      subtitle: 'Credentials and character for TimedFetch login',
+      label: 'menu.autoLogin'.tr(),
+      subtitle: 'menu.autoLoginSubtitle'.tr(),
       onTap: onOpenAutoLogin,
     ),
     AppMenuItem(
       id: 'userscripts',
       icon: Icons.extension,
-      label: 'Userscripts',
-      subtitle: 'Import, enable and remove .user.js scripts',
+      label: 'menu.userscripts'.tr(),
+      subtitle: 'menu.userscriptsSubtitle'.tr(),
       onTap: onOpenUserScripts,
     ),
     if (includeDebugItem)
       AppMenuItem(
         id: 'debug',
         icon: Icons.bug_report,
-        label: 'Debug panel',
-        subtitle: 'Inspect host, network, console and eval JS',
+        label: 'menu.debugPanel'.tr(),
+        subtitle: 'menu.debugPanelSubtitle'.tr(),
         onTap: onOpenDebugPanel,
       ),
   ];
