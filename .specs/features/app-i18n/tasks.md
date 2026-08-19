@@ -256,10 +256,10 @@ T8
 
 **Done when**:
 
-- [ ] Build gate green (all commands above; counts recorded)
-- [ ] Sweep output reviewed; zero unjustified literals remain (each remainder mapped to an Out-of-Scope/assumption row)
-- [ ] STATE.md Handoff updated (targeted edit, Decisions untouched)
-- [ ] Gate check passes: build gate
+- [x] Build gate green (analyze ×3; dart test utils 102; flutter test webview 24; flutter test app 68)
+- [x] Sweep output reviewed; zero unjustified literals remain (each remainder mapped to an Out-of-Scope/assumption row)
+- [x] STATE.md Handoff updated (targeted edit, Decisions untouched)
+- [x] Gate check passes: build gate
 
 **Tests**: none new (gate task)
 **Gate**: build
