@@ -12,6 +12,7 @@ List<AppMenuItem> buildAppMenuItems({
   required VoidCallback onOpenDebugPanel,
   required VoidCallback onOpenUserScripts,
   required VoidCallback onOpenAutoLogin,
+  required VoidCallback onOpenLanguage,
   bool includeDebugItem = kDebugMode,
 }) {
   return [
@@ -28,6 +29,13 @@ List<AppMenuItem> buildAppMenuItems({
       label: 'menu.userscripts'.tr(),
       subtitle: 'menu.userscriptsSubtitle'.tr(),
       onTap: onOpenUserScripts,
+    ),
+    AppMenuItem(
+      id: 'language',
+      icon: Icons.language,
+      label: 'menu.language'.tr(),
+      subtitle: 'menu.languageSubtitle'.tr(),
+      onTap: onOpenLanguage,
     ),
     if (includeDebugItem)
       AppMenuItem(

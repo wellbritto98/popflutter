@@ -155,13 +155,13 @@ T8
 
 **Done when**:
 
-- [ ] Dialog lists exactly English/Português and marks the active locale
-- [ ] Selecting PT re-renders shell strings live (test asserts a PT label after tap, no restart)
-- [ ] Choice persists: re-pump with saved-locale semantics asserted via harness (saveLocale path) or documented test-double equivalent — must demonstrate I18N-03 AC3 at behavior level (startLocale simulating the saved value is acceptable evidence)
-- [ ] Re-selecting active locale closes dialog without error (AC4)
-- [ ] Registry test: with `includeDebugItem: false` ids are [auto-login, userscripts, language]; onTap invokes callback once
-- [ ] Gate check passes: quick gate
-- [ ] Test count: ≥ 62 tests pass (58 + ~4 selector tests; exact delta recorded in commit)
+- [x] Dialog lists exactly English/Português and marks the active locale
+- [x] Selecting PT re-renders shell strings live (test asserts a PT label after tap, no restart)
+- [x] Choice persists: re-pump with saved-locale semantics asserted via harness (saveLocale path) or documented test-double equivalent — must demonstrate I18N-03 AC3 at behavior level (startLocale simulating the saved value is acceptable evidence)
+- [x] Re-selecting active locale closes dialog without error (AC4)
+- [x] Registry test: with `includeDebugItem: false` ids are [auto-login, userscripts, language]; onTap invokes callback once
+- [x] Gate check passes: quick gate
+- [x] Test count: 66 tests pass (61 + 4 selector + 1 registry language item)
 
 **Tests**: widget
 **Gate**: quick
