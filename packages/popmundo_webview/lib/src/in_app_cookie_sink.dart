@@ -1,13 +1,11 @@
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 
-/// Writes [GameCookie]s into the WebView's jar via `CookieManager`.
-///
-/// This is what makes the native auth handshake visible to the WebView: page
-/// loads authenticate from this jar, not from the `dart:io` client's.
-class InAppCookieSink implements CookieSink {
+/// Writes [GameCookie]s into the WebView's jar via `CookieManager`, and reads
+/// them back so the session heartbeat can seed [AuthSession] (AD-019).
+class InAppCookieSink implements CookieSink, CookieSource {
   InAppCookieSink({CookieManager? manager})
-      : _manager = manager ?? CookieManager.instance();
+    : _manager = manager ?? CookieManager.instance();
 
   final CookieManager _manager;
 
@@ -29,6 +27,43 @@ class InAppCookieSink implements CookieSink {
       );
     }
   }
+
+  @override
+  Future<List<GameCookie>> read(Uri url) async {
+    final cookies = await _manager.getCookies(url: WebUri(url.toString()));
+    return [for (final cookie in cookies) gameCookieFromInApp(cookie, url)];
+  }
+}
+
+/// Maps a plugin [Cookie] onto [GameCookie], preserving host-only scope.
+///
+/// Android may omit `domain`/`path`/`httpOnly` unless `GET_COOKIE_INFO` is
+/// available — name+value still produce a sendable `Cookie` header. A domain
+/// equal to [url]'s host is treated as host-only.
+GameCookie gameCookieFromInApp(Cookie cookie, Uri url) {
+  final rawDomain = cookie.domain?.trim();
+  String? domainAttribute;
+  if (rawDomain != null && rawDomain.isNotEmpty) {
+    final bare =
+        rawDomain.startsWith('.') ? rawDomain.substring(1) : rawDomain;
+    if (bare.toLowerCase() != url.host.toLowerCase()) {
+      domainAttribute = rawDomain;
+    }
+  }
+  final path = cookie.path;
+  return GameCookie(
+    name: cookie.name,
+    value: '${cookie.value ?? ''}',
+    host: url.host,
+    path: (path == null || path.isEmpty) ? '/' : path,
+    domainAttribute: domainAttribute,
+    secure: cookie.isSecure ?? url.scheme == 'https',
+    httpOnly: cookie.isHttpOnly ?? false,
+    sameSite: sameSiteName(cookie.sameSite),
+    expires: cookie.expiresDate == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(cookie.expiresDate!, isUtc: true),
+  );
 }
 
 /// Maps a `SameSite` attribute string onto the plugin's enum.
@@ -43,6 +78,19 @@ HTTPCookieSameSitePolicy? sameSitePolicyFor(String? raw) {
       return HTTPCookieSameSitePolicy.STRICT;
     case 'none':
       return HTTPCookieSameSitePolicy.NONE;
+    default:
+      return null;
+  }
+}
+
+String? sameSiteName(HTTPCookieSameSitePolicy? policy) {
+  switch (policy) {
+    case HTTPCookieSameSitePolicy.LAX:
+      return 'Lax';
+    case HTTPCookieSameSitePolicy.STRICT:
+      return 'Strict';
+    case HTTPCookieSameSitePolicy.NONE:
+      return 'None';
     default:
       return null;
   }
