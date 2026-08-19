@@ -22,7 +22,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 | Code Layer | Required Test Type | Coverage Expectation | Location Pattern | Run Command |
 | ---------- | ------------------ | -------------------- | ---------------- | ----------- |
-| Device test suites (deliverable) | e2e (on-device) | Every P1/P2 AC has an on-device assertion; every listed edge case handled; failure mode proven by mutation | `apps/popmundo_app/integration_test/*_test.dart` | `patrol test -d 0090995435` |
+| Device test suites (deliverable) | e2e (on-device) | Every P1/P2 AC has an on-device assertion; every listed edge case handled; failure mode proven by mutation | `apps/popmundo_app/integration_test/*_test.dart` | `patrol test -d emulator-5554` |
 | Test support / harness | e2e (via consumers) | Exercised by ≥1 device test **in the same task** — never landed unused | `apps/popmundo_app/integration_test/support/*.dart` | same as above |
 | Build & instrumentation config | none — build gate only | Proven by the smoke test actually executing on device | `android/app/build.gradle.kts`, `android/app/src/androidTest/**`, `pubspec.yaml` | `patrol test --target integration_test/smoke_test.dart` |
 | Existing app `lib/` + fast tier | unit (existing, unchanged) | Must not regress — E2E-05 | `apps/popmundo_app/test/**` | `flutter test` |
@@ -30,13 +30,24 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 ## Gate Check Commands
 
-> Generated from codebase — confirm before Execute. Device id `0090995435` = motorola edge 70 fusion (Android 16).
+> Generated from codebase — confirm before Execute. Device id `emulator-5554` = sdk_gphone64_x86_64 emulator (physical device retired at user request).
 
 | Gate Level | When to Use | Command |
 | ---------- | ----------- | ------- |
 | Quick | After config-only or Dart-only tasks | `cd apps/popmundo_app && flutter analyze lib test integration_test` |
-| Full | After any task that adds a device test | Quick, then `cd apps/popmundo_app && patrol test --target integration_test/<file>.dart -d 0090995435` |
-| Build | End of each phase | Quick, then `flutter test`, then `patrol test -d 0090995435` (whole device suite) |
+| **Pre-device (mandatory)** | **Before asking a human to run anything on the device** | `cd apps/popmundo_app && flutter analyze integration_test` — must report `No issues found!` |
+| Full | After any task that adds a device test | Quick, then Pre-device, then `cd apps/popmundo_app && patrol test --target integration_test/<file>.dart -d emulator-5554` |
+| Build | End of each phase | Quick, then `flutter test`, then `patrol test -d emulator-5554` (whole device suite) |
+
+### Environment split (learned during T2 — applies to every remaining device task)
+
+The agent session **cannot run any Gradle/Android build**: every JDK 17+ spawned there fails `Selector.open()` with `IOException: Unable to establish loopback connection` (`sun.nio.ch.UnixDomainSockets.connect0`), reproduced with a bare 5-line Java program outside Gradle and Patrol. A human terminal on the same machine (java 17.0.12) builds fine. So work splits:
+
+| Runs in the agent session | Requires a human terminal |
+| ------------------------- | ------------------------- |
+| `flutter analyze` (incl. `integration_test`), `flutter test`, `dart test`, all file edits, `git` | `patrol test`, `flutter build apk`, anything invoking Gradle |
+
+**The Pre-device gate is not optional.** T2's first device run was burned on two Dart compile errors (`expect` / `findsOneWidget` undefined — missing `package:flutter_test/flutter_test.dart` import) that `flutter analyze integration_test` catches locally in under 2s. Never spend a human round-trip on an error the analyzer can find for free.
 
 > **Analyze scoping note:** `flutter analyze` on the whole package already exits 1 today on a pre-existing `info` (`unnecessary_brace_in_string_interps`) at `test/userscripts_screen_test.dart:198` — recorded as Fix 3 in the previous feature's `validation.md`. It is not this feature's to fix. Gates treat that specific pre-existing info as known; any **new** analyze issue in changed paths fails the gate.
 
@@ -126,7 +137,7 @@ T11
 - [ ] `build.gradle.kts` `defaultConfig` sets `testInstrumentationRunner = "pl.leancode.patrol.PatrolJUnitRunner"` and `testInstrumentationRunnerArguments["clearPackageData"] = "true"` — **Kotlin DSL syntax**, not the Groovy from the docs
 - [ ] `MainActivityTest.java` exists under package `com.popmundo.popmundo_app`, parameterized per Patrol docs, referencing `MainActivity.class`
 - [ ] `smoke_test.dart` pumps a trivial widget and asserts it — imports nothing from `lib/` and constructs no runtime
-- [ ] `patrol test --target integration_test/smoke_test.dart -d 0090995435` is **green on the physical device**
+- [x] `patrol test --target integration_test/smoke_test.dart` is **green on device** (verified on the physical device before it was retired; target is now `emulator-5554`)
 - [ ] A deliberately failing assertion in the smoke test produces output naming the test and carrying the message (E2E-04), then is reverted
 - [ ] `flutter test` still passes with its existing count and does not pick up `integration_test/` (E2E-05)
 
@@ -156,7 +167,7 @@ T11
 - [ ] KA-02: real `FlutterForegroundTaskPlatform.isRunningService()` returns `true`
 - [ ] KA-04: second `bootstrap()` starts no second service; `serviceRunning` stays `true`
 - [ ] No harness member is unused — every one is exercised by this task's tests or a later one in the same phase
-- [ ] Gate passes: `patrol test --target integration_test/keepalive_test.dart -d 0090995435`
+- [ ] Gate passes: `patrol test --target integration_test/keepalive_test.dart -d emulator-5554`
 
 **Tests**: e2e (device)
 **Gate**: full
@@ -183,7 +194,7 @@ T11
 - [ ] KA-03: **two distinct** heartbeats received within 30s, second strictly later than the first — one tick alone must not satisfy the assertion
 - [ ] `waitForTicks` timeout message names ticks received vs expected (E2E-04)
 - [ ] Test completes in bounded time even when no heartbeat ever arrives — it fails, never hangs
-- [ ] Gate passes: `patrol test --target integration_test/keepalive_test.dart -d 0090995435`
+- [ ] Gate passes: `patrol test --target integration_test/keepalive_test.dart -d emulator-5554`
 
 **Tests**: e2e (device)
 **Gate**: full
@@ -210,7 +221,7 @@ T11
 - [ ] KA-05: after `pressHome()` + `openNotifications()`, a notification matching `textContains: 'Popmundo is running'` is asserted present (reader API if the T1 spike found one; otherwise `tapOnNotificationBySelector` with a 5s timeout)
 - [ ] KA-06: after returning to the app, the service is still running **and** the heartbeat advanced past its pre-background value
 - [ ] **Mutation proof recorded**: with `stopWithTask` reverted to `true` in both the manifest and the adapter, KA-05 goes **red**; the revert is undone and the tree left clean. Evidence pasted into the commit body or `validation.md`
-- [ ] Gate passes: `patrol test --target integration_test/keepalive_test.dart -d 0090995435`
+- [ ] Gate passes: `patrol test --target integration_test/keepalive_test.dart -d emulator-5554`
 
 **Tests**: e2e (device)
 **Gate**: full
@@ -235,7 +246,7 @@ T11
 - [ ] STO-01: `write` then `read` returns the exact value (real Keystore / EncryptedSharedPreferences)
 - [ ] STO-02: `delete` then `read` returns `null`
 - [ ] Test cleans up its own keys so repeated runs are idempotent even if `clearPackageData` is disabled
-- [ ] Gate passes: `patrol test --target integration_test/storage_test.dart -d 0090995435`
+- [ ] Gate passes: `patrol test --target integration_test/storage_test.dart -d emulator-5554`
 
 **Tests**: e2e (device)
 **Gate**: full
@@ -259,7 +270,7 @@ T11
 **Done when**:
 - [ ] STO-04: a structured value written via `set` is returned equal by `get` from a **freshly constructed** `SharedPreferencesStore` — proving the real channel, not an in-memory cache
 - [ ] STO-05: `remove` then `get` returns `null`
-- [ ] Gate passes: `patrol test --target integration_test/storage_test.dart -d 0090995435`
+- [ ] Gate passes: `patrol test --target integration_test/storage_test.dart -d emulator-5554`
 
 **Tests**: e2e (device)
 **Gate**: full
@@ -284,7 +295,7 @@ T11
 - [ ] A password is saved through the Auto Login storage path (settings via `KeyValueStore`, password via `SecretStore`)
 - [ ] Every key from `SharedPreferences.getKeys()` is read and **no** stored value equals the password, nor contains it as a substring
 - [ ] The same password **is** readable via `SecretStore.read` — proving the test would catch a store swap rather than trivially passing on an empty store
-- [ ] Gate passes: `patrol test --target integration_test/storage_test.dart -d 0090995435`
+- [ ] Gate passes: `patrol test --target integration_test/storage_test.dart -d emulator-5554`
 
 **Tests**: e2e (device)
 **Gate**: full
@@ -310,7 +321,7 @@ T11
 - [ ] US-01: `fetchUserScriptUrl` returns exactly the served body
 - [ ] US-02: the imported script is listed by a **freshly constructed** catalog over real `SharedPreferences`
 - [ ] No request leaves the device — assertion targets loopback only
-- [ ] Gate passes: `patrol test --target integration_test/userscripts_test.dart -d 0090995435`
+- [ ] Gate passes: `patrol test --target integration_test/userscripts_test.dart -d emulator-5554`
 
 **Tests**: e2e (device)
 **Gate**: full
@@ -335,7 +346,7 @@ T11
 - [ ] US-03: a non-2xx response throws `UserScriptImportException` whose message names the status code
 - [ ] US-04: a server that accepts but never responds triggers `UserScriptImportException` indicating a timeout, using a short injected `timeout` so the test stays bounded
 - [ ] Both assert the exception **type and message**, not merely that something threw
-- [ ] Gate passes: `patrol test --target integration_test/userscripts_test.dart -d 0090995435`
+- [ ] Gate passes: `patrol test --target integration_test/userscripts_test.dart -d emulator-5554`
 
 **Tests**: e2e (device)
 **Gate**: full

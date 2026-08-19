@@ -20,7 +20,7 @@ New features, bug fixes with any ambiguity, or changes touching more than one pa
 
 ## Specialist agents — use them for their area, don't freelance
 
-Five domain-specialist agents exist for this repo, defined at `.cursor/agents/*.md` (Cursor) and mirrored at `.claude/agents/popmundo-greasemonkey.md` for Claude Code's Agent tool. **Whenever a change falls inside one of their areas, invoke that agent instead of editing directly** — each one carries a file-ownership list, non-negotiable rules, and lessons from past mistakes that aren't otherwise obvious from the code alone.
+Five domain-specialist agents exist for this repo, defined at `.agents/agents/*.md` (Cursor) and mirrored at `.claude/agents/popmundo-greasemonkey.md` for Claude Code's Agent tool. **Whenever a change falls inside one of their areas, invoke that agent instead of editing directly** — each one carries a file-ownership list, non-negotiable rules, and lessons from past mistakes that aren't otherwise obvious from the code alone.
 
 | Agent | Area | Touch it when |
 | ----- | ---- | -------------- |
@@ -73,6 +73,24 @@ cd apps/popmundo_app && flutter run
 
 There are no melos scripts defined (`melos.yaml` only lists package globs) and no CI config in-repo — analyze/test are invoked manually per package as above.
 
+### Device-real tests (Patrol)
+
+A second test tier lives in `apps/popmundo_app/integration_test/` and runs on a real Android device or emulator. It exercises real platform APIs — the foreground service, the Keystore, the SharedPreferences channel, real sockets — which the fake-based tier structurally cannot reach.
+
+```bash
+# one-time: install the CLI, and make sure adb is on PATH
+flutter pub global activate patrol_cli
+
+# run one file (see the one-test-per-file rule below)
+cd apps/popmundo_app && patrol test --target integration_test/keepalive_test.dart -d <device-id>
+```
+
+- **`flutter test` never runs these** — it globs `test/` only, so the two tiers stay independent.
+- **The device tier never loads popmundo.com, and structurally cannot.** Under `integration_test`/Patrol the Dart entrypoint is the *test file*, so `lib/main.dart` never runs, `PopmundoApp` is never constructed and `InAppPopmundoRuntime` never exists. Tests pump minimal harness widgets instead. Because `lib/main.dart` does not run, anything it sets up must be redone in `integration_test/support/harness.dart` — notably `FlutterForegroundTask.initCommunicationPort()`.
+- **Exactly ONE `patrolTest` per file.** Patrol runs a single Dart test per app process; a second one fails with `Invalid response 500`. This is an open upstream bug ([2005](https://github.com/leancodepl/patrol/issues/2005), [2380](https://github.com/leancodepl/patrol/issues/2380)) — group related assertions into one sequential test with a `reason` on each `expect`.
+- **Always run `flutter analyze integration_test` before a device run.** It catches Dart errors in ~2s that would otherwise cost a full build-install-run cycle.
+- See `.specs/features/mobile-e2e-tests/` for the spec, and AD-015 for the tier's boundary.
+
 ## Architecture notes that span files
 
 - **`PopmundoRuntime` is the seam.** It's a port defined in `popmundo_utils` (`popmundo_runtime.dart`) and implemented once, in `popmundo_webview` (`InAppPopmundoRuntime`). Everything in `popmundo_utils` — `Utils`, `Notifications`, `TimedFetch`, `Scoring`, `CssSelectorHelper` — takes a `PopmundoRuntime` and calls `runtime.evaluate(...)` or `runtime.fetchInPage(...)`; none of them know about `flutter_inappwebview`. Tests fake this runtime (`packages/popmundo_utils/test/fake_runtime.dart`) instead of using a device.
@@ -86,4 +104,4 @@ There are no melos scripts defined (`melos.yaml` only lists package globs) and n
 - **Storage has no `chrome.*`.** `KeyValueStore` is the contract (`popmundo_utils`); `MemoryKeyValueStore` is used in tests, `SharedPreferencesStore` (`apps/popmundo_app/lib/prefs_store.dart`) is the real implementation, injected at the composition root in `main.dart`.
 - **GPL-3.0-or-later applies repo-wide** (see `LICENSE`/`NOTICE`) because these packages are a translation of Popmundo-Utils' GPL-3 `common/`. `chrome.storage`/`chrome.runtime` equivalents are reimplemented in Dart from scratch, never copied. Keep this in mind before pulling in code from the original JS project.
 - **Gameplay automation features (mass interact, call friends, autograph collector, etc.) are explicitly out of scope** per `spec.md` — this repo is the observable foundation only, not a full port of the Chrome extension.
-- **No live-site e2e tests.** Testing against `www.popmundo.com` in CI is deliberately excluded (instability, real auth, ToS) — business logic is tested via `FakePopmundoRuntime` in `popmundo_utils`, and widget tests in `popmundo_app`/`popmundo_webview` use fake event streams instead of a real WebView.
+- **No live-site e2e tests.** Testing against `www.popmundo.com` is deliberately excluded (instability, real auth, ToS) — business logic is tested via `FakePopmundoRuntime` in `popmundo_utils`, and widget tests in `popmundo_app`/`popmundo_webview` use fake event streams instead of a real WebView. This bans the *live site*, not device testing: a Patrol tier in `apps/popmundo_app/integration_test/` does run on real Android hardware, covering only the mobile-side surface that never touches the game (foreground service, Keystore, prefs channel, loopback sockets). See the Commands section and AD-015.

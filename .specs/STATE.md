@@ -115,13 +115,23 @@
 - **Date**: 2026-08-18
 - **Status**: active
 
+### AD-015
+
+- **Decision**: O repositório passa a ter **dois tiers de teste**. O tier rápido (`apps/popmundo_app/test/`, `flutter test`, fakes) continua sendo o padrão. Um tier **device-real** vive em `apps/popmundo_app/integration_test/`, roda com **Patrol** (`patrol test`) em Android físico ou emulador, e cobre exclusivamente a superfície mobile que **não toca o popmundo.com**: foreground service, Keystore, canal do SharedPreferences e sockets loopback. Regras não-negociáveis do tier: (a) nenhum teste constrói `PopmundoApp`/`InAppPopmundoRuntime` — usa harness mínimo; (b) **exatamente um `patrolTest` por arquivo**; (c) `flutter analyze integration_test` obrigatório antes de qualquer execução em device.
+- **Reason**: O AD-013 (`stopWithTask="true"`) passou por 54 testes verdes e um Verifier PASS porque todo teste do app substitui a plataforma por fake — o tier era estruturalmente cego a comportamento de runtime. O tier device-real agora detecta esse bug automaticamente (prova de mutação registrada em `validation.md`). A restrição do popmundo.com do `CLAUDE.md` é satisfeita **por construção**: sob `integration_test` o entrypoint Dart é o arquivo de teste, então `lib/main.dart` nunca roda.
+- **Trade-off**: `patrol_cli` vira pré-requisito global; execuções levam ~1 min contra ~7s do tier rápido; um `patrolTest` por arquivo é limitação upstream aberta ([2005](https://github.com/leancodepl/patrol/issues/2005), [2380](https://github.com/leancodepl/patrol/issues/2380)), então critérios relacionados se agrupam num teste sequencial; como `lib/main.dart` não roda, o que ele inicializa (ex. `initCommunicationPort()`) precisa ser reproduzido em `integration_test/support/harness.dart`.
+- **Scope**: `apps/popmundo_app` (`integration_test/`, `android/app/build.gradle.kts`, `android/app/src/androidTest/`, `pubspec.yaml`), `CLAUDE.md`
+- **Date**: 2026-08-19
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: mobile-e2e-tests / `.specs/features/mobile-e2e-tests`
-- **Phase / Task**: Execute, Phase 1 — T1 done, **T2 BLOCKED** (environment, not product)
-- **Completed**: spec.md, design.md, tasks.md (11 tasks / 5 phases / 21 requirements); T1 `f43805c` (patrol ^4.9.0 dep + `patrol:` pubspec config). Spike result: Patrol exposes **no** read-only notification API — KA-05 must assert via `tapOnNotificationBySelector` (recorded in design.md Risks row 1)
-- **In-progress**: T2 — code written but deliberately **uncommitted** (gate never passed, per Execution Protocol). Files: `apps/popmundo_app/android/app/build.gradle.kts` (modified), `apps/popmundo_app/android/app/src/androidTest/**` (new), `apps/popmundo_app/integration_test/smoke_test.dart` (new)
-- **Next step**: Run `cd apps/popmundo_app && patrol test --target integration_test/smoke_test.dart -d 0090995435` from a **real terminal outside the agent session**, then report the result so T2 can be gated and committed and T3–T5 can proceed
-- **Blockers**: **Any JDK 17+ in the agent session cannot open an NIO `Selector`** — `java.io.IOException: Unable to establish loopback connection` → `SocketException: Invalid argument: connect` at `sun.nio.ch.UnixDomainSockets.connect0`. Reproduced independently with a bare 5-line `Selector.open()` program on Android Studio's bundled JBR 21.0.9, outside Gradle and Patrol entirely. JDK 21's `PipeImpl` hardcodes `preferAfUnix=true` on Windows and AF_UNIX loopback is unavailable to JVMs spawned in this sandbox. JDK 11 works but Gradle 9.3.1 requires JVM 17+. **Consequence: no Gradle/Android build of any kind can run from the agent session — this blocks T2–T10 wholesale, and would block a plain `integration_test` tier identically. It is not a Patrol-specific problem.**
-- **Uncommitted files**: T2's three files above; plus unrelated in-flight repo-wide rename `.cursor/agents/` → `.agents/agents/` (5 deletions, `.agents/` untracked, 4 one-line path references in `CLAUDE.md`, `.claude/agents/popmundo-greasemonkey.md`, `.claude/skills/.../tasks.md`, `.specs/features/background-keepalive/tasks.md`) — **not made by this feature's work**; also `apps/popmundo_app/patrol_test/` (Patrol-generated bundle, likely wants a .gitignore entry)
+- **Phase / Task**: Execute — T1–T11 implemented and committed; **Verifier pass pending**
+- **Completed**: spec.md, design.md, tasks.md; T1 `f43805c`, T2 `0bec34e`, T3–T5 `315c27d`, battery-dialog automation + mutation proof `1e32a4b`, T6–T8 `dacb11c`, T9–T10 `45771fd`, T11 (CLAUDE.md + AD-015). All three device suites green on `emulator-5554`; `flutter test` still 55 passed.
+- **Mutation proof (the feature's acceptance bar)**: reverting `stopWithTask` to `true` in both `AndroidManifest.xml` and `FlutterForegroundTaskPlatform.initService` turns KA-05 **red** with `does not contain 'Popmundo is running'`. Both files restored from HEAD; tree clean.
+- **In-progress**: none
+- **Next step**: dispatch the independent Verifier (author ≠ verifier) to write `.specs/features/mobile-e2e-tests/validation.md`, then distil lessons via `scripts/lessons.py`
+- **Blockers**: none for the feature. Standing environment constraint: **the agent session cannot run Gradle** — every JDK 17+ there fails `Selector.open()` (`IOException: Unable to establish loopback connection`, `sun.nio.ch.UnixDomainSockets.connect0`), reproduced with a bare 5-line Java program outside Gradle and Patrol. A human terminal on the same machine (java 17.0.12) builds fine. So `patrol test` / `flutter build apk` need a human terminal; `flutter analyze`, `flutter test`, `git` and all edits do not.
+- **Uncommitted files**: unrelated in-flight work by the user (i18n: `lib/app.dart`, `lib/main.dart`, `lib/l10n.dart`; repo-wide `.cursor/agents/` → `.agents/agents/` rename) — **not this feature's**. Also `apps/popmundo_app/patrol_test/` (Patrol-generated bundle; wants a `.gitignore` entry).
 - **Branch**: master
