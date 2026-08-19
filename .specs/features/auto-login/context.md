@@ -1,19 +1,19 @@
 # Auto Login Context
 
+> **Heartbeat (2026-08-19).** Segundo gatilho do Auto Login: probe nativo
+> 60 s em `{HostTracker.currentOrigin}/World/Popmundo.aspx/Character` com o
+> jar da WebView. 302 `Location: /Default.aspx` = deslogado → mesmo handshake
+> AD-018. Não segue o redirect. Não usa `www` nem `HostTracker.resolve`.
+> Timer no isolate do app; FGS só mantém o processo (AD-012). Ver `spec.md`.
+
 > **Superseded in part by AD-017 (2026-08-19).** The `redirect: 'manual'` +
 > `loadUrl(Location)` hop described below is not implementable — browser fetch
-> returns an opaque redirect with no readable `Location`. The shipped flow is:
-> silent POST with the default `redirect: 'follow'`, landing host read from
-> `InPageFetchResult.url`, injected-`<form>` navigation as the cross-origin
-> fallback, POST bodies built by serializing the whole `#aspnetForm`
-> (`AspNetFormData`), characters matched by the full name in each
-> `div.box > h2`, and a single final navigation to `{origin}/World/Popmundo.aspx`.
-> `LastUrlStore` no longer exists. See `spec.md` and `validation.md` for the
-> current contract.
+> returns an opaque redirect with no readable `Location`. The shipped flow is
+> AD-018 native HTTP (not TimedFetch). `LastUrlStore` no longer exists.
 
-**Gathered:** 2026-08-18
+**Gathered:** 2026-08-18; heartbeat 2026-08-19
 **Spec:** `.specs/features/auto-login/spec.md`
-**Status:** Ready for design
+**Status:** Spec updated — awaiting confirmation before Design/Execute
 
 ---
 
@@ -24,6 +24,16 @@ Auto Login configures credentials in the sidebar, detects the ASP.NET login page
 ---
 
 ## Implementation Decisions
+
+### Session heartbeat (2026-08-19)
+
+- Intervalo 60 s; GET nativo único, sem seguir 302.
+- URL: `{currentOrigin}/World/Popmundo.aspx/Character` no host numerado sticky (`74.`, `75.`, …).
+- Logout = 3xx cuja Location resolvida é `/` ou `/Default.aspx` → ciclo Auto Login existente.
+- Cookies: ler jar da WebView → semear `AuthSession` antes do probe; após relogin, `CookieSink.write` como hoje.
+- Skip: host ainda `www`, Auto Login off, credenciais faltando, `inFlight`, CookieManager indisponível.
+- 200 / rede / 5xx ≠ logout.
+- Background: timer no isolate do controller; isolate do FGS não fala com o jogo.
 
 ### Login hop (302)
 

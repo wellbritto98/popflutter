@@ -156,12 +156,21 @@
 - **Date**: 2026-08-19
 - **Status**: active
 
+### AD-019
+
+- **Decision**: Detecção de sessão expirada em idle/background é um GET nativo (`AuthSession.probe`) a cada 60 s em `{HostTracker.currentOrigin}/World/Popmundo.aspx/Character`, **sem** seguir redirects. Cookies vêm da WebView via porta `CookieSource` (`CookieManager.getCookies` → `GameCookie`) semeados no jar do `AuthSession`. 302 cuja `Location` resolvida é path de login dispara o handshake AD-018 no **mesmo** origin sticky. Host `www.popmundo.com` não é probed. O timer vive no isolate do `AutoLoginController`; o isolate do FGS permanece só keepalive (AD-012). Erro de rede/5xx/200 não é logout.
+- **Reason**: A WebView pode não navegar quando a sessão ASP.NET cai (app em keepalive). Fetch in-page congela em background. Seguir o 302 baixaria `Default.aspx` à toa. Cookies de sessão são host-only no `N.` atribuído no login (AD-007).
+- **Trade-off**: Um GET/minuto ao jogo mesmo idle; mitigado por um hop, skip `www`, e não seguir redirect. `CookieManager.getCookies` no Android pode omitir atributos sem `GET_COOKIE_INFO` — name+value bastam para o header `Cookie`.
+- **Scope**: `popmundo_utils` (`CookieSource`, `AuthSession.probe`/`seed`, `AutoLoginController.checkSession`), `popmundo_webview` (`InAppCookieSink.read`), `popmundo_app` (wiring)
+- **Date**: 2026-08-19
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: auto-login (rework) / `.specs/features/auto-login`
-- **Phase / Task**: Execute complete
-- **Completed**: Full-name character matching, whole-form POST bodies, native-HTTP silent handshake with cookie sync into the WebView, status snackbars (EN/PT), LastUrlStore removed. See AD-017 and AD-018.
-- **In-progress**: none
-- **Next step**: device smoke-test with a real `.user.js` using GM_xmlhttpRequest + registerMenuCommand
-- **Blockers**: none
+- **Feature**: auto-login (session heartbeat) / `.specs/features/auto-login`
+- **Phase / Task**: Specify — spec updated, awaiting user confirmation
+- **Completed**: Handshake nativo AD-018, cookie sync WebView, snackbars, full-name character match
+- **In-progress**: P1 heartbeat (HB-01…HB-10) drafted in spec.md
+- **Next step**: User confirms spec (or overrides agent defaults: 302 not followed, skip `www`, probe only when Auto Login enabled). Then Design (CookieSource + AuthSession.probe) → Execute
+- **Blockers**: waiting on spec confirmation
 - **Branch**: master

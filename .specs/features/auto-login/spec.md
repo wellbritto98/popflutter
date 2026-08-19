@@ -2,24 +2,29 @@
 
 ## Problem Statement
 
-Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `/` ou `/Default.aspx`. O userscript de referência preenche o DOM e clica; no Popflutter o ciclo é **silencioso e fora da WebView**: o handshake inteiro (GET do form, POST de login, handover de host, escolha de personagem) roda em HTTP nativo `dart:io`, os cookies resultantes são copiados para o jar da WebView, e a única coisa que o jogador vê é `{host}/World/Popmundo.aspx` carregando. O personagem é identificado pelo **nome completo**. Feedback vai por snackbars na shell. Se o transporte nativo falhar, o ciclo aborta com snackbar — não existe caminho visível (AD-018).
+Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `/` ou `/Default.aspx`. Isso pode acontecer **sem a WebView navegar** — em especial com o app em segundo plano (keepalive). Detectar só a URL de login deixa a sessão morta até o jogador tocar na página.
+
+O ciclo de Auto Login continua **silencioso e fora da WebView**: handshake em HTTP nativo `dart:io`, cookies copiados para o jar da WebView, uma navegação para `{host}/World/Popmundo.aspx`. Além da detecção por navegação, um **heartbeat** a cada 60 s faz GET em `{hostSticky}/World/Popmundo.aspx/Character` com os cookies da WebView; um 302 para `/Default.aspx` significa deslogado e dispara o mesmo ciclo de renovação. Personagem pelo **nome completo**. Feedback por snackbars. Sem fallback visível (AD-018).
 
 ## Goals
 
-- [ ] Jogador configura usuário, senha, personagem (nome completo) e status no sidebar; senha fica em cofre seguro
-- [ ] Com Auto Login enabled, ao detectar página de login o app autentica via TimedFetch sem clicar no form
-- [ ] O personagem é identificado pelo `<h2>` da `div.box`, não pelo rótulo do botão (que só tem o primeiro nome)
-- [ ] Ao fim do ciclo o WebView vai sempre para `{origin}/World/Popmundo.aspx`
-- [ ] Cada etapa do ciclo aparece como snackbar localizado (EN/PT)
+- [x] Jogador configura usuário, senha, personagem (nome completo) e status no sidebar; senha fica em cofre seguro
+- [x] Com Auto Login enabled, ao detectar página de login o app autentica via HTTP nativo (`AuthSession`) sem clicar no form
+- [x] O personagem é identificado pelo `<h2>` da `div.box`, não pelo rótulo do botão (que só tem o primeiro nome)
+- [x] Ao fim do ciclo o WebView vai sempre para `{origin}/World/Popmundo.aspx`
+- [x] Cada etapa do ciclo aparece como snackbar localizado (EN/PT)
+- [ ] Com Auto Login enabled, um GET nativo a cada 60 s em `{hostSticky}/World/Popmundo.aspx/Character` detecta logout (302 → `/Default.aspx`) e renova a sessão — inclusive com o app em keepalive/background
 
 ## Out of Scope
 
 | Feature | Reason |
 | ------- | ------ |
-| Clique no formulário de login (DOM fill) | Substituído por POST TimedFetch |
+| Clique no formulário de login (DOM fill) | Substituído por POST nativo (AD-018) |
 | Facebook OAuth | Fora do fluxo mapeado |
 | Telegram / notificações de logout | Userscript-only; não pedido |
-| Retry infinito / polling agressivo | Um ciclo por detecção; inFlight bloqueia |
+| Polling mais frequente que 60 s / seguir o 302 do Character | Sobrecarregaria o jogo; o 302 já basta |
+| Probe a partir do isolate do FGS | AD-012: isolate só emite tick de keepalive; não fala com o jogo |
+| Heartbeat in-page (`TimedFetch` / JS da WebView) | Em background o JS congela; o transporte nativo já existe |
 | E2E live contra popmundo.com | Wrapper policy / ToS |
 | Restore da última URL visitada | Substituído por World home fixo (pedido do usuário) |
 | Desambiguação por ID de personagem | Nome completo resolve; ID fica como hardening futuro |
@@ -47,6 +52,15 @@ Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `
 | UI nativa | Localizada EN/PT via `easy_localization` (AD-014); item sempre visível | Padrão sidebar | y |
 | Feedback | Stream `AutoLoginStatus` no controller → snackbars na shell | Pedido explícito | y |
 | Concurrency | Um auto-login por vez (`inFlight`); falha 200+form = parar | Evita loop / throttle abuse | y (agent) |
+| Heartbeat intervalo | 60 s, um GET por tick | Pedido explícito ("a cada minuto"); saudável vs throttle do jogo | y |
+| Heartbeat URL | `{HostTracker.currentOrigin}/World/Popmundo.aspx/Character` — host numerado (`74.`, `75.`, …), **nunca** `www` hardcoded e **nunca** `HostTracker.resolve` (trailing slash) | Sessão e cookies são host-only no `N.` atribuído no login (AD-007); captura do usuário | y |
+| Heartbeat logout | GET **sem** seguir redirect; status 3xx cuja `Location` resolvida é path de login (`/` / `/Default.aspx`) ⇒ deslogado ⇒ mesmo ciclo de Auto Login | Seguir o 302 baixaria o HTML grande de `Default.aspx` à toa; a captura mostra `Location: /Default.aspx` | y (agent) |
+| Heartbeat cookies | Antes de cada probe, copiar o jar da **WebView** (`CookieManager.getCookies` no origin sticky) para o jar do `AuthSession`; depois do relogin, `CookieSink.write` como hoje | O jar `dart:io` é in-memory e vazio após restart; a sessão viva está na WebView (AD-004) | y |
+| Heartbeat background | Timer no isolate do `AutoLoginController` (o mesmo do app). O FGS (AD-012) só mantém o processo vivo; o isolate do FGS **não** faz o GET | Pedido: funcionar em keepalive/background sem violar AD-012 | y |
+| Heartbeat só com Auto Login | Probe e renovação só se enabled + username + password + character | Sem credenciais não há o que renovar | y (agent) |
+| Heartbeat skip `www` | Se `currentOrigin.host` ainda é `www.popmundo.com`, o tick é ignorado | Ainda não há host de jogo; cookies de sessão são do `N.` | y |
+| Heartbeat erro de rede / 5xx / 200 | Não é logout; espera o próximo tick. 200 no Character = sessão ok (corpo ignorado) | Evita relogin em queda de rede | y (agent) |
+| Heartbeat vs navegação | Detecção por URL de login **permanece**. Heartbeat é o segundo gatilho. `inFlight` cobre os dois | Idle/background não gera `NavigationEvent` | y |
 
 **Open questions:** none — all resolved or logged above.
 
@@ -134,10 +148,33 @@ Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `
 
 ---
 
+### P1: Heartbeat de sessão no host sticky ⭐ MVP
+
+**User Story**: As a player with Auto Login enabled, I want the app to notice that I was logged out even when the WebView did not navigate (idle or background keepalive), and silently renew the session on the same numbered host I was playing on.
+
+**Why P1**: Sem probe, o keepalive mantém o processo mas a sessão ASP.NET expira; o jogador só descobre no próximo toque.
+
+**Acceptance Criteria**:
+
+1. WHEN Auto Login is enabled, credentials+character are present, `HostTracker.currentOrigin.host` is a Popmundo host other than `www.popmundo.com`, and no cycle is in flight THEN the system SHALL issue a native HTTP GET to `{currentOrigin}/World/Popmundo.aspx/Character` once per 60 seconds (first probe after `waitUntilReady`, then every 60 s).
+2. WHEN that GET is issued THEN it SHALL use the WebView's cookies for that origin (seeded into the `AuthSession` jar immediately before the request), the WebView's User-Agent, and SHALL NOT follow redirects (`followRedirects` off, one hop only).
+3. WHEN the response is a 3xx whose resolved `Location` is a login path (`/` or `/Default.aspx`) THEN the system SHALL treat the session as expired and start the existing silent Auto Login cycle (same handshake, same snackbars, same final `loadUrl` to `{assignedHost}/World/Popmundo.aspx`).
+4. WHEN the response is 200 THEN the system SHALL treat the session as healthy, ignore the body, write nothing, navigate nowhere, and wait for the next tick.
+5. WHEN the GET throws, times out, or returns a non-redirect error status (4xx/5xx other than the logout 3xx) THEN the system SHALL NOT start a login cycle and SHALL wait for the next tick.
+6. WHEN `currentOrigin.host` is `www.popmundo.com` OR Auto Login is disabled OR credentials are missing OR a cycle is already in flight THEN that tick SHALL be a no-op (no GET).
+7. WHEN the probe URL is built THEN it SHALL be `currentOrigin.replace(path: '/World/Popmundo.aspx/Character')` — not `HostTracker.resolve`, not a literal `www.popmundo.com`, not a stored origin from a previous login.
+8. WHEN the app is in Android background with keepalive running THEN the probe timer SHALL keep firing on the main isolate; the FGS isolate SHALL NOT perform the GET, read cookies, or call `loadUrl`.
+9. WHEN iOS suspends the process THEN probes MAY pause; this SHALL NOT be treated as logout.
+10. WHEN a heartbeat-triggered cycle is in flight THEN a concurrent navigation trigger and the next heartbeat tick SHALL be ignored (`inFlight`).
+11. WHEN sequential native calls run (probe then handshake, or handshake hops) THEN they SHALL remain at least 750 ms apart (AD-006).
+
+**Independent Test**: fake `AuthHttpSend` + fake `CookieSource` + virtual clock; host sticky `https://75.popmundo.com`; 302 `Location: /Default.aspx` starts one cycle; 200 does not; `www` host skips the GET; seed cookies appear on the Cookie header of the Character GET; no second hop after the 302.
+
+---
+
 ## Edge Cases
 
 - WHEN the login page has no `#aspnetForm` THEN cycle SHALL abort (`missingForm`)
-- WHEN the login POST throws THEN the cycle SHALL fall back to form navigation, not abort
 - WHEN the token GET throws THEN cycle SHALL abort with `networkError` and clear `inFlight`
 - WHEN the choice POST throws THEN cycle SHALL abort with `networkError` and clear `inFlight`
 - WHEN `GetPageNotifications` itself throws THEN the cycle SHALL proceed — a failed poll says nothing about the choice
@@ -146,6 +183,12 @@ Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `
 - WHEN sequential calls run THEN throttle >=750 ms between them (AD-006)
 - WHEN the sticky host is `N.` THEN no code path SHALL hardcode `www.popmundo.com` (AD-007)
 - WHEN building the ChooseCharacter URL THEN `HostTracker.resolve` SHALL NOT be used — it appends a trailing slash
+- WHEN the Character GET 302s to `/Default.aspx` THEN the system SHALL NOT fetch `Default.aspx` as part of the probe
+- WHEN the Character GET 302s to a non-login path THEN the system SHALL NOT treat it as logout
+- WHEN WebView cookies cannot be read (CookieManager unavailable) THEN that tick SHALL be skipped, not treated as logout
+- WHEN the sticky host is `75.popmundo.com` THEN the probe SHALL go to `https://75.popmundo.com/World/Popmundo.aspx/Character` and the Cookie header SHALL only include cookies that match that host (host-only session cookies of `www` MUST NOT be sent)
+- WHEN keepalive FGS ticks every 5 s THEN that SHALL NOT cause a Character GET every 5 s — the session probe stays on its own 60 s timer
+- WHEN the login POST throws THEN the cycle SHALL abort with `networkError` (no form-navigation fallback; AD-018)
 
 ---
 
@@ -177,8 +220,18 @@ Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `
 | FDBK-02 | One snackbar per status | Execute | Done |
 | FDBK-03 | Name/message interpolation | Execute | Done |
 | FDBK-04 | EN/PT catalog coverage | Execute | Done |
+| HB-01 | Probe 60 s on sticky host Character URL | Specify | Pending |
+| HB-02 | Seed WebView jar; do not follow redirect | Specify | Pending |
+| HB-03 | 302 → login path starts Auto Login cycle | Specify | Pending |
+| HB-04 | 200 = healthy; network/5xx ≠ logout | Specify | Pending |
+| HB-05 | Skip www / disabled / missing / inFlight | Specify | Pending |
+| HB-06 | URL from currentOrigin, not resolve/www | Specify | Pending |
+| HB-07 | Main-isolate timer; FGS isolate does not probe | Specify | Pending |
+| HB-08 | iOS suspend ≠ logout | Specify | Pending |
+| HB-09 | Dual trigger + inFlight | Specify | Pending |
+| HB-10 | 750 ms between probe and handshake | Specify | Pending |
 
-**Coverage:** 24 total, 24 mapped to tests, 0 unmapped
+**Coverage:** 34 total, 24 previously mapped, 10 heartbeat unmapped until Execute
 
 ---
 
@@ -191,3 +244,6 @@ Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `
 - [x] The cycle ends on `{origin}/World/Popmundo.aspx` on the host actually landed on
 - [x] Every status resolves in EN and PT
 - [x] Unit/widget gates pass without live HTTP to popmundo.com
+- [ ] Logout on `75.popmundo.com` (302 from `/World/Popmundo.aspx/Character` to `/Default.aspx`) renews the session without the WebView having navigated
+- [ ] Probe never hits `www.popmundo.com/.../Character` after the sticky host is a numbered `N.`
+- [ ] One Character GET per minute, never per FGS 5 s tick; the 302 is not followed
