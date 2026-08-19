@@ -98,6 +98,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: 3 rodadas perdidas em hipoteses (debugging)
 - last seen: 2026-08-19T01:10:56Z
 
+### L-015 — When a test injects a short timeout to keep itself bounded, assert the elapsed wall-clock time is within that bound, not just the resulting exception's type and message.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `apps/popmundo_app` · harmful: 0
+- features: mobile-e2e-tests
+- evidence: apps/popmundo_app/integration_test/userscripts_test.dart:120-130 (US-04) (apps/popmundo_app)
+- last seen: 2026-08-19T01:27:26Z
+
+### L-016 — An idempotency criterion (no duplicate action on repeat call) needs an assertion on the action's call count or side effect, not just that the end-state boolean stays true afterward.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `apps/popmundo_app` · harmful: 0
+- features: mobile-e2e-tests
+- evidence: apps/popmundo_app/integration_test/keepalive_test.dart:79-89 (KA-04) (apps/popmundo_app)
+- last seen: 2026-08-19T01:27:32Z
+
+### L-017 — Patrol (leancodepl/patrol) runs exactly one Dart test per app process per install -- design device-test task breakdowns as one patrolTest per file from the start, not one task per acceptance criterion.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `patrol` · harmful: 0
+- features: mobile-e2e-tests
+- evidence: commits 315c27d, dacb11c, 45771fd (T3/T4/T5, T6/T7/T8, T9/T10 merges) (patrol)
+- last seen: 2026-08-19T01:27:39Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
