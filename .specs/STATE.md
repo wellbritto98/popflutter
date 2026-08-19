@@ -124,13 +124,21 @@
 - **Date**: 2026-08-19
 - **Status**: active
 
+### AD-016
+
+- **Decision**: O polyfill GM cobre **Core + Host**: value/info/style/log/unsafeWindow (já existente) mais `GM.getResourceUrl`, `GM.notification`, `GM.openInTab`, `GM.registerMenuCommand`, `GM.setClipboard`, `GM.xmlHttpRequest` (formas `GM_*` e `GM.*`). `@resource`/`@connect` deixam de rejeitar o import; resources persistem em `GmResourceStore`; XHR Popmundo usa `TimedFetch`, terceiros usam `HttpClient` nativo sem cookies do jogo; `GM.openInTab` abre no navegador do SO; menu commands aparecem no sidebar (limpos a cada navegação); notificações GM são banner in-app. Canal único `popmundo` ganha `type: 'gm'` + `gmReply`. AD-003 inalterado.
+- **Reason**: Scripts Tampermonkey/Greasemonkey reais dependem das APIs host; trade-off "sem polyfill GM" do AD-010 era pré-implementação Core.
+- **Trade-off**: Superfície de ataque maior (XHR nativo + clipboard + abas externas); `@connect` não bloqueia import — nega em runtime.
+- **Scope**: `popmundo_utils` (parser/shim/stores/policy), `popmundo_webview` (bridge/hooks), `popmundo_app` (GmHostHandler, sidebar, overlay)
+- **Date**: 2026-08-19
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: app-i18n / `.specs/features/app-i18n`
-- **Phase / Task**: Execute complete; Verifier **PASS** (iteration 2/3). I18N-01..07 Verified.
-- **Completed**: T1 `262911b`, T2 `ea1c58b`, T3 `e3a6b3d`, T4 `767f76d`, T5 `c3a4dc7`, T6 `6c7ef5f`, T7 `ebb817e`, T8 `0d4269a`, fix `c86d5d2`. Gate 197 passed (utils 102, webview 24, app 71). Sensor 3/3 killed. Report: `.specs/features/app-i18n/validation.md`.
-- **In-progress**: Interactive UAT (user-facing)
-- **Next step**: walk the user through UAT (sidebar PT, language selector live-switch, keepalive notification)
+- **Feature**: gm-host-apis / `.specs/features/gm-host-apis`
+- **Phase / Task**: Execute complete
+- **Completed**: GM host APIs (Core+Host polyfill)
+- **In-progress**: none
+- **Next step**: device smoke-test with a real `.user.js` using GM_xmlhttpRequest + registerMenuCommand
 - **Blockers**: none
-- **Uncommitted files**: spec status + this Handoff + `validation.md` (docs); unrelated `.agents/` rename — **not this feature's**
 - **Branch**: master

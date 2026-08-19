@@ -89,7 +89,7 @@ var x = 1;
       const raw = '''
 // ==UserScript==
 // @name Bad Grant
-// @grant GM_xmlhttpRequest
+// @grant GM_unknownApi
 // ==/UserScript==
 1;
 ''';
@@ -98,31 +98,24 @@ var x = 1;
         throwsA(
           isA<UserScriptParseException>()
               .having((e) => e.unsupportedHeaders, 'unsupported',
-                  contains('@grant GM_xmlhttpRequest'))
+                  contains('@grant GM_unknownApi'))
               .having((e) => e.message, 'message', contains('Unsupported')),
         ),
       );
     });
 
-    test('rejects @resource and @connect', () {
+    test('accepts @resource and @connect headers', () {
       const raw = '''
 // ==UserScript==
 // @name Res
-// @resource foo https://example.com/a.png
+// @resource icon https://example.com/a.png
 // @connect example.com
 // ==/UserScript==
 1;
 ''';
-      expect(
-        () => UserScriptParser.parse(raw),
-        throwsA(
-          isA<UserScriptParseException>().having(
-            (e) => e.unsupportedHeaders,
-            'unsupported',
-            allOf(contains('@resource'), contains('@connect')),
-          ),
-        ),
-      );
+      final parsed = UserScriptParser.parse(raw);
+      expect(parsed.headers['resource'], ['icon https://example.com/a.png']);
+      expect(parsed.headers['connect'], ['example.com']);
     });
 
     test('rejects @run-at context-menu', () {
@@ -222,21 +215,54 @@ var x = 1;
 // @grant GM.setValue
 // @grant GM.deleteValue
 // @grant GM.listValues
+// @grant GM.addValueChangeListener
+// @grant GM.removeValueChangeListener
 // @grant GM.info
 // ==/UserScript==
 1;
 ''';
       final parsed = UserScriptParser.parse(raw);
-      expect(parsed.grants, hasLength(12));
+      expect(parsed.grants, hasLength(14));
     });
 
-    test('still rejects unsupported GM_* grants like GM_xmlhttpRequest', () {
+    test('accepts GM value change listener grants', () {
       const raw = '''
 // ==UserScript==
-// @name Bad
+// @name Listeners
+// @grant GM_addValueChangeListener
+// @grant GM_removeValueChangeListener
+// @grant GM.addValueChangeListener
+// @grant GM.removeValueChangeListener
+// ==/UserScript==
+1;
+''';
+      final parsed = UserScriptParser.parse(raw);
+      expect(parsed.grants, hasLength(4));
+    });
+
+    test('accepts GM host grants (legacy and modern)', () {
+      const raw = '''
+// ==UserScript==
+// @name Host
 // @grant GM_openInTab
 // @grant GM_registerMenuCommand
 // @grant GM_setClipboard
+// @grant GM_xmlhttpRequest
+// @grant GM.notification
+// @grant GM.openInTab
+// @grant GM.getResourceUrl
+// ==/UserScript==
+1;
+''';
+      final parsed = UserScriptParser.parse(raw);
+      expect(parsed.grants, hasLength(7));
+    });
+
+    test('still rejects unknown @grant tokens', () {
+      const raw = '''
+// ==UserScript==
+// @name Bad
+// @grant GM_unknownApi
 // ==/UserScript==
 1;
 ''';
@@ -246,11 +272,7 @@ var x = 1;
           isA<UserScriptParseException>().having(
             (e) => e.unsupportedHeaders,
             'unsupported',
-            allOf(
-              contains('@grant GM_openInTab'),
-              contains('@grant GM_registerMenuCommand'),
-              contains('@grant GM_setClipboard'),
-            ),
+            contains('@grant GM_unknownApi'),
           ),
         ),
       );

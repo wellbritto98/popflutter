@@ -15,6 +15,8 @@ export 'src/scoring.dart';
 export 'src/secret_store.dart';
 export 'src/storage.dart';
 export 'src/timed_fetch.dart';
+export 'src/userscript/gm_connect_policy.dart';
+export 'src/userscript/gm_resource_store.dart';
 export 'src/userscript/gm_value_store.dart';
 export 'src/userscript/userscript_catalog.dart';
 export 'src/userscript/userscript_gm_shim.dart';

@@ -58,6 +58,7 @@ void main() {
     expect(hooks.contains("type: 'console'"), isTrue);
     expect(hooks.contains('flutterInAppWebViewPlatformReady'), isTrue);
     expect(hooks.contains('window.__popmundo.post = post;'), isTrue);
+    expect(hooks.contains('window.__popmundo.gmReply'), isTrue);
     expect(helpers.contains('getMyID'), isTrue);
     expect(helpers.contains('applyScoringNumbers();'), isFalse);
     expect(helpers.contains('applyBarPercentage();'), isFalse);
@@ -161,6 +162,29 @@ void main() {
     expect(events[0].value, 3);
     expect(events[1].action, 'delete');
     expect(events[1].value, isNull);
+  });
+
+  test('JS bridge emits gm host call events', () async {
+    final runtime = _Runtime();
+    final events = <GmCallEvent>[];
+    runtime.events.gmCall.listen(events.add);
+
+    final bridge = PopmundoJsBridge(runtime);
+    bridge.handleArguments([
+      {
+        'type': 'gm',
+        'payload': {
+          'scriptId': 'abc',
+          'action': 'setClipboard',
+          'text': 'hello',
+        },
+      },
+    ]);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(events, hasLength(1));
+    expect(events.single.action, 'setClipboard');
+    expect(events.single.data['text'], 'hello');
   });
 
   test('initial URL default is www.popmundo.com', () {

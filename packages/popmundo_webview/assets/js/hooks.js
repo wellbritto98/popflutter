@@ -109,6 +109,29 @@
 
   window.__popmundo = window.__popmundo || {};
   window.__popmundo.post = post;
+  window.__popmundo.__gmCallbacks = window.__popmundo.__gmCallbacks || {};
+  window.__popmundo.__gmMenuCommands = window.__popmundo.__gmMenuCommands || {};
+  window.__popmundo.__gmNotifCallbacks = window.__popmundo.__gmNotifCallbacks || {};
+  window.__popmundo.gmReply = function (payload) {
+    if (!payload) return;
+    if (payload.action === 'menuClick') {
+      var menuFn = window.__popmundo.__gmMenuCommands[payload.commandId];
+      if (typeof menuFn === 'function') menuFn();
+      return;
+    }
+    if (payload.action === 'notificationClick') {
+      var notifFn = window.__popmundo.__gmNotifCallbacks[payload.callId];
+      if (typeof notifFn === 'function') notifFn();
+      delete window.__popmundo.__gmNotifCallbacks[payload.callId];
+      return;
+    }
+    var callId = payload.callId;
+    if (!callId) return;
+    var entry = window.__popmundo.__gmCallbacks[callId];
+    if (!entry || typeof entry.fn !== 'function') return;
+    entry.fn(payload);
+    if (!entry.persistent) delete window.__popmundo.__gmCallbacks[callId];
+  };
   window.__popmundo.fetch = function (url, options) {
     if (!originalFetch) return Promise.reject(new Error('fetch unavailable'));
     // Pass options through unchanged so redirect: 'manual' (and others) work.

@@ -78,9 +78,17 @@ class UserScriptParser {
     'none', 'unsafewindow', 'unwrap',
     // GM "Core" polyfill — legacy sync form.
     'gm_getvalue', 'gm_setvalue', 'gm_deletevalue', 'gm_listvalues',
+    'gm_addvaluechangelistener', 'gm_removevaluechangelistener',
     'gm_addstyle', 'gm_log', 'gm_info',
     // GM "Core" polyfill — modern namespaced/Promise form.
     'gm.getvalue', 'gm.setvalue', 'gm.deletevalue', 'gm.listvalues', 'gm.info',
+    'gm.addvaluechangelistener', 'gm.removevaluechangelistener',
+    // GM "Host" polyfill — legacy form.
+    'gm_getresourceurl', 'gm_notification', 'gm_openintab',
+    'gm_registermenucommand', 'gm_setclipboard', 'gm_xmlhttprequest',
+    // GM "Host" polyfill — modern namespaced/Promise form.
+    'gm.getresourceurl', 'gm.notification', 'gm.openintab',
+    'gm.registermenucommand', 'gm.setclipboard', 'gm.xmlhttprequest',
   };
   static const _allowedRunAt = {'document-start', 'document-end', 'document-idle'};
 
@@ -116,13 +124,6 @@ class UserScriptParser {
       if (!_allowedGrants.contains(grant.toLowerCase())) {
         unsupported.add('@grant $grant');
       }
-    }
-
-    for (final _ in headers['resource'] ?? const <String>[]) {
-      unsupported.add('@resource');
-    }
-    for (final _ in headers['connect'] ?? const <String>[]) {
-      unsupported.add('@connect');
     }
 
     final runAtValues = headers['run-at'] ?? const <String>[];

@@ -1,18 +1,21 @@
 import 'dart:convert';
 
+import 'gm_connect_policy.dart';
 import 'userscript_catalog.dart';
+import 'userscript_gm_host_bindings.dart';
+import 'userscript_gm_value_bindings.dart';
 import 'userscript_parser.dart';
 
 /// Builds a per-script Greasemonkey/Tampermonkey (`GM_*`/`GM.*`) JS prelude
-/// for the "Core" grant set, honoring only the tokens the script actually
-/// requested via `@grant`.
+/// for the "Core" and "Host" grant sets, honoring only the tokens the script
+/// actually requested via `@grant`.
 ///
 /// Every userscript runs in the same `ContentWorld.PAGE` global scope, so the
 /// generated prelude opens its own closure — callers must append the
 /// script's guarded body followed by `})();` to close it (see
 /// `UserScriptInjector.toUserScript`).
 class UserScriptGmShim {
-  /// Returns null when the script requests no Core GM grant, so callers can
+  /// Returns null when the script requests no Core/Host GM grant, so callers can
   /// leave `script.source` untouched (no behavior change for today's
   /// grant-less scripts).
   /// Whether [script]'s `@grant` list includes any Core GM value function
@@ -37,6 +40,21 @@ class UserScriptGmShim {
         grants.contains('gm.listvalues');
   }
 
+  static bool _needsHostHelpers(Set<String> grants) {
+    return grants.contains('gm_setclipboard') ||
+        grants.contains('gm.setclipboard') ||
+        grants.contains('gm_openintab') ||
+        grants.contains('gm.openintab') ||
+        grants.contains('gm_notification') ||
+        grants.contains('gm.notification') ||
+        grants.contains('gm_registermenucommand') ||
+        grants.contains('gm.registermenucommand') ||
+        grants.contains('gm_getresourceurl') ||
+        grants.contains('gm.getresourceurl') ||
+        grants.contains('gm_xmlhttprequest') ||
+        grants.contains('gm.xmlhttprequest');
+  }
+
   static String? build({
     required InstalledUserScript script,
     required Map<String, Object?> initialValues,
@@ -52,34 +70,75 @@ class UserScriptGmShim {
     final hasModernSet = grants.contains('gm.setvalue');
     final hasModernDelete = grants.contains('gm.deletevalue');
     final hasModernList = grants.contains('gm.listvalues');
+    final hasLegacyAddListener = grants.contains('gm_addvaluechangelistener');
+    final hasLegacyRemoveListener = grants.contains('gm_removevaluechangelistener');
+    final hasModernAddListener = grants.contains('gm.addvaluechangelistener');
+    final hasModernRemoveListener = grants.contains('gm.removevaluechangelistener');
     final hasAddStyle = grants.contains('gm_addstyle');
     final hasLog = grants.contains('gm_log');
     final hasLegacyInfo = grants.contains('gm_info');
     final hasModernInfo = grants.contains('gm.info');
     final hasUnsafeWindow = grants.contains('unsafewindow');
 
+    final hasLegacySetClipboard = grants.contains('gm_setclipboard');
+    final hasModernSetClipboard = grants.contains('gm.setclipboard');
+    final hasLegacyOpenInTab = grants.contains('gm_openintab');
+    final hasModernOpenInTab = grants.contains('gm.openintab');
+    final hasLegacyNotification = grants.contains('gm_notification');
+    final hasModernNotification = grants.contains('gm.notification');
+    final hasLegacyMenu = grants.contains('gm_registermenucommand');
+    final hasModernMenu = grants.contains('gm.registermenucommand');
+    final hasModernResourceUrl = grants.contains('gm.getresourceurl');
+    final hasLegacyXhr = grants.contains('gm_xmlhttprequest');
+    final hasModernXhr = grants.contains('gm.xmlhttprequest');
+
     final needsValuesCache = hasValueGrant(script);
-    final needsGmNamespace =
-        hasModernGet || hasModernSet || hasModernDelete || hasModernList || hasModernInfo;
+    final needsValueListeners = needsValuesCache ||
+        hasLegacyAddListener ||
+        hasLegacyRemoveListener ||
+        hasModernAddListener ||
+        hasModernRemoveListener;
+    final needsHostHelpers = _needsHostHelpers(grants);
+    final needsGmNamespace = hasModernGet ||
+        hasModernSet ||
+        hasModernDelete ||
+        hasModernList ||
+        hasModernInfo ||
+        hasModernAddListener ||
+        hasModernRemoveListener ||
+        hasModernSetClipboard ||
+        hasModernOpenInTab ||
+        hasModernNotification ||
+        hasModernMenu ||
+        hasModernResourceUrl ||
+        hasModernXhr;
 
     if (!needsValuesCache &&
+        !needsValueListeners &&
+        !needsHostHelpers &&
         !hasAddStyle &&
         !hasLog &&
         !hasLegacyInfo &&
         !hasModernInfo &&
-        !hasUnsafeWindow) {
+        !hasUnsafeWindow &&
+        !hasLegacySetClipboard &&
+        !hasLegacyOpenInTab &&
+        !hasLegacyNotification &&
+        !hasLegacyMenu &&
+        !hasLegacyXhr) {
       return null;
     }
 
     final buf = StringBuffer()
       ..writeln('(function() {')
-      ..writeln("  'use strict';");
+      ..writeln("  'use strict';")
+      ..writeln('  var __gmScriptId = ${jsonEncode(script.id)};');
 
-    if (needsValuesCache) {
+    if (needsValuesCache || needsValueListeners) {
       buf
-        ..writeln('  var __gmScriptId = ${jsonEncode(script.id)};')
         ..writeln('  var __gmValues = ${jsonEncode(initialValues)};')
-        ..writeln('  function __gmPost(action, key, value) {')
+        ..writeln(UserScriptGmValueBindings.valueChangeListeners())
+        ..writeln('  function __gmPostValue(action, key, value) {')
         ..writeln('    try {')
         ..writeln('      if (window.__popmundo && window.__popmundo.post) {')
         ..writeln('        window.__popmundo.post({')
@@ -97,16 +156,24 @@ class UserScriptGmShim {
         )
         ..writeln('  }')
         ..writeln('  function __gmSetValue(key, value) {')
+        ..writeln('    var oldVal = __gmGetValue(key, undefined);')
         ..writeln('    __gmValues[key] = value;')
-        ..writeln("    __gmPost('set', key, value);")
+        ..writeln("    __gmPostValue('set', key, value);")
+        ..writeln('    __gmNotifyValueChangeListeners(key, oldVal, value, false);')
         ..writeln('  }')
         ..writeln('  function __gmDeleteValue(key) {')
+        ..writeln('    var oldVal = __gmGetValue(key, undefined);')
         ..writeln('    delete __gmValues[key];')
-        ..writeln("    __gmPost('delete', key, null);")
+        ..writeln("    __gmPostValue('delete', key, null);")
+        ..writeln('    __gmNotifyValueChangeListeners(key, oldVal, undefined, false);')
         ..writeln('  }')
         ..writeln('  function __gmListValues() {')
         ..writeln('    return Object.keys(__gmValues);')
         ..writeln('  }');
+    }
+
+    if (needsHostHelpers) {
+      buf.writeln(UserScriptGmHostBindings.sharedHelpers());
     }
 
     if (hasLegacyGet) buf.writeln('  var GM_getValue = __gmGetValue;');
@@ -114,28 +181,96 @@ class UserScriptGmShim {
     if (hasLegacyDelete) buf.writeln('  var GM_deleteValue = __gmDeleteValue;');
     if (hasLegacyList) buf.writeln('  var GM_listValues = __gmListValues;');
 
-    if (needsGmNamespace) {
-      buf.writeln('  var GM = {};');
-      if (hasModernGet) {
-        buf.writeln(
-          '  GM.getValue = function(key, dv) { return Promise.resolve(__gmGetValue(key, dv)); };',
-        );
-      }
-      if (hasModernSet) {
-        buf.writeln(
-          '  GM.setValue = function(key, value) { return Promise.resolve(__gmSetValue(key, value)); };',
-        );
-      }
-      if (hasModernDelete) {
-        buf.writeln(
-          '  GM.deleteValue = function(key) { return Promise.resolve(__gmDeleteValue(key)); };',
-        );
-      }
-      if (hasModernList) {
-        buf.writeln(
-          '  GM.listValues = function() { return Promise.resolve(__gmListValues()); };',
-        );
-      }
+    if (needsGmNamespace) buf.writeln('  var GM = {};');
+
+    if (hasModernGet) {
+      buf.writeln(
+        '  GM.getValue = function(key, dv) { return Promise.resolve(__gmGetValue(key, dv)); };',
+      );
+    }
+    if (hasModernSet) {
+      buf.writeln(
+        '  GM.setValue = function(key, value) { return Promise.resolve(__gmSetValue(key, value)); };',
+      );
+    }
+    if (hasModernDelete) {
+      buf.writeln(
+        '  GM.deleteValue = function(key) { return Promise.resolve(__gmDeleteValue(key)); };',
+      );
+    }
+    if (hasModernList) {
+      buf.writeln(
+        '  GM.listValues = function() { return Promise.resolve(__gmListValues()); };',
+      );
+    }
+    if (needsValueListeners && hasLegacyAddListener) {
+      buf.writeln(UserScriptGmValueBindings.addListenerLegacy());
+    }
+    if (needsValueListeners && hasLegacyRemoveListener) {
+      buf.writeln(UserScriptGmValueBindings.removeListenerLegacy());
+    }
+    if (needsValueListeners && hasModernAddListener) {
+      buf.writeln(UserScriptGmValueBindings.addListenerModern());
+    }
+    if (needsValueListeners && hasModernRemoveListener) {
+      buf.writeln(UserScriptGmValueBindings.removeListenerModern());
+    }
+
+    // Tampermonkey bundles listeners with value grants even without explicit
+    // @grant lines — mirror that for legacy and modern namespaces separately.
+    final hasLegacyValueGrant =
+        hasLegacyGet || hasLegacySet || hasLegacyDelete || hasLegacyList;
+    final hasModernValueGrant =
+        hasModernGet || hasModernSet || hasModernDelete || hasModernList;
+    if (needsValuesCache &&
+        hasLegacyValueGrant &&
+        !hasLegacyAddListener &&
+        !hasLegacyRemoveListener) {
+      buf
+        ..writeln(UserScriptGmValueBindings.addListenerLegacy())
+        ..writeln(UserScriptGmValueBindings.removeListenerLegacy());
+    }
+    if (needsValuesCache &&
+        hasModernValueGrant &&
+        !hasModernAddListener &&
+        !hasModernRemoveListener) {
+      buf
+        ..writeln(UserScriptGmValueBindings.addListenerModern())
+        ..writeln(UserScriptGmValueBindings.removeListenerModern());
+    }
+
+    if (hasLegacySetClipboard) {
+      buf.writeln(UserScriptGmHostBindings.setClipboardLegacy());
+    }
+    if (hasModernSetClipboard) {
+      buf.writeln(UserScriptGmHostBindings.setClipboardModern());
+    }
+    if (hasLegacyOpenInTab) {
+      buf.writeln(UserScriptGmHostBindings.openInTabLegacy());
+    }
+    if (hasModernOpenInTab) {
+      buf.writeln(UserScriptGmHostBindings.openInTabModern());
+    }
+    if (hasLegacyNotification) {
+      buf.writeln(UserScriptGmHostBindings.notificationLegacy());
+    }
+    if (hasModernNotification) {
+      buf.writeln(UserScriptGmHostBindings.notificationModern());
+    }
+    if (hasLegacyMenu) {
+      buf.writeln(UserScriptGmHostBindings.registerMenuCommandLegacy());
+    }
+    if (hasModernMenu) {
+      buf.writeln(UserScriptGmHostBindings.registerMenuCommandModern());
+    }
+    if (hasModernResourceUrl) {
+      buf.writeln(UserScriptGmHostBindings.getResourceUrlModern());
+    }
+    if (hasLegacyXhr) {
+      buf.writeln(UserScriptGmHostBindings.xmlHttpRequestLegacy());
+    }
+    if (hasModernXhr) {
+      buf.writeln(UserScriptGmHostBindings.xmlHttpRequestModern());
     }
 
     if (hasAddStyle) {
@@ -174,6 +309,8 @@ class UserScriptGmShim {
       return list.first;
     }
 
+    final resources = UserScriptResourceParser.parseHeaders(h['resource'] ?? const []);
+
     return {
       'script': {
         'name': script.name,
@@ -185,8 +322,7 @@ class UserScriptGmShim {
         'excludes': h['exclude'] ?? const <String>[],
         'run-at':
             script.runAt == UserScriptRunAt.documentStart ? 'document-start' : 'document-end',
-        // @resource is unconditionally rejected at parse time — always empty.
-        'resources': const <String, String>{},
+        'resources': resources,
         'unwrap': h.containsKey('unwrap'),
       },
       'scriptHandler': 'Popmundo',

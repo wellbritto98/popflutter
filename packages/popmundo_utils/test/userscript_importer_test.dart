@@ -141,6 +141,35 @@ main();
     );
   });
 
+  test('downloads @resource bytes into GmResourceStore', () async {
+    final url = 'https://cdn.example.com/with-res.user.js';
+    responses[url] = '''
+// ==UserScript==
+// @name With Resource
+// @resource icon https://cdn.example.com/icon.png
+// ==/UserScript==
+main();
+''';
+    final resourceStore = GmResourceStore(store);
+    final importer = UserScriptImporter(
+      catalog: catalog,
+      httpGet: fakeGet,
+      httpGetBytes: (uri, {timeout}) async {
+        fetched.add(uri);
+        if (uri.toString() == 'https://cdn.example.com/icon.png') {
+          return [0x89, 0x50, 0x4E, 0x47];
+        }
+        throw UserScriptImportException('missing bytes');
+      },
+      resourceStore: resourceStore,
+    );
+
+    final installed = await importer.importFromUrl(url);
+    final resources = await resourceStore.loadAll(installed.id);
+    expect(resources['icon']!.mimeType, 'application/octet-stream');
+    expect(resources['icon']!.base64, isNotEmpty);
+  });
+
   test('concatenates successful @require before body', () async {
     final url = 'https://cdn.example.com/with-req-ok.user.js';
     responses[url] = '''
