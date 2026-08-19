@@ -15,7 +15,10 @@ abstract class BackgroundPlatform {
 
   Future<bool> isRunningService();
   Future<void> initService();
-  Future<void> startService();
+  Future<void> startService({
+    required String notificationTitle,
+    required String notificationText,
+  });
 
   void addTaskDataCallback(void Function(Object data) callback);
   void removeTaskDataCallback(void Function(Object data) callback);

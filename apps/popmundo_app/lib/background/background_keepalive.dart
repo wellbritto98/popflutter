@@ -7,6 +7,7 @@ import 'background_status.dart';
 class BackgroundKeepalive {
   BackgroundKeepalive({
     required BackgroundPlatform platform,
+    this.translator,
     AppLifecycleState initialLifecycle = AppLifecycleState.resumed,
   }) : _platform = platform,
        status = ValueNotifier(
@@ -18,6 +19,11 @@ class BackgroundKeepalive {
        );
 
   final BackgroundPlatform _platform;
+
+  /// Resolves a catalog key to a translated string. Null, or a value equal
+  /// to the key, is treated as unresolved (pre-load race) and yields the
+  /// bundled English default (I18N-04 / A8).
+  final String Function(String key)? translator;
 
   final ValueNotifier<BackgroundStatus> status;
 
@@ -69,7 +75,16 @@ class BackgroundKeepalive {
     try {
       running = await _platform.isRunningService();
       if (!running) {
-        await _platform.startService();
+        await _platform.startService(
+          notificationTitle: _localize(
+            'keepalive.notificationTitle',
+            kKeepaliveNotificationTitleEn,
+          ),
+          notificationText: _localize(
+            'keepalive.notificationText',
+            kKeepaliveNotificationTextEn,
+          ),
+        );
         running = await _platform.isRunningService();
       }
     } catch (_) {
@@ -105,6 +120,11 @@ class BackgroundKeepalive {
     }
   }
 
+  String _localize(String key, String enDefault) {
+    final v = translator?.call(key);
+    return (v == null || v == key) ? enDefault : v;
+  }
+
   void _patch({
     bool? notificationGranted,
     Object? batteryUnrestricted = _unset,
@@ -126,4 +146,8 @@ class BackgroundKeepalive {
 }
 
 const Object _unset = Object();
+
+const kKeepaliveNotificationTitleEn = 'Popmundo is running';
+const kKeepaliveNotificationTextEn =
+    'Keeping your session alive in the background.';
 

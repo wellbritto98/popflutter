@@ -230,12 +230,12 @@ T8
 
 **Done when**:
 
-- [ ] With translator injected, startService receives catalog strings (test: translator returning PT values → captured PT title/text)
-- [ ] Without translator, bundled EN defaults used (existing tests adapted, behavior preserved)
-- [ ] Unresolved key (translator returns the key) falls back to EN default (A8 race)
-- [ ] `stopWithTask` assertions in platform_config_test still green (unrelated behavior untouched)
-- [ ] Gate check passes: full gate (quick + webview package tests)
-- [ ] Test count: ≥ previous + 2 (translator injection + fallback), no deletions
+- [x] With translator injected, startService receives catalog strings (test: translator returning PT values → captured PT title/text)
+- [x] Without translator, bundled EN defaults used (existing tests adapted, behavior preserved)
+- [x] Unresolved key (translator returns the key) falls back to EN default (A8 race)
+- [x] `stopWithTask` assertions in platform_config_test still green (unrelated behavior untouched)
+- [x] Gate check passes: full gate (quick + webview package tests)
+- [x] Test count: 68 (66 + 2 translator/fallback), no deletions
 
 **Tests**: widget/unit
 **Gate**: full

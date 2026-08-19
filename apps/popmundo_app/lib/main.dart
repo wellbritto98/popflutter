@@ -17,6 +17,7 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   final keepalive = BackgroundKeepalive(
     platform: FlutterForegroundTaskPlatform(),
+    translator: (key) => key.tr(),
   );
   runApp(
     EasyLocalization(
