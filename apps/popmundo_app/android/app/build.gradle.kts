@@ -29,6 +29,14 @@ android {
         versionName = flutter.versionName
         // Patrol device-real test tier (mobile-e2e-tests E2E-02).
         testInstrumentationRunner = "pl.leancode.patrol.PatrolJUnitRunner"
+        // Gives each run a clean app data directory, so storage tests never
+        // inherit state from a previous run.
+        //
+        // It does NOT enable multiple Dart tests per file — that is an upstream
+        // Patrol limitation (one patrolTest per file; see the header of
+        // integration_test/keepalive_test.dart and issues 2005 / 2380). This
+        // setting was wrongly suspected of causing that failure and briefly
+        // removed; removing it changed nothing.
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
 
