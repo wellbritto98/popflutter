@@ -44,15 +44,28 @@
     "passwordRequired": "Obrigatório para o login automático",
     "clearPassword": "Limpar senha armazenada",
     "character": "Nome do personagem",
-    "characterHelp": "Deve corresponder ao rótulo do botão Choose / Escolher",
-    "status": "Status",
+    "characterHelp": "Nome completo, exatamente como aparece na página de seleção de personagem",
     "saved": "Configurações de login automático salvas",
     "saveFailed": "Falha ao salvar: {}",
+    "status": "Status",
     "statusNormal": "Normal",
     "statusBusy": "Ocupado",
     "statusMobile": "Celular",
     "statusAway": "Ausente",
-    "statusDrunk": "Bêbado"
+    "statusDrunk": "Bêbado",
+    "cycle": {
+      "detected": "Sessão expirada — entrando…",
+      "authenticating": "Autenticando…",
+      "choosingCharacter": "Selecionando {}…",
+      "done": "Conectado como {}",
+      "failedCredentials": "Auto Login falhou: verifique usuário e senha",
+      "failedForm": "Auto Login falhou: não foi possível ler a página de login",
+      "failedNoCharacters": "Auto Login falhou: nenhum personagem nesta conta",
+      "failedCharacterNotFound": "Auto Login falhou: nenhum personagem chamado “{}” — use o nome completo",
+      "failedCharacterAmbiguous": "Auto Login falhou: mais de um personagem chamado “{}”",
+      "failedServer": "Auto Login falhou: {}",
+      "failedNetwork": "Auto Login falhou: não foi possível acessar o Popmundo"
+    }
   },
   "keepalive": {
     "notificationTitle": "Popmundo está em execução",

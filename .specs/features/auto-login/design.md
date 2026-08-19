@@ -1,26 +1,44 @@
-# Auto Login Design
+# Auto Login Design — Session Heartbeat
 
 **Spec**: `.specs/features/auto-login/spec.md`
-**Status**: Approved (plan confirmed)
+**Context**: `.specs/features/auto-login/context.md`
+**Status**: Approved (spec confirmed 2026-08-19)
+
+Handshake silencioso permanece AD-018. Este documento cobre só o **segundo gatilho**: probe de sessão.
+
+O design antigo (TimedFetch + `redirect: 'manual'` + `LastUrlStore`) está **superseded** por AD-017/AD-018; não reexecutar.
 
 ---
 
 ## Architecture Overview
 
-Pure-Dart orchestration in `popmundo_utils` (settings, last URL, ASP.NET parse, `AutoLoginController`) uses `TimedFetch` + new `PopmundoRuntime.loadUrl`. WebView adapter extends `fetchInPage`/`hooks.js` for redirect-manual + Location header and implements `loadUrl`. App shell owns sidebar UI, `FlutterSecureStorage` as `SecretStore`, wiring, and cold-start `initialUrl`.
+Probe e handshake compartilham `AuthSession` + jar `GameCookie`. A WebView é a fonte da sessão viva (AD-004); o cliente `dart:io` é semeado a cada tick e, após relogin, despeja de volta via `CookieSink`.
+
+O timer vive no isolate do `AutoLoginController`. O isolate do FGS **não** entra neste fluxo (AD-012).
 
 ```mermaid
-graph TD
-  Sidebar[AutoLoginScreen] --> Settings[AutoLoginSettingsStore]
-  Sidebar --> Secrets[SecretStore]
-  Home[PopmundoHome] --> Controller[AutoLoginController]
-  Home --> LastUrl[LastUrlStore]
-  Controller --> TF[TimedFetch.fetchResponse]
-  Controller --> Runtime[PopmundoRuntime]
-  TF --> Runtime
-  Runtime --> Hooks[hooks.js fetch]
-  Runtime --> LoadUrl[controller.loadUrl]
-  Home --> WebView[PopmundoWebView initialUrl]
+sequenceDiagram
+  participant T as Timer 60s
+  participant C as AutoLoginController
+  participant S as CookieSource
+  participant A as AuthSession
+  participant G as N.popmundo.com
+  participant W as WebView CookieSink
+
+  T->>C: checkSession()
+  C->>C: skip if www / disabled / inFlight
+  C->>S: read(currentOrigin)
+  S-->>C: GameCookie[] (WebView jar)
+  C->>A: seed(jar) + probe(Character)
+  A->>G: GET /World/Popmundo.aspx/Character (no follow)
+  G-->>A: 200 or 302 Location /Default.aspx
+  alt 302 login path
+    C->>A: handshake AD-018
+    A->>W: CookieSink.write
+    C->>C: loadUrl World home
+  else 200 / network / 5xx
+    C-->>C: no-op until next tick
+  end
 ```
 
 ---
@@ -31,126 +49,74 @@ graph TD
 
 | Component | Location | How to Use |
 | --------- | -------- | ---------- |
-| TimedFetch | `packages/popmundo_utils/lib/src/timed_fetch.dart` | Extend with `fetchResponse`; keep `fetch()` for Notifications |
-| KeyValueStore | `packages/popmundo_utils/lib/src/storage.dart` | Settings + last URL |
-| PopmundoEventBus.navigation | `packages/popmundo_utils/lib/src/events.dart` | Trigger + last URL |
-| FakePopmundoRuntime | `packages/popmundo_utils/test/fake_runtime.dart` | Unit tests |
-| buildAppMenuItems | `apps/popmundo_app/lib/menu/app_menu_registry.dart` | Add Auto Login item |
-| UserScriptsScreen | `apps/popmundo_app/lib/userscripts/` | UI pattern for settings screen |
-| Notifications POST | `packages/popmundo_utils/lib/src/notifications.dart` | Shape for TimedFetch POST + useCache:false |
+| `AuthSession` | `auth_http.dart` | New `seed` + `probe` (one GET, no follow). Cooldown 750 ms already there |
+| `IoAuthHttpSender` | `auth_http_io.dart` | Unchanged (`followRedirects = false`) |
+| `CookieSink` / `MemoryCookieSink` | `cookie_sink.dart` | Add sibling port `CookieSource`; memory double implements both |
+| `InAppCookieSink` | `in_app_cookie_sink.dart` | Implement `CookieSource` via `CookieManager.getCookies` |
+| `GameCookie.matches` | `game_cookie.dart` | Filter www host-only cookies off the 75 probe |
+| `AspNetForm.isLoginPath` | `aspnet_form.dart` | Classify 302 Location |
+| `HostTracker.currentOrigin` | `host_tracker.dart` | Sticky `N.` host. **Do not** use `resolve` (trailing slash) |
+| `AutoLoginController._runLoginCycle` | `auto_login_controller.dart` | Same cycle when probe says logged out |
+| `FakePopmundoRuntime` | `test/fake_runtime.dart` | `waitUntilReady` + host + `authSend` |
 
 ### Integration Points
 
 | System | Integration Method |
 | ------ | ------------------ |
-| HostTracker | Updated only via `loadUrl` / native navigation (AD-007) |
-| CookieManager | Unchanged — document navigation applies Set-Cookie (AD-004) |
-| ObservePolicy | Unchanged (AD-003) |
+| AD-003 observe-only | Probe is native HTTP, not intercept |
+| AD-006 throttle | `AuthSession` cooldown applies to probe |
+| AD-007 sticky host | `currentOrigin.replace(path: characterPath)` |
+| AD-012 FGS | Timer on app isolate; FGS isolate unchanged |
+| AD-018 handshake | Unchanged; heartbeat is an extra caller of `_runLoginCycle` |
 
 ---
 
 ## Components
 
-### InPageFetchResult (extended)
+### CookieSource
 
-- **Purpose**: Carry status/body and redirect Location from in-page fetch
-- **Location**: `packages/popmundo_utils/lib/src/popmundo_runtime.dart`
+- **Purpose**: Read the WebView (or test) cookie jar for one URL.
+- **Location**: `packages/popmundo_utils/lib/src/autologin/cookie_sink.dart`
+- **Interfaces**: `Future<List<GameCookie>> read(Uri url)`
+- **Dependencies**: `GameCookie`
+- **Reuses**: Same file as `CookieSink`. `MemoryCookieSink` implements both; `seed()` loads cookies without a write.
+
+### AuthSession.probe / seed
+
+- **Purpose**: One GET that does **not** follow redirects; seed jar from WebView cookies.
+- **Location**: `auth_http.dart`
 - **Interfaces**:
-  - `ok`, `status`, `text` (existing)
-  - `Map<String, String> headers` — at least `location` when present (lowercase keys)
-  - `String? url` — optional final/request URL
-- **Dependencies**: none
-- **Reuses**: existing class
+  - `void seed(Iterable<GameCookie> cookies)`
+  - `Future<AuthHttpResponse> probe(Uri url)`
+  - `static Uri? resolveLocation(Uri from, String location)` (existing helper, public)
+- **Dependencies**: `AuthHttpSend`, cooldown
+- **Reuses**: `_headersFor`, `_absorb`, `_cooldown`
 
-### PopmundoRuntime.loadUrl
+### AutoLoginController.checkSession
 
-- **Purpose**: Navigate the WebView document so host sticky + cookies update
-- **Location**: contract in utils; impl in `in_app_runtime.dart`; fake in `fake_runtime.dart`
-- **Interfaces**: `Future<void> loadUrl(Uri url)`
-- **Dependencies**: InAppWebViewController
-- **Reuses**: native `loadUrl` API
-
-### TimedFetch.fetchResponse
-
-- **Purpose**: Same serial 750ms queue; return full `InPageFetchResult`; optionally accept 3xx
-- **Location**: `packages/popmundo_utils/lib/src/timed_fetch.dart`
+- **Purpose**: 60 s session probe + trigger existing cycle.
+- **Location**: `auto_login_controller.dart`
 - **Interfaces**:
-  - `Future<InPageFetchResult> fetchResponse(String resource, {Map options, bool useCache, bool acceptRedirect})`
-  - Existing `fetch()` unchanged (still throws on non-2xx, returns text)
-- **Dependencies**: PopmundoRuntime
-- **Reuses**: queue/cache helpers
+  - `static const characterPath = '/World/Popmundo.aspx/Character'`
+  - `static const heartbeatInterval = Duration(seconds: 60)`
+  - `Future<void> checkSession()` — test seam; timer calls this
+- **Dependencies**: `cookieSource`, `HostTracker`, `AuthSession`, `_runLoginCycle`
+- **Rules**: skip `www.popmundo.com`; skip if source null / read throws; 200 = healthy; 3xx to login path = cycle with `loginPath: '/Default.aspx'` on the **current** origin (still `N.`, not www).
 
-### SecretStore
+### InAppCookieSink (CookieSource)
 
-- **Purpose**: Flutter-free secret string API
-- **Location**: `packages/popmundo_utils/lib/src/secret_store.dart`
-- **Interfaces**: `Future<String?> read(String key)`, `Future<void> write(String key, String value)`, `Future<void> delete(String key)`
-- **Dependencies**: none in utils; app implements with FlutterSecureStorage
-- **Reuses**: n/a
-
-### AutoLoginSettingsStore
-
-- **Purpose**: Persist non-secret settings
-- **Location**: `packages/popmundo_utils/lib/src/autologin/auto_login_settings.dart`
-- **Interfaces**: load/save `AutoLoginSettings { enabled, username, characterName, status }`
-- **Key**: `autologin.v1`
-- **Dependencies**: KeyValueStore
-- **Reuses**: UserScriptCatalog persistence pattern
-
-### LastUrlStore
-
-- **Purpose**: Persist eligible last Popmundo URL
-- **Location**: `packages/popmundo_utils/lib/src/autologin/last_url_store.dart`
-- **Key**: `session.last_url.v1`
-- **Interfaces**: `record(String url)`, `Future<String?> read()`, auth-path filter
-- **Dependencies**: KeyValueStore, HostTracker.isPopmundoHost
-
-### AspNetForm
-
-- **Purpose**: Parse VIEWSTATE tokens and character submit buttons
-- **Location**: `packages/popmundo_utils/lib/src/autologin/aspnet_form.dart`
-- **Interfaces**: `extractHidden(html, name)`, `findCharacterButtons(html)`, `matchCharacter(buttons, name)`
-- **Dependencies**: none
-
-### AutoLoginController
-
-- **Purpose**: Orchestrate detect → GET → POST login → loadUrl → ChooseCharacter → restore
-- **Location**: `packages/popmundo_utils/lib/src/autologin/auto_login_controller.dart`
-- **Interfaces**: `start()`, `dispose()`, listens to `runtime.events.navigation`
-- **Dependencies**: PopmundoRuntime, TimedFetch, AutoLoginSettingsStore, SecretStore, LastUrlStore
-- **Reuses**: Utils patterns; never getServerLink for these paths
-
-### hooks.js fetch
-
-- **Purpose**: Honor `redirect` option; return `headers.location`
-- **Location**: `packages/popmundo_webview/assets/js/hooks.js`
-- **Reuses**: existing `__popmundo.fetch`
-
-### AutoLoginScreen + SecureStorageSecretStore
-
-- **Purpose**: UI + platform secret backend
-- **Location**: `apps/popmundo_app/lib/autologin/`
-- **Dependencies**: settings store, SecretStore, menu registry
+- **Purpose**: `CookieManager.getCookies` → `GameCookie`.
+- **Location**: `packages/popmundo_webview/lib/src/in_app_cookie_sink.dart`
+- **Interfaces**: `gameCookieFromInApp(Cookie cookie, Uri url)` (pure, tested)
+- **Mapping**: name/value required; `domain` null or equal to `url.host` → host-only; otherwise `domainAttribute`; path default `/`. Android may omit attributes without `GET_COOKIE_INFO` — name+value still enough to send `Cookie:`.
 
 ---
 
 ## Data Models
 
-```dart
-class AutoLoginSettings {
-  final bool enabled;
-  final String username;
-  final String characterName;
-  final int status; // 0,1,2,3,4
-}
+Nenhum modelo novo. `AuthHttpResponse` já tem `status`, `location`, `isRedirect`.
 
-class CharacterButton {
-  final String name;  // ASP.NET name=
-  final String value; // "Escolher Troy"
-}
-```
-
-Secret key: `autologin.password` (SecretStore only).
+Logout = `response.isRedirect && AspNetForm.isLoginPath(resolveLocation(...).path)`.
 
 ---
 
@@ -158,12 +124,13 @@ Secret key: `autologin.password` (SecretStore only).
 
 | Error Scenario | Handling | User Impact |
 | -------------- | -------- | ----------- |
-| Missing tokens | Abort cycle | Stay on login |
-| 200 after login POST | Abort | Stay on login |
-| Missing Location / non-Popmundo | Abort | Stay on login |
-| Character not found | Abort | Stay on ChooseCharacter |
-| TimedFetchException | Abort, clear inFlight | No loop |
-| Secure storage failure on save | SnackBar error | Settings unchanged |
+| CookieManager throws | Skip tick | None |
+| `waitUntilReady` throws | Skip tick | None |
+| Probe `AuthHttpException` / 4xx / 5xx | Skip tick | None |
+| 302 to non-login path | Skip tick | None |
+| 302 to `/Default.aspx` | Existing cycle + snackbars | Same as nav trigger |
+| iOS process suspend | Timer pauses | Honest; not logout |
+| Host still `www` | No GET | Avoids probing before sticky host |
 
 ---
 
@@ -171,12 +138,11 @@ Secret key: `autologin.password` (SecretStore only).
 
 | Concern | Location | Impact | Mitigation |
 | ------- | -------- | ------ | ---------- |
-| TimedFetch `fetch()` would throw on 302 | `timed_fetch.dart` | Breaks login hop | New `fetchResponse` + `acceptRedirect`; leave `fetch()` alone |
-| Fetch does not update HostTracker | AD-007 | Sticky stuck on www | Mandatory `loadUrl` on Location |
-| Password in prefs | security | Leak on device dump | SecretStore / flutter_secure_storage |
-| Trailing slash via getServerLink | `host_tracker.dart` | Wrong ChooseCharacter path | Absolute paths without resolve() |
-| Duplicate NavigationEvents | webview callbacks | Extra last-URL writes | Idempotent same-URL write OK |
-| waitUntilReady not reset per nav | `in_app_runtime.dart` | Stale ready after loadUrl | Document; loadUrl then wait on next TimedFetch if needed — or re-ready on loadStop (minimal: rely on existing ready after first page) |
+| `AutoLoginController` already ~400 lines | `auto_login_controller.dart` | God-file | Heartbeat is `checkSession` + `Timer`; helpers stay on `AuthSession` / `AspNetForm` |
+| Existing tests stub `sleep: (_) async {}` | `auto_login_controller_test.dart` | Busy-loop if heartbeat used that sleeper | Heartbeat uses `Timer.periodic`, **not** `_sleep` |
+| Android `GET_COOKIE_INFO` | CookieManager | Missing domain/HttpOnly | name+value still sent; host-only assumed when domain absent |
+| Probe GET every 60 s | game servers | Throttle / ToS | One hop, no follow, skip www, 750 ms cooldown |
+| Stale design.md TimedFetch | this file historically | Drift | This rewrite; handshake = AD-018 |
 
 ---
 
@@ -184,7 +150,10 @@ Secret key: `autologin.password` (SecretStore only).
 
 | Decision | Choice | Rationale |
 | -------- | ------ | --------- |
-| Redirect hop | loadUrl after 302 | User choice; cookies + sticky |
-| Password | flutter_secure_storage | User choice |
-| Contract extension | loadUrl + headers on InPageFetchResult | AD-002 seam |
-| Project decision | AD-011 | See STATE.md |
+| Timer vs FGS ticks | `Timer.periodic(60s)` on controller | FGS ticks every 5 s; must not become a Character GET (HB-07) |
+| Test seam | public `checkSession()` | Unit tests must not wait 60 s |
+| Login after probe | `_runLoginCycle(loginPath: '/Default.aspx')` against **currentOrigin** | Session died on `N.`; login form exists there (user capture) |
+| Cookie port | `CookieSource` sibling of `CookieSink` | Read vs write; AD-002 keeps CookieManager in webview |
+| First tick | `waitUntilReady` then `checkSession`, then periodic | Spec HB-01 |
+
+Project-level: **AD-019** (appended to STATE.md).

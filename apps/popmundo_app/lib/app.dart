@@ -7,6 +7,7 @@ import 'package:popmundo_utils/popmundo_utils.dart';
 import 'package:popmundo_webview/popmundo_webview.dart';
 
 import 'app_shell.dart';
+import 'autologin/auto_login_messages.dart';
 import 'autologin/auto_login_screen.dart';
 import 'autologin/secure_secret_store.dart';
 import 'background/background_keepalive.dart';
@@ -35,10 +36,14 @@ class PopmundoApp extends StatelessWidget {
   final SecretStore? secretStore;
   final BackgroundKeepalive? keepalive;
 
+  /// Lets the auto-login listener show snackbars from above the [Scaffold].
+  static final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'app.title'.tr(),
+      scaffoldMessengerKey: scaffoldMessengerKey,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
@@ -79,7 +84,6 @@ class _PopmundoHomeState extends State<PopmundoHome>
   var _enabledUserScripts = <InstalledUserScript>[];
   var _allUserScripts = <InstalledUserScript>[];
   var _previouslyEnabledIds = <String>{};
-  String? _initialUrl;
   BackgroundStatus? _backgroundStatus;
 
   late final storage = StorageService(widget.store);
@@ -89,7 +93,6 @@ class _PopmundoHomeState extends State<PopmundoHome>
   late final gmMenuRegistry = GmMenuRegistry();
   late final gmNotificationController = GmNotificationController();
   late final settingsStore = AutoLoginSettingsStore(widget.store);
-  late final lastUrlStore = LastUrlStore(widget.store);
   late final timedFetch = TimedFetch(widget.runtime);
   late final importer = UserScriptImporter(
     catalog: catalog,
@@ -105,16 +108,20 @@ class _PopmundoHomeState extends State<PopmundoHome>
     notificationController: gmNotificationController,
     connectHeadersFor: _connectHeadersFor,
   );
+  late final cookieJar = InAppCookieSink();
   late final autoLogin = AutoLoginController(
     runtime: widget.runtime,
-    timedFetch: timedFetch,
     settingsStore: settingsStore,
     secretStore: widget.secretStore,
-    lastUrlStore: lastUrlStore,
+    // The native handshake authenticates over dart:io; without this the
+    // WebView's own jar never learns about it and stays logged out.
+    cookieSink: cookieJar,
+    cookieSource: cookieJar,
   );
 
   StreamSubscription<NavigationEvent>? _navSub;
   StreamSubscription<GmCallEvent>? _gmCallSub;
+  StreamSubscription<AutoLoginStatus>? _autoLoginSub;
 
   @override
   void initState() {
@@ -125,6 +132,7 @@ class _PopmundoHomeState extends State<PopmundoHome>
     _gmCallSub = widget.runtime.events.gmCall.listen((e) {
       unawaited(gmHostHandler.handle(e));
     });
+    _autoLoginSub = autoLogin.status.listen(_onAutoLoginStatus);
     gmMenuRegistry.addListener(_onGmMenuChanged);
     _refreshCookies();
     autoLogin.start();
@@ -145,6 +153,7 @@ class _PopmundoHomeState extends State<PopmundoHome>
     widget.keepalive?.status.removeListener(_onKeepaliveStatus);
     _navSub?.cancel();
     _gmCallSub?.cancel();
+    _autoLoginSub?.cancel();
     gmMenuRegistry.removeListener(_onGmMenuChanged);
     unawaited(autoLogin.dispose());
     super.dispose();
@@ -163,7 +172,6 @@ class _PopmundoHomeState extends State<PopmundoHome>
 
   Future<void> _onNavigation(NavigationEvent event) async {
     gmMenuRegistry.clear();
-    await lastUrlStore.record(event.url);
     await _refreshCookies();
   }
 
@@ -195,13 +203,11 @@ class _PopmundoHomeState extends State<PopmundoHome>
   Future<void> _bootstrap() async {
     final all = await catalog.list();
     final enabled = all.where((s) => s.enabled).toList();
-    final last = await lastUrlStore.read();
     if (!mounted) return;
     setState(() {
       _allUserScripts = all;
       _enabledUserScripts = enabled;
       _previouslyEnabledIds = {for (final s in enabled) s.id};
-      _initialUrl = last;
       _bootstrapReady = true;
     });
   }
@@ -268,6 +274,24 @@ class _PopmundoHomeState extends State<PopmundoHome>
     );
   }
 
+  void _onAutoLoginStatus(AutoLoginStatus status) {
+    final messenger = PopmundoApp.scaffoldMessengerKey.currentState;
+    if (messenger == null) return;
+    final message = autoLoginStatusMessage(status);
+    if (message == null) return;
+    messenger
+      ..removeCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          key: Key('autologin-status-${status.phase.name}'),
+          content: Text(message),
+          backgroundColor: status.phase == AutoLoginPhase.failed
+              ? Theme.of(context).colorScheme.error
+              : null,
+        ),
+      );
+  }
+
   void _openLanguage() {
     unawaited(showLanguageDialog(context));
   }
@@ -312,7 +336,6 @@ class _PopmundoHomeState extends State<PopmundoHome>
                       runtime: widget.runtime,
                       gmValueStore: gmValueStore,
                       enabledUserScripts: _enabledUserScripts,
-                      initialUrl: LastUrlStore.resolveInitialUrl(_initialUrl),
                     ),
                   ),
                 ),

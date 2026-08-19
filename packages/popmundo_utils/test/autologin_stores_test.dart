@@ -36,48 +36,4 @@ void main() {
       isNull,
     );
   });
-
-  test('LastUrlStore rejects auth paths and accepts game paths', () async {
-    final store = MemoryKeyValueStore();
-    final last = LastUrlStore(store);
-
-    await last.record('https://74.popmundo.com/');
-    expect(await last.read(), isNull);
-
-    await last.record('https://74.popmundo.com/Default.aspx');
-    expect(await last.read(), isNull);
-
-    await last.record(
-      'https://74.popmundo.com/World/Popmundo.aspx/ChooseCharacter',
-    );
-    expect(await last.read(), isNull);
-
-    await last.record('https://74.popmundo.com/Login.aspx?t=x');
-    expect(await last.read(), isNull);
-
-    await last.record('https://74.popmundo.com/World/Popmundo.aspx/Character/1');
-    expect(
-      await last.read(),
-      'https://74.popmundo.com/World/Popmundo.aspx/Character/1',
-    );
-
-    expect(LastUrlStore.isEligible('https://evil.com/x'), isFalse);
-  });
-
-  test('resolveInitialUrl uses last eligible or www default (NAV-04)', () {
-    expect(
-      LastUrlStore.resolveInitialUrl(
-        'https://74.popmundo.com/World/Popmundo.aspx/Character/1',
-      ),
-      'https://74.popmundo.com/World/Popmundo.aspx/Character/1',
-    );
-    expect(
-      LastUrlStore.resolveInitialUrl(null),
-      HostTracker.defaultOrigin,
-    );
-    expect(
-      LastUrlStore.resolveInitialUrl(''),
-      HostTracker.defaultOrigin,
-    );
-  });
 }

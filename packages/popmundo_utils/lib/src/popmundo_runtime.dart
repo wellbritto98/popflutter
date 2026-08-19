@@ -19,12 +19,6 @@ class InPageFetchResult {
 
   /// Request or final URL when the adapter provides it.
   final String? url;
-
-  String? get locationHeader {
-    final raw = headers['location'] ?? headers['Location'];
-    if (raw == null || raw.isEmpty) return null;
-    return raw;
-  }
 }
 
 class PopmundoRuntimeException implements Exception {

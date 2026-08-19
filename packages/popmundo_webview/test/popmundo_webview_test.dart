@@ -85,7 +85,6 @@ void main() {
     expect(result.status, 302);
     expect(result.headers['location'], '/Login.aspx?t=abc');
     expect(result.headers.containsKey('x-unused'), isFalse);
-    expect(result.locationHeader, '/Login.aspx?t=abc');
     expect(result.url, 'https://73.popmundo.com/Login.aspx');
   });
 

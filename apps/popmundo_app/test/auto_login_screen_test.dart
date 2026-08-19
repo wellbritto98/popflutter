@@ -41,7 +41,7 @@ void main() {
     );
     await tester.enterText(
       find.byKey(const Key('autologin-password')),
-      'jovemfla1',
+      'test-password-not-real',
     );
     await tester.enterText(
       find.byKey(const Key('autologin-character')),
@@ -60,7 +60,7 @@ void main() {
     expect((raw as Map).containsKey('password'), isFalse);
     expect(
       await secrets.read(AutoLoginSettingsStore.passwordSecretKey),
-      'jovemfla1',
+      'test-password-not-real',
     );
     expect(find.byKey(const Key('autologin-snackbar')), findsOneWidget);
   });

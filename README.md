@@ -1,41 +1,59 @@
 # Popflutter
 
-Wrapper Flutter (Android + iOS) do [Popmundo](https://www.popmundo.com) com `flutter_inappwebview`. A UI principal é o próprio jogo. O app observa requests/console/navegação, persiste cookies e oferece uma lib de utilitários inspirada em [Popmundo-Utils `common/`](https://github.com/ilpersi/Popmundo-Utils) (GPL-3).
+Wrapper Flutter (Android + iOS) do [Popmundo](https://www.popmundo.com) com `flutter_inappwebview`. A UI principal é o próprio jogo. O app observa rede/console/navegação, persiste cookies, reloga em silêncio (opcional), injeta UserScripts com polyfill GM, e oferece a lib Dart portada de [Popmundo-Utils `common/`](https://github.com/ilpersi/Popmundo-Utils) (GPL-3).
+
+Documentação oficial: [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md), [`docs/OBJETIVO.md`](docs/OBJETIVO.md). Índice: [`docs/README.md`](docs/README.md). Specs: [`.specs/`](.specs/README.md).
 
 ## Packages
 
-| Package | Função |
-| ------- | ------ |
-| `packages/popmundo_utils` | Dart puro: `HostTracker`, `TimedFetch`, notifications, storage, selectors, Scoring API, `PopmundoRuntime` |
-| `packages/popmundo_webview` | Adapter InAppWebView 6.x, UserScripts, JS bridge `popmundo` |
-| `apps/popmundo_app` | Shell fullscreen + overlay de debug |
+| Package | Função | README |
+| ------- | ------ | ------ |
+| `packages/popmundo_utils` | Dart puro: contrato `PopmundoRuntime`, host sticky, TimedFetch, Auto Login, UserScripts/GM, storage | [README](packages/popmundo_utils/README.md) |
+| `packages/popmundo_webview` | Adapter InAppWebView 6.x, JS bridge `popmundo`, injector de scripts, cookie sink | [README](packages/popmundo_webview/README.md) |
+| `apps/popmundo_app` | Shell, composition root, sidebar, i18n, keepalive, telas nativas | [README](apps/popmundo_app/README.md) |
 
-`popmundo_utils` **não** depende do WebView. Teste helpers com um fake de `PopmundoRuntime`.
+Cadeia de dependência: `popmundo_utils` ← `popmundo_webview` ← `popmundo_app`. Utils **não** depende de Flutter.
 
-## Host sticky
+## Comandos
 
-A URL inicial é `https://www.popmundo.com`. Redirecionamentos para `73.popmundo.com` (etc.) atualizam a origem. `Utils.getServerLink` e `TimedFetch` usam o hostname atual — nunca hardcode `www` depois do primeiro load.
+Na raiz (`resolution: workspace`):
 
-## TimedFetch
+```bash
+flutter pub get
+flutter analyze packages/popmundo_utils packages/popmundo_webview apps/popmundo_app
+cd packages/popmundo_utils && dart test
+cd packages/popmundo_webview && flutter test
+cd apps/popmundo_app && flutter test
+cd apps/popmundo_app && flutter run
+```
 
-Fila serial, delay padrão **750 ms**, cache in-memory `METHOD:URL`. Executa `fetch` **no contexto da página** (cookies + same-origin). O jogo throttla e pode deslogar se você disparar requests em rajada.
+Patrol (Android, um arquivo por vez; **não** carrega popmundo.com):
 
-## Overlay
+```bash
+cd apps/popmundo_app && patrol test --target integration_test/keepalive_test.dart -d <device-id>
+```
 
-FAB de debug: host atual, lista de network/console, `evaluateJavascript`, clear. Cookies mostram **nome@domínio**, não o valor.
+## Host sticky e TimedFetch
+
+URL inicial: `https://www.popmundo.com`. Redirecionamentos `N.popmundo.com` atualizam a origem. `Utils.getServerLink` e `TimedFetch` usam o hostname atual.
+
+Fila serial, delay **750 ms**, cache in-memory `METHOD:URL`. Fetch auxiliar do jogo roda **no contexto da página**. O handshake de Auto Login é a exceção: HTTP nativo `dart:io` com o mesmo cooldown, depois sync de cookies na WebView. Heartbeat de sessão: GET nativo a cada 60 s em `{N.popmundo.com}/World/Popmundo.aspx/Character`.
+
+## Overlay e menu
+
+Um FAB (`menu-toggle`) abre o sidebar. Itens fixos vêm de `buildAppMenuItems` (Auto Login, Userscripts, Language; Debug só em debug). Cookies no overlay: **nome@domínio**, nunca o valor.
 
 ## Estender
 
 ```dart
-final runtime = InAppPopmundoRuntime(); // composition root no app
+final runtime = InAppPopmundoRuntime(); // só no composition root
 final timed = TimedFetch(runtime);
-final utils = Utils(runtime);
-final id = await utils.getMyID();
+final id = await Utils(runtime).getMyID();
 ```
 
-Scoring **não** roda sozinho no load. Chame `Scoring(runtime).applyScoringNumbers()` se quiser.
+Scoring **não** roda no load. Storage: `KeyValueStore` (`MemoryKeyValueStore` nos testes, `SharedPreferencesStore` no app). Senha de Auto Login: `SecretStore` / `flutter_secure_storage`.
 
-Storage substitui `chrome.storage` via `KeyValueStore` (`MemoryKeyValueStore` nos testes, `SharedPreferencesStore` no app).
+Novo item de menu nativo = uma entrada em `buildAppMenuItems`. Nova regra de negócio = `popmundo_utils` + teste fake. Depois de mudar comportamento documentado, atualize `docs/` e o README do módulo (`CLAUDE.md`, Documentation maintenance).
 
 ## Licença
 

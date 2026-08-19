@@ -51,6 +51,18 @@ void main() {
     expect(source.contains('stopWithTask: true'), isFalse);
   });
 
+  test('FGS isolate does not probe Character or touch AuthSession', () {
+    final source = _open([
+      'lib/background/keepalive_task_handler.dart',
+      'apps/popmundo_app/lib/background/keepalive_task_handler.dart',
+    ]);
+    expect(source.contains('World/Popmundo.aspx/Character'), isFalse);
+    expect(source.contains('AuthSession'), isFalse);
+    expect(source.contains('CookieSource'), isFalse);
+    expect(source.contains('loadUrl'), isFalse);
+    expect(source.contains("'heartbeat'"), isTrue);
+  });
+
   test('iOS ATS includes popmundo.com subdomains', () {
     final plist = _open([
       'ios/Runner/Info.plist',

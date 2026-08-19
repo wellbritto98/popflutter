@@ -44,15 +44,28 @@
     "passwordRequired": "Required for Auto Login",
     "clearPassword": "Clear stored password",
     "character": "Character name",
-    "characterHelp": "Must match Choose / Escolher button label",
-    "status": "Status",
+    "characterHelp": "Full name, exactly as shown on the character selection page",
     "saved": "Auto Login settings saved",
     "saveFailed": "Save failed: {}",
+    "status": "Status",
     "statusNormal": "Normal",
     "statusBusy": "Busy",
     "statusMobile": "Mobile",
     "statusAway": "Away",
-    "statusDrunk": "Drunk"
+    "statusDrunk": "Drunk",
+    "cycle": {
+      "detected": "Session expired — signing in…",
+      "authenticating": "Authenticating…",
+      "choosingCharacter": "Selecting {}…",
+      "done": "Signed in as {}",
+      "failedCredentials": "Auto Login failed: check your username and password",
+      "failedForm": "Auto Login failed: the login page could not be read",
+      "failedNoCharacters": "Auto Login failed: no characters on this account",
+      "failedCharacterNotFound": "Auto Login failed: no character named “{}” — use the full name",
+      "failedCharacterAmbiguous": "Auto Login failed: more than one character named “{}”",
+      "failedServer": "Auto Login failed: {}",
+      "failedNetwork": "Auto Login failed: could not reach Popmundo"
+    }
   },
   "keepalive": {
     "notificationTitle": "Popmundo is running",

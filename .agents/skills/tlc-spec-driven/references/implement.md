@@ -398,6 +398,8 @@ If you are unsure whether more tasks remain, check `tasks.md`: if every task is 
 
 **After the LAST task:** dispatch the Verifier sub-agent (see step 10 and [sub-agents.md](sub-agents.md)) for independent feature-level validation, including the spec-anchored check and discrimination sensor. Validation always runs automatically — never prompted. Execute is not done until the Verifier reports PASS and the validation report is written.
 
+**Documentation sync (mandatory when the change is relevant):** if the feature changed architecture, product flows, module responsibility, public APIs, dependencies, or documented couplings, update `docs/ARQUITETURA.md`, `docs/OBJETIVO.md`, the root README, and the `README.md` of every touched module so they match the code. Never invent behavior; mark inferences as **Hipótese**. This is the project rule in `CLAUDE.md` (*Documentation maintenance*) — specs under `.specs/features/` stay the requirement source; global/module docs stay the maintenance baseline. Skip only when the delta is purely internal and already covered by those docs.
+
 ---
 
 ## Tips

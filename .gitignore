@@ -27,3 +27,9 @@ coverage/
 **/ios/Flutter/Generated.xcconfig
 **/ios/Flutter/ephemeral/
 **/ios/Flutter/flutter_export_environment.sh
+
+# Live-tier credentials for test_live/ — never commit real ones.
+.env
+
+# Pages recorded by the live tier at run time, not source.
+packages/popmundo_utils/test_live/captured/

@@ -49,3 +49,6 @@ app.*.map.json
 
 # Patrol generates this bundle on every `patrol test` run
 patrol_test/
+
+
+.env
