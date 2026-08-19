@@ -17,6 +17,7 @@ import 'auto_login_settings.dart';
 import 'auto_login_status.dart';
 import 'auto_login_trace.dart';
 import 'cookie_sink.dart';
+import 'game_cookie.dart';
 
 /// Detects the login page and signs the player back in without showing it.
 ///
@@ -37,14 +38,17 @@ class AutoLoginController {
     required this.settingsStore,
     required this.secretStore,
     this.cookieSink,
+    this.cookieSource,
     AutoLoginTrace? trace,
     Future<void> Function(Duration)? sleep,
     this.authSend,
+    this.heartbeatInterval = const Duration(seconds: 60),
   })  : _trace = trace ?? defaultAutoLoginTrace,
         _sleep = sleep ?? Future<void>.delayed;
 
   static const chooseCharacterPath = '/World/Popmundo.aspx/ChooseCharacter';
   static const worldHomePath = '/World/Popmundo.aspx';
+  static const characterPath = '/World/Popmundo.aspx/Character';
 
   final PopmundoRuntime runtime;
   final AutoLoginSettingsStore settingsStore;
@@ -54,8 +58,14 @@ class AutoLoginController {
   /// login authenticates nobody — the WebView has a jar of its own.
   final CookieSink? cookieSink;
 
+  /// Live WebView cookies, seeded into [AuthSession] before each heartbeat.
+  final CookieSource? cookieSource;
+
   /// Native transport. Injected so tests drive the handshake without sockets.
   final AuthHttpSend? authSend;
+
+  /// How often [checkSession] runs after the first ready probe.
+  final Duration heartbeatInterval;
 
   final AutoLoginTrace _trace;
   final Future<void> Function(Duration) _sleep;
@@ -70,7 +80,9 @@ class AutoLoginController {
   final _status = StreamController<AutoLoginStatus>.broadcast();
 
   StreamSubscription<NavigationEvent>? _sub;
+  Timer? _heartbeatTimer;
   var _inFlight = false;
+  var _running = false;
 
   bool get inFlight => _inFlight;
 
@@ -79,11 +91,31 @@ class AutoLoginController {
 
   void start() {
     if (_sub != null) return;
+    _running = true;
     _trace('listening for navigations (host=${runtime.host.currentOrigin})');
     _sub = runtime.events.navigation.listen(_onNavigation);
+    unawaited(_armHeartbeat());
+  }
+
+  Future<void> _armHeartbeat() async {
+    try {
+      await runtime.waitUntilReady();
+    } on PopmundoRuntimeException catch (e) {
+      _trace('heartbeat: runtime not ready yet ($e)');
+    }
+    if (!_running) return;
+    await checkSession();
+    if (!_running) return;
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = Timer.periodic(heartbeatInterval, (_) {
+      unawaited(checkSession());
+    });
   }
 
   Future<void> dispose() async {
+    _running = false;
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
     await _sub?.cancel();
     _sub = null;
     _ioSender?.close();
@@ -141,6 +173,83 @@ class AutoLoginController {
     } finally {
       _inFlight = false;
     }
+  }
+
+  /// Probes `{stickyHost}/World/Popmundo.aspx/Character` (AD-019).
+  ///
+  /// A 302 to a login path starts the silent handshake. 200 / network errors
+  /// / `www` are no-ops. Safe to call from tests; the timer also calls this.
+  Future<void> checkSession() async {
+    if (!_running || _inFlight) return;
+    try {
+      await runtime.waitUntilReady();
+    } on PopmundoRuntimeException {
+      _trace('heartbeat skip: runtime not ready');
+      return;
+    }
+    if (!_running || _inFlight) return;
+
+    final host = runtime.host.currentOrigin.host.toLowerCase();
+    if (!HostTracker.isPopmundoHost(host) || host == 'www.popmundo.com') {
+      _trace('heartbeat skip: host=$host');
+      return;
+    }
+
+    final source = cookieSource;
+    if (source == null) {
+      _trace('heartbeat skip: no CookieSource');
+      return;
+    }
+
+    final settings = await settingsStore.load();
+    final password =
+        await secretStore.read(AutoLoginSettingsStore.passwordSecretKey);
+    if (!settings.enabled ||
+        settings.username.trim().isEmpty ||
+        settings.characterName.trim().isEmpty ||
+        password == null ||
+        password.isEmpty) {
+      _trace('heartbeat skip: auto-login not armed');
+      return;
+    }
+
+    List<GameCookie> jar;
+    try {
+      jar = await source.read(runtime.host.currentOrigin);
+    } catch (e) {
+      _trace('heartbeat skip: cookie read failed ($e)');
+      return;
+    }
+
+    final url = runtime.host.currentOrigin.replace(path: characterPath);
+    _trace('heartbeat GET $url');
+    _inFlight = true;
+    try {
+      final session = AuthSession(
+        send: _send,
+        userAgent: await _readUserAgent(),
+        sleep: _sleep,
+      );
+      session.seed(jar);
+      final response = await session.probe(url);
+      _trace('heartbeat ${response.status} location=${response.location}');
+      if (response.status == 200) return;
+      if (!_isLogoutRedirect(url, response)) return;
+      _trace('heartbeat: logged out — starting cycle');
+      await _runLoginCycle(loginPath: '/Default.aspx');
+    } on AuthHttpException catch (e) {
+      _trace('heartbeat network error: $e');
+    } finally {
+      _inFlight = false;
+    }
+  }
+
+  static bool _isLogoutRedirect(Uri from, AuthHttpResponse response) {
+    if (!response.isRedirect || response.location == null) return false;
+    final next = AuthSession.resolveLocation(from, response.location!);
+    if (next == null) return false;
+    final path = next.path.isEmpty ? '/' : next.path;
+    return AspNetForm.isLoginPath(path);
   }
 
   Future<void> _runLoginCycle({required String loginPath}) async {

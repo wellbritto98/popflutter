@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:popmundo_utils/popmundo_utils.dart';
@@ -146,9 +147,11 @@ void main() {
       settingsStore: settingsStore,
       secretStore: secrets,
       cookieSink: cookies,
+      cookieSource: cookies,
       trace: trace.add,
       sleep: (_) async {},
       authSend: server.call,
+      heartbeatInterval: const Duration(days: 1),
     );
     statuses = [];
     controller.status.listen(statuses.add);
@@ -162,6 +165,11 @@ void main() {
     );
     await secrets.write(AutoLoginSettingsStore.passwordSecretKey, 'test-password-not-real');
     controller.start();
+    // Drain the initial heartbeat tick (www skip) so tests that then move
+    // the sticky host do not race the first checkSession.
+    for (var i = 0; i < 10; i++) {
+      await Future<void>.delayed(Duration.zero);
+    }
   });
 
   tearDown(() async {
@@ -447,4 +455,211 @@ void main() {
     final json = jsonDecode(encodeSettingsWithoutSecrets(settings)) as Map;
     expect(json.containsKey('password'), isFalse);
   });
+
+  group('session heartbeat', () {
+    const characterUrl =
+        'https://75.popmundo.com/World/Popmundo.aspx/Character';
+
+    void onGameHost() {
+      runtime.host.onNavigation(
+          Uri.parse('https://75.popmundo.com/World/Popmundo.aspx'));
+      cookies.seed([
+        const GameCookie(
+          name: 'popmundo.com',
+          value: 'OLDSESSION',
+          host: '75.popmundo.com',
+          httpOnly: true,
+          secure: true,
+        ),
+      ]);
+    }
+
+    void wireLogoutOn75() {
+      server.routes.addAll({
+        'GET $characterUrl': const AuthHttpResponse(
+          status: 302,
+          body: '',
+          location: '/Default.aspx',
+        ),
+        'GET https://75.popmundo.com/Default.aspx':
+            AuthHttpResponse(status: 200, body: loginHtml),
+        'POST https://75.popmundo.com/Default.aspx': const AuthHttpResponse(
+          status: 302,
+          body: '',
+          setCookieHeaders: [
+            'ASP.NET_SessionId=n75session; path=/; HttpOnly; SameSite=Lax',
+            'popmundo.com=AUTHVALUE; path=/; HttpOnly; SameSite=Lax',
+          ],
+          location: '/World/Popmundo.aspx/ChooseCharacter',
+        ),
+        'GET https://75.popmundo.com/World/Popmundo.aspx/ChooseCharacter':
+            AuthHttpResponse(status: 200, body: chooseHtml),
+        'POST https://75.popmundo.com/World/Popmundo.aspx/ChooseCharacter':
+            const AuthHttpResponse(
+          status: 302,
+          body: '',
+          location: '/World/Popmundo.aspx',
+        ),
+        'GET https://75.popmundo.com/World/Popmundo.aspx':
+            const AuthHttpResponse(status: 200, body: worldHomeHtml),
+      });
+    }
+
+    test('302 to Default.aspx renews the session on the sticky host', () async {
+      onGameHost();
+      wireLogoutOn75();
+      await controller.checkSession();
+
+      expect(
+        server.seen.first.url.toString(),
+        characterUrl,
+        reason: 'HB-06: path from currentOrigin.replace, no trailing slash',
+      );
+      expect(server.seen.first.headers['Cookie'], contains('OLDSESSION'));
+      expect(
+        server.seen.any((r) => r.url.host == 'www.popmundo.com'),
+        isFalse,
+        reason: 'login stays on 75, the sticky game host',
+      );
+      expect(server.postTo('75.popmundo.com/Default.aspx'), isNotNull);
+      expect(runtime.loadUrlCalls.map((u) => u.toString()), [
+        'https://75.popmundo.com/World/Popmundo.aspx',
+      ]);
+    });
+
+    test('200 means the session is healthy', () async {
+      onGameHost();
+      server.routes['GET $characterUrl'] =
+          const AuthHttpResponse(status: 200, body: '<html>character</html>');
+      await controller.checkSession();
+
+      expect(server.seen.length, 1);
+      expect(server.seen.single.url.toString(), characterUrl);
+      expect(runtime.loadUrlCalls, isEmpty);
+      expect(statuses, isEmpty);
+    });
+
+    test('does not follow the 302 to Default.aspx as part of the probe',
+        () async {
+      onGameHost();
+      server.routes['GET $characterUrl'] = const AuthHttpResponse(
+        status: 302,
+        body: '',
+        location: '/World/Popmundo.aspx/Other',
+      );
+      server.routes['GET https://75.popmundo.com/Default.aspx'] =
+          const AuthHttpResponse(status: 200, body: loginHtml);
+      await controller.checkSession();
+
+      expect(server.seen.length, 1, reason: 'non-login 302 is not logout');
+      expect(runtime.loadUrlCalls, isEmpty);
+    });
+
+    test('www host is not probed', () async {
+      cookies.seed([
+        const GameCookie(
+          name: 'popmundo.com',
+          value: 'WWW',
+          host: 'www.popmundo.com',
+        ),
+      ]);
+      await controller.checkSession();
+      expect(server.seen, isEmpty);
+    });
+
+    test('disabled auto-login does not GET Character', () async {
+      onGameHost();
+      await settingsStore.save(const AutoLoginSettings(
+          enabled: false,
+          username: 'troyfournier',
+          characterName: 'Deon Drinkwater',
+          status: 0));
+      server.routes['GET $characterUrl'] =
+          const AuthHttpResponse(status: 302, body: '', location: '/Default.aspx');
+      await controller.checkSession();
+      expect(server.seen, isEmpty);
+    });
+
+    test('network error is not logout', () async {
+      onGameHost();
+      await controller.checkSession();
+      expect(runtime.loadUrlCalls, isEmpty);
+      expect(statuses, isEmpty);
+    });
+
+    test('5xx is not logout', () async {
+      onGameHost();
+      server.routes['GET $characterUrl'] =
+          const AuthHttpResponse(status: 503, body: 'down');
+      await controller.checkSession();
+      expect(runtime.loadUrlCalls, isEmpty);
+      expect(statuses, isEmpty);
+    });
+
+    test('CookieSource throw skips the tick', () async {
+      await controller.dispose();
+      controller = AutoLoginController(
+        runtime: runtime,
+        settingsStore: settingsStore,
+        secretStore: secrets,
+        cookieSink: cookies,
+        cookieSource: _ThrowingCookies(),
+        trace: trace.add,
+        sleep: (_) async {},
+        authSend: server.call,
+        heartbeatInterval: const Duration(days: 1),
+      );
+      statuses = [];
+      controller.status.listen(statuses.add);
+      controller.start();
+      for (var i = 0; i < 10; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      onGameHost();
+      await controller.checkSession();
+      expect(server.seen, isEmpty);
+      expect(runtime.loadUrlCalls, isEmpty);
+    });
+
+    test('inFlight probe ignores a second tick', () async {
+      final held = Completer<AuthHttpResponse>();
+      var characterGets = 0;
+      await controller.dispose();
+      controller = AutoLoginController(
+        runtime: runtime,
+        settingsStore: settingsStore,
+        secretStore: secrets,
+        cookieSink: cookies,
+        cookieSource: cookies,
+        trace: trace.add,
+        sleep: (_) async {},
+        heartbeatInterval: const Duration(days: 1),
+        authSend: (req) async {
+          if (req.url.toString() == characterUrl) {
+            characterGets++;
+            return held.future;
+          }
+          return server.call(req);
+        },
+      );
+      statuses = [];
+      controller.status.listen(statuses.add);
+      controller.start();
+      await Future<void>.delayed(Duration.zero);
+      onGameHost();
+      final first = controller.checkSession();
+      await Future<void>.delayed(Duration.zero);
+      await controller.checkSession();
+      expect(characterGets, 1);
+      held.complete(const AuthHttpResponse(status: 200, body: 'ok'));
+      await first;
+    });
+  });
+}
+
+class _ThrowingCookies implements CookieSource {
+  @override
+  Future<List<GameCookie>> read(Uri url) async {
+    throw StateError('CookieManager unavailable');
+  }
 }
