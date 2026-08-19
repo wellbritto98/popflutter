@@ -37,7 +37,7 @@ cd apps/popmundo_app && patrol test --target integration_test/keepalive_test.dar
 
 URL inicial: `https://www.popmundo.com`. Redirecionamentos `N.popmundo.com` atualizam a origem. `Utils.getServerLink` e `TimedFetch` usam o hostname atual.
 
-Fila serial, delay **750 ms**, cache in-memory `METHOD:URL`. Fetch auxiliar do jogo roda **no contexto da página**. O handshake de Auto Login é a exceção: HTTP nativo `dart:io` com o mesmo cooldown, depois sync de cookies na WebView.
+Fila serial, delay **750 ms**, cache in-memory `METHOD:URL`. Fetch auxiliar do jogo roda **no contexto da página**. O handshake de Auto Login é a exceção: HTTP nativo `dart:io` com o mesmo cooldown, depois sync de cookies na WebView. Heartbeat de sessão: GET nativo a cada 60 s em `{N.popmundo.com}/World/Popmundo.aspx/Character`.
 
 ## Overlay e menu
 

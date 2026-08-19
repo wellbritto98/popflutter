@@ -42,7 +42,7 @@ O propósito central é:
 1. **Jogar:** abre o app → bootstrap do catálogo de UserScripts → WebView carrega `https://www.popmundo.com` → cookies persistem (não incógnito) → redirecionamentos de subdomínio atualizam o host sticky.
 2. **Sair do domínio:** link fora de `*.popmundo.com` abre no navegador do sistema (`ObservePolicy.openExternal` + `url_launcher`).
 3. **Voltar no jogo:** botão/gesto de system-back anda no histórico da WebView; com histórico vazio, o app sai.
-4. **Reautenticar (Auto Login):** se enabled e a navegação cai em `/` ou `/Default.aspx`, o handshake nativo corre fora da tela; o jogador só vê `{host}/World/Popmundo.aspx`. Personagem pelo **nome completo** (`div.box > h2`). Snackbars EN/PT por fase. Sem restore da última URL.
+4. **Reautenticar (Auto Login):** se enabled e (a) a navegação cai em `/` ou `/Default.aspx`, ou (b) o heartbeat 60 s em `{hostSticky}/World/Popmundo.aspx/Character` recebe 302 para `/Default.aspx`, o handshake nativo corre fora da tela; o jogador só vê `{host}/World/Popmundo.aspx`. Personagem pelo **nome completo** (`div.box > h2`). Snackbars EN/PT por fase. Sem restore da última URL.
 5. **UserScripts:** item sempre visível no sidebar → import por URL, toggle, delete → injector recarrega a página. `@require`/`@resource` via HTTP do app. Scripts com `@grant` GM recebem shim.
 6. **GM host:** `GM.xmlHttpRequest` (TimedFetch no jogo / HttpClient fora), `GM.openInTab` (browser do SO), menu commands no sidebar (limpos a cada navegação), notificação in-app, clipboard, `getResourceUrl`.
 7. **Keepalive:** FGS sobe no boot; isolate só heartbeat; overlay de debug mostra se o serviço está rodando / bateria / ciclo de vida.
@@ -80,7 +80,7 @@ Com base nas features em `.specs/features/` e no código vigente:
 | Overlay de debug | wrapper P2 | Controlado `visible`/`onClose`; inglês |
 | UserScripts persistidos | userscript-manager, AD-010 | `userscripts.v1`; reload após sync |
 | Polyfill GM Core + Host | userscript-manager + gm-host-apis, AD-016 | Sem `validation.md` da feature host no repo |
-| Auto Login silencioso | auto-login, AD-018 | HTTP nativo + `CookieSink`; senha no cofre |
+| Auto Login silencioso + heartbeat | auto-login, AD-018, AD-019 | HTTP nativo + `CookieSink`/`CookieSource`; senha no cofre |
 | Keepalive em background | background-keepalive, AD-012/013 | FGS Android; iOS suspende a página |
 | i18n EN/PT | app-i18n, AD-014 | Catálogos JSON; DebugOverlay fora |
 | System-back no WebView | webview-back-navigation | `PopScope` no adapter |

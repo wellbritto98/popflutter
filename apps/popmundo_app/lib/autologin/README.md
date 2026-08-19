@@ -18,7 +18,7 @@ Persistir settings não-secretos no `KeyValueStore` e a senha no `SecretStore`. 
 | `secure_secret_store.dart` | `FlutterSecureStorage` (iOS `first_unlock`) |
 | `auto_login_messages.dart` | `autoLoginStatusMessage` → chaves `autologin.cycle.*` |
 
-Wiring: `PopmundoHome` cria `AutoLoginController` com `InAppCookieSink()`, `start()`, escuta `status`.
+Wiring: `PopmundoHome` cria um `InAppCookieSink()` compartilhado como `cookieSink` e `cookieSource`, `start()`, escuta `status`.
 
 ## Dependências
 

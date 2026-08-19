@@ -4,7 +4,7 @@ Keepalive de processo. Spec: `background-keepalive`. AD-012, AD-013.
 
 ## Objetivo
 
-Manter um Foreground Service Android (e o melhor esforço no iOS) **sem** TimedFetch e **sem** WebView no isolate.
+Manter um Foreground Service Android (e o melhor esforço no iOS) **sem** TimedFetch e **sem** WebView no isolate. O GET de sessão (`/World/Popmundo.aspx/Character`) **não** vive aqui — é o timer do `AutoLoginController` (AD-019); o FGS só impede o OS de matar o processo.
 
 ## Responsabilidade principal
 

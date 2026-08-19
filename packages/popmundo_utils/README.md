@@ -34,7 +34,7 @@ Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testáv
 
 ## Módulos relacionados
 
-- `popmundo_webview` — implementa `PopmundoRuntime` e `CookieSink` (`InAppCookieSink`).
+- `popmundo_webview` — implementa `PopmundoRuntime` e `CookieSink`/`CookieSource` (`InAppCookieSink`).
 - `popmundo_webview/assets/js` — `window.__popmundo.*` chamado pelas facades.
 - `popmundo_app` — `SharedPreferencesStore`, `FlutterSecureSecretStore`, composition do `AutoLoginController` / catalog / GM.
 

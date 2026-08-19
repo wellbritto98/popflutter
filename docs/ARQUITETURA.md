@@ -46,8 +46,9 @@ graph TD
   Runtime --> Bus[PopmundoEventBus]
   Overlay --> Bus
   AutoLogin[AutoLoginController] --> Auth[AuthSession dart:io]
-  Auth --> CookieSink[CookieSink / InAppCookieSink]
+  Auth --> CookieSink[CookieSink / CookieSource / InAppCookieSink]
   CookieSink --> CookieMgr[CookieManager WebView]
+  CookieMgr --> CookieSink
   AutoLogin --> Runtime
   GmHost[GmHostHandler] --> Bus
   GmHost --> TimedFetch
@@ -61,7 +62,7 @@ graph TD
 
 | Padrão | Onde | Evidência no código |
 | ------ | ---- | -------------------- |
-| **Porta/Adapter** | `PopmundoRuntime` vs. `InAppPopmundoRuntime`; `CookieSink` vs. `InAppCookieSink`; `SecretStore` vs. `FlutterSecureSecretStore`; `KeyValueStore` vs. `SharedPreferencesStore` / `MemoryKeyValueStore`; `UserScriptWebViewPort` vs. `InAppUserScriptWebViewPort`; `BackgroundPlatform` vs. `FlutterForegroundTaskPlatform` | Contratos em `popmundo_utils` (e `background_platform.dart` no app); implementações no adapter/app |
+| **Porta/Adapter** | `PopmundoRuntime` vs. `InAppPopmundoRuntime`; `CookieSink`/`CookieSource` vs. `InAppCookieSink`; `SecretStore` vs. `FlutterSecureSecretStore`; `KeyValueStore` vs. `SharedPreferencesStore` / `MemoryKeyValueStore`; `UserScriptWebViewPort` vs. `InAppUserScriptWebViewPort`; `BackgroundPlatform` vs. `FlutterForegroundTaskPlatform` | Contratos em `popmundo_utils` (e `background_platform.dart` no app); implementações no adapter/app |
 | **Composition root** | `apps/popmundo_app/lib/main.dart` monta runtime, store, keepalive e `EasyLocalization`; `PopmundoHome` monta catalog, TimedFetch, AutoLogin, GM host | Nenhum outro ponto instancia `InAppPopmundoRuntime()` |
 | **Facade** | `Utils`, `Notifications`, `Scoring`, `CssSelectorHelper`, `XPathHelper` — `runtime.evaluate('window.__popmundo.<fn>(...)')` | `packages/popmundo_utils/lib/src/{utils,notifications,scoring,css_selector}.dart` |
 | **Event Bus** | `PopmundoEventBus` com streams `network`, `console`, `navigation`, `gmValue`, `gmCall` | `packages/popmundo_utils/lib/src/events.dart` |
@@ -93,8 +94,9 @@ Registradas em `.specs/STATE.md` (AD-001 a AD-018; AD-011 e AD-017 **superseded*
 13. **i18n da shell (AD-014).** `easy_localization`, catálogos `en`/`pt`. `popmundo_utils`/`popmundo_webview` e o DebugOverlay permanecem em inglês.
 14. **Dois tiers de teste no app (AD-015).** `flutter test` (fakes) vs. Patrol em `integration_test/` (device-real, **nunca** carrega popmundo.com). Exatamente um `patrolTest` por arquivo.
 15. **Auto Login autentica fora da WebView (AD-018).** `AuthSession` em `dart:io`, redirects manuais, cookies copiados via `CookieSink`. Sem fallback de `form.submit()`. Observe-only (AD-003) permanece.
-16. **Senha só em `SecretStore`.** Settings não-secretos em `autologin.v1`. Nunca gravar senha em `KeyValueStore`.
-17. **System-back consome histórico do WebView** antes de sair do app (`WebViewBackHandler` + `PopScope` em `PopmundoWebView`).
+16. **Heartbeat de sessão (AD-019).** GET nativo 60 s em `{N.popmundo.com}/World/Popmundo.aspx/Character` com jar da WebView (`CookieSource`); 302 para login dispara AD-018. Timer no isolate do app; FGS não fala com o jogo.
+17. **Senha só em `SecretStore`.** Settings não-secretos em `autologin.v1`. Nunca gravar senha em `KeyValueStore`.
+18. **System-back consome histórico do WebView** antes de sair do app (`WebViewBackHandler` + `PopScope` em `PopmundoWebView`).
 
 ---
 
@@ -153,11 +155,15 @@ Navegação de documento
   → runtime.loadUrl(uri)  (WebView.loadUrl)
 ```
 
-### 6.3 Auto Login (AD-018)
+### 6.3 Auto Login (AD-018 + AD-019)
 
 ```
-navegação para / ou /Default.aspx
-  → AutoLoginController (enabled + credenciais)
+gatilho A: navegação para / ou /Default.aspx
+gatilho B: a cada 60 s, GET nativo {hostSticky}/World/Popmundo.aspx/Character
+           (sem seguir redirect; cookies da WebView via CookieSource)
+           302 Location /Default.aspx ⇒ mesmo ciclo
+           200 / rede / 5xx / host www ⇒ no-op
+  → AutoLoginController (enabled + credenciais, inFlight)
   → AuthSession (dart:io, followRedirects=false, cooldown 750 ms)
       GET form → POST #aspnetForm inteiro + overrides
       hop www → N.popmundo.com (Set-Cookie no último hop)
@@ -167,7 +173,7 @@ navegação para / ou /Default.aspx
   → Stream AutoLoginStatus → snackbars EN/PT
 ```
 
-O User-Agent do cliente nativo é lido de `navigator.userAgent` na WebView (fallback Android Chrome string se o evaluate falhar).
+O User-Agent do cliente nativo é lido de `navigator.userAgent` na WebView (fallback Android Chrome string se o evaluate falhar). O isolate do FGS **não** faz o GET de Character (AD-012).
 
 ### 6.4 UserScripts + GM
 
@@ -215,7 +221,7 @@ GM.registerMenuCommand → GmMenuRegistry → seção extra no AppSidebar (limpa
 | iOS sem `shouldInterceptRequest` nativo | `web_settings.dart` / widget | Stream de assets nativos incompleto no iOS | Hooks JS cobrem fetch/XHR/console |
 | `app.dart` importa `CookieManager`/`WebUri` | `apps/popmundo_app/lib/app.dart` | Shell acoplada ao plugin, fora do adapter | Documentado; overlay só lê name+domain |
 | `app` também importa `url_launcher` | `gm_host_handler.dart` | Segunda call site além de `popmundo_webview` | `GM.openInTab` vive no app porque usa clipboard/UI |
-| Cookie sync nativo → WebView | `InAppCookieSink` | Sessão "quase" válida se host-only ganhar `domain=` | Testes de `GameCookie` + 6 mutações registradas no spec; código omite `domain` quando o servidor não enviou |
+| Cookie sync nativo ↔ WebView | `InAppCookieSink` | Sessão "quase" válida se host-only ganhar `domain=` | Testes de `GameCookie` + `gameCookieFromInApp`; write omite `domain` quando o servidor não enviou; read trata domain=host como host-only |
 | Cliente HTTP fora do browser | `AuthSession` | Servidor pode distinguir o handshake da WebView | Escolha explícita (AD-018); UA copiado da WebView |
 | `isInspectable: true` fixo | `web_settings.dart` | DevTools também em release | Nenhuma flag `kReleaseMode`. **Hipótese:** aceitável por ser ferramenta de desenvolvedor |
 | `StorageService.toggleExclusion` → `int.parse` | `storage.dart` | `FormatException` se a chave não for numérica | Sem validação no pacote |
@@ -224,7 +230,7 @@ GM.registerMenuCommand → GmMenuRegistry → seção extra no AppSidebar (limpa
 | Patrol: um teste Dart por processo | `integration_test/` | Segundo `patrolTest` no mesmo arquivo falha 500 | Um `patrolTest` por arquivo (AD-015) |
 | `test_live/` vs. política "sem e2e live" | `packages/popmundo_utils/test_live` | Suite opt-in **acessa** popmundo.com com credenciais de env; o `dart test` padrão **não** a inclui (`dart_test.yaml` globa só `test/`) | Não é CI; `.env` / `.envexample` não devem ser commitados com segredos. **Hipótese:** `.envexample` usa `TEST_*` enquanto o código lê `POPMUNDO_*` — nomes divergem |
 | `gm-host-apis` sem `validation.md` | `.specs/features/gm-host-apis/` | Só `spec.md` + `context.md`; Handoff pede smoke em device com `.user.js` real | Código e testes unitários existem; Verifier da feature não está no repo |
-| Spec Auto Login (Goals) ainda cita TimedFetch | `.specs/features/auto-login/spec.md` | Drift spec vs. AD-018 / controller | O código vigente é HTTP nativo |
+| Spec Auto Login (Goals) ainda cita TimedFetch | `.specs/features/auto-login/spec.md` | Drift spec vs. AD-018 / controller | Resolvido no heartbeat: Goals citam `AuthSession` |
 | `PopmundoScope` sem call sites | `app.dart` | InheritedWidget morto | Decisão de manter o menu agnóstico do runtime |
 | `packages/popmundo_utils/example/` | example | `main` só imprime `HostTracker.defaultOrigin` | Boilerplate; não é ponto de entrada do produto |
 | Cache TimedFetch só em memória | `timed_fetch.dart` | Perde ao matar o processo | AD-006, aceito |
@@ -257,7 +263,7 @@ GM.registerMenuCommand → GmMenuRegistry → seção extra no AppSidebar (limpa
 | `popmundo-wrapper` | utils, webview, app | AD-001…008 |
 | `app-sidebar-menu` | app | AD-009 |
 | `userscript-manager` | utils, webview, app | AD-010 |
-| `auto-login` | utils, webview, app | AD-018 (AD-011/017 superseded) |
+| `auto-login` | utils, webview, app | AD-018, AD-019 (AD-011/017 superseded) |
 | `background-keepalive` | app | AD-012, AD-013 |
 | `app-i18n` | app | AD-014 |
 | `mobile-e2e-tests` | app `integration_test/` | AD-015 |

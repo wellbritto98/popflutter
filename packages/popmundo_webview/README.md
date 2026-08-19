@@ -19,7 +19,7 @@ Implementar o runtime e o widget `PopmundoWebView`. Regras (host, throttle, pars
 | `src/popmundo_webview_widget.dart` | `InAppWebView` + builtins/catalog merge, intercept observe-only, links externos, `PopScope` / system-back |
 | `src/user_scripts.dart` | Carrega `hooks.js` (DOCUMENT_START) e `helpers.js` (DOCUMENT_END) |
 | `src/userscript_injector.dart` | `UserScript` nativo `groupName: userscript:<id>`; sync add/remove + reload; **não** expõe wipe-all |
-| `src/in_app_cookie_sink.dart` | `CookieSink` → `CookieManager.setCookie` (host-only sem `domain` se o servidor não enviou) |
+| `src/in_app_cookie_sink.dart` | `CookieSink` + `CookieSource` → `CookieManager` (write host-only; read `getCookies` → `GameCookie`) |
 | `src/webview_back_navigation.dart` | `WebViewBackHandler`: back no histórico ou `allowExit` |
 | `src/web_settings.dart` | `incognito: false`, JS on, intercept fetch/ajax, `isInspectable: true` |
 | `assets/js/` | Ver [README JS](assets/js/README.md) |
@@ -32,7 +32,7 @@ Implementar o runtime e o widget `PopmundoWebView`. Regras (host, throttle, pars
 
 ## Módulos relacionados
 
-- `popmundo_utils` — porta + `CookieSink` + catalog/shim.
+- `popmundo_utils` — porta + `CookieSink`/`CookieSource` + catalog/shim.
 - `popmundo_app` — instancia o runtime, passa `gmValueStore` e scripts enabled, implementa `GmHostHandler`.
 
 ## Pontos de entrada
@@ -40,7 +40,7 @@ Implementar o runtime e o widget `PopmundoWebView`. Regras (host, throttle, pars
 - `lib/popmundo_webview.dart` — barrel.
 - `InAppPopmundoRuntime()` — composition root do app.
 - `PopmundoWebView(runtime:, gmValueStore:, enabledUserScripts:)` — widget.
-- `InAppCookieSink()` — wired no `AutoLoginController`.
+- `InAppCookieSink()` — wired no `AutoLoginController` como sink e source.
 
 ## Fluxos importantes
 

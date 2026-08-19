@@ -108,13 +108,15 @@ class _PopmundoHomeState extends State<PopmundoHome>
     notificationController: gmNotificationController,
     connectHeadersFor: _connectHeadersFor,
   );
+  late final cookieJar = InAppCookieSink();
   late final autoLogin = AutoLoginController(
     runtime: widget.runtime,
     settingsStore: settingsStore,
     secretStore: widget.secretStore,
     // The native handshake authenticates over dart:io; without this the
     // WebView's own jar never learns about it and stays logged out.
-    cookieSink: InAppCookieSink(),
+    cookieSink: cookieJar,
+    cookieSource: cookieJar,
   );
 
   StreamSubscription<NavigationEvent>? _navSub;

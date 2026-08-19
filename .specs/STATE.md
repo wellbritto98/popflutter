@@ -168,9 +168,9 @@
 ## Handoff
 
 - **Feature**: auto-login (session heartbeat) / `.specs/features/auto-login`
-- **Phase / Task**: Specify — spec updated, awaiting user confirmation
-- **Completed**: Handshake nativo AD-018, cookie sync WebView, snackbars, full-name character match
-- **In-progress**: P1 heartbeat (HB-01…HB-10) drafted in spec.md
-- **Next step**: User confirms spec (or overrides agent defaults: 302 not followed, skip `www`, probe only when Auto Login enabled). Then Design (CookieSource + AuthSession.probe) → Execute
-- **Blockers**: waiting on spec confirmation
+- **Phase / Task**: Execute complete — awaiting Verifier
+- **Completed**: T1 CookieSource, T2 AuthSession.probe, T3 checkSession, T4 InAppCookieSink.read, T5 wiring+docs. AD-019.
+- **In-progress**: none
+- **Next step**: Verifier (author ≠ verifier) on HB-01…HB-10
+- **Blockers**: none
 - **Branch**: master

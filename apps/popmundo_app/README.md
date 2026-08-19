@@ -47,7 +47,7 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 ## Fluxos importantes
 
 - **Boot:** prefs + EasyLocalization + porta FGS antes do primeiro frame. `PopmundoHome` espera `_bootstrapReady` (lista do catálogo) antes de montar a WebView.
-- **Auto Login:** `autoLogin.start()` no `initState`; snackbars via `scaffoldMessengerKey`.
+- **Auto Login:** `autoLogin.start()` no `initState`; snackbars via `scaffoldMessengerKey`. Heartbeat 60 s usa o mesmo `InAppCookieSink` como source.
 - **UserScripts:** `syncUserScripts` após import/toggle; delete limpa GM values/resources.
 - **Navegação:** atualiza cookies do overlay e `gmMenuRegistry.clear()`.
 - **Lifecycle:** `didChangeAppLifecycleState` → keepalive.

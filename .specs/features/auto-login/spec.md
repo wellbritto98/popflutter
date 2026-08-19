@@ -13,7 +13,7 @@ O ciclo de Auto Login continua **silencioso e fora da WebView**: handshake em HT
 - [x] O personagem é identificado pelo `<h2>` da `div.box`, não pelo rótulo do botão (que só tem o primeiro nome)
 - [x] Ao fim do ciclo o WebView vai sempre para `{origin}/World/Popmundo.aspx`
 - [x] Cada etapa do ciclo aparece como snackbar localizado (EN/PT)
-- [ ] Com Auto Login enabled, um GET nativo a cada 60 s em `{hostSticky}/World/Popmundo.aspx/Character` detecta logout (302 → `/Default.aspx`) e renova a sessão — inclusive com o app em keepalive/background
+- [x] Com Auto Login enabled, um GET nativo a cada 60 s em `{hostSticky}/World/Popmundo.aspx/Character` detecta logout (302 → `/Default.aspx`) e renova a sessão — inclusive com o app em keepalive/background
 
 ## Out of Scope
 
@@ -220,18 +220,18 @@ O ciclo de Auto Login continua **silencioso e fora da WebView**: handshake em HT
 | FDBK-02 | One snackbar per status | Execute | Done |
 | FDBK-03 | Name/message interpolation | Execute | Done |
 | FDBK-04 | EN/PT catalog coverage | Execute | Done |
-| HB-01 | Probe 60 s on sticky host Character URL | Specify | Pending |
-| HB-02 | Seed WebView jar; do not follow redirect | Specify | Pending |
-| HB-03 | 302 → login path starts Auto Login cycle | Specify | Pending |
-| HB-04 | 200 = healthy; network/5xx ≠ logout | Specify | Pending |
-| HB-05 | Skip www / disabled / missing / inFlight | Specify | Pending |
-| HB-06 | URL from currentOrigin, not resolve/www | Specify | Pending |
-| HB-07 | Main-isolate timer; FGS isolate does not probe | Specify | Pending |
-| HB-08 | iOS suspend ≠ logout | Specify | Pending |
-| HB-09 | Dual trigger + inFlight | Specify | Pending |
-| HB-10 | 750 ms between probe and handshake | Specify | Pending |
+| HB-01 | Probe 60 s on sticky host Character URL | Execute | Done |
+| HB-02 | Seed WebView jar; do not follow redirect | Execute | Done |
+| HB-03 | 302 → login path starts Auto Login cycle | Execute | Done |
+| HB-04 | 200 = healthy; network/5xx ≠ logout | Execute | Done |
+| HB-05 | Skip www / disabled / missing / inFlight | Execute | Done |
+| HB-06 | URL from currentOrigin, not resolve/www | Execute | Done |
+| HB-07 | Main-isolate timer; FGS isolate does not probe | Execute | Done |
+| HB-08 | iOS suspend ≠ logout | Execute | Done |
+| HB-09 | Dual trigger + inFlight | Execute | Done |
+| HB-10 | 750 ms between probe and handshake | Execute | Done |
 
-**Coverage:** 34 total, 24 previously mapped, 10 heartbeat unmapped until Execute
+**Coverage:** 34 total, 34 mapped to tests, 0 unmapped
 
 ---
 
@@ -244,6 +244,6 @@ O ciclo de Auto Login continua **silencioso e fora da WebView**: handshake em HT
 - [x] The cycle ends on `{origin}/World/Popmundo.aspx` on the host actually landed on
 - [x] Every status resolves in EN and PT
 - [x] Unit/widget gates pass without live HTTP to popmundo.com
-- [ ] Logout on `75.popmundo.com` (302 from `/World/Popmundo.aspx/Character` to `/Default.aspx`) renews the session without the WebView having navigated
-- [ ] Probe never hits `www.popmundo.com/.../Character` after the sticky host is a numbered `N.`
-- [ ] One Character GET per minute, never per FGS 5 s tick; the 302 is not followed
+- [x] Logout on `75.popmundo.com` (302 from `/World/Popmundo.aspx/Character` to `/Default.aspx`) renews the session without the WebView having navigated
+- [x] Probe never hits `www.popmundo.com/.../Character` after the sticky host is a numbered `N.`
+- [x] One Character GET per minute, never per FGS 5 s tick; the 302 is not followed
