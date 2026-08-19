@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 11,
+  "next_id": 15,
   "lessons": [
     {
       "id": "L-001",
@@ -184,6 +184,78 @@
       ],
       "created": "2026-08-18T18:49:50Z",
       "last_seen": "2026-08-18T18:49:50Z"
+    },
+    {
+      "id": "L-011",
+      "key": "gate_fail::patrol roda um teste dart por processo do app os completers do patrolappservice sao final e nunca reciclados entao o 2o patroltest de um bundle falha com invalid response 500 escreva exatamente um patroltest por arquivo e agrupe criterios relacionados num teste sequencial com reason em cada expect",
+      "text": "Patrol roda UM teste Dart por processo do app: os completers do PatrolAppService sao final e nunca reciclados, entao o 2o patrolTest de um bundle falha com 'Invalid response 500'. Escreva exatamente um patrolTest por arquivo e agrupe criterios relacionados num teste sequencial com reason em cada expect.",
+      "signal": "gate_fail",
+      "scope": "apps/popmundo_app/integration_test",
+      "status": "candidate",
+      "features": [
+        "mobile-e2e-tests"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "leancodepl/patrol#2005 (apps/popmundo_app/integration_test)"
+      ],
+      "created": "2026-08-19T01:10:55Z",
+      "last_seen": "2026-08-19T01:10:55Z"
+    },
+    {
+      "id": "L-012",
+      "key": "gate_fail::rode flutter analyze integration test antes de pedir qualquer execucao em device uma rodada foi queimada em dois erros de compilacao dart import de flutter test faltando que o analisador acha em 2s sem gradle",
+      "text": "Rode 'flutter analyze integration_test' antes de pedir qualquer execucao em device: uma rodada foi queimada em dois erros de compilacao Dart (import de flutter_test faltando) que o analisador acha em 2s sem Gradle.",
+      "signal": "gate_fail",
+      "scope": "apps/popmundo_app/integration_test",
+      "status": "candidate",
+      "features": [
+        "mobile-e2e-tests"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "T2 device run (apps/popmundo_app/integration_test)"
+      ],
+      "created": "2026-08-19T01:10:55Z",
+      "last_seen": "2026-08-19T01:10:55Z"
+    },
+    {
+      "id": "L-013",
+      "key": "spec_precision_gap::para saber se uma api de terceiro existe leia a fonte do pacote instalado em appdata local pub cache nao a documentacao os docs do patrol omitem getnotifications que existe em patrol 4 9 0 native automator dart 205",
+      "text": "Para saber se uma API de terceiro existe, leia a fonte do pacote instalado em ~/AppData/Local/Pub/Cache, nao a documentacao: os docs do Patrol omitem getNotifications(), que existe em patrol-4.9.0 native_automator.dart:205.",
+      "signal": "spec_precision_gap",
+      "scope": "dependencias-terceiros",
+      "status": "candidate",
+      "features": [
+        "mobile-e2e-tests"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "design.md Risks row 1 (dependencias-terceiros)"
+      ],
+      "created": "2026-08-19T01:10:55Z",
+      "last_seen": "2026-08-19T01:10:55Z"
+    },
+    {
+      "id": "L-014",
+      "key": "gate_fail::quando o erro vem de dependencia de terceiro busque issues conhecidas do projeto antes de teorizar sobre o proprio codigo duas hipoteses plausiveis clearpackagedata fgs impedindo restart custaram 3 execucoes e o sintoma era o titulo literal de uma issue aberta",
+      "text": "Quando o erro vem de dependencia de terceiro, busque issues conhecidas do projeto ANTES de teorizar sobre o proprio codigo: duas hipoteses plausiveis (clearPackageData, FGS impedindo restart) custaram 3 execucoes e o sintoma era o titulo literal de uma issue aberta.",
+      "signal": "gate_fail",
+      "scope": "debugging",
+      "status": "candidate",
+      "features": [
+        "mobile-e2e-tests"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "3 rodadas perdidas em hipoteses (debugging)"
+      ],
+      "created": "2026-08-19T01:10:56Z",
+      "last_seen": "2026-08-19T01:10:56Z"
     }
   ]
 }

@@ -74,6 +74,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: edge: TaskHandler isolate unreachable / validation.md (apps/popmundo_app)
 - last seen: 2026-08-18T18:49:50Z
 
+### L-011 — Patrol roda UM teste Dart por processo do app: os completers do PatrolAppService sao final e nunca reciclados, entao o 2o patrolTest de um bundle falha com 'Invalid response 500'. Escreva exatamente um patrolTest por arquivo e agrupe criterios relacionados num teste sequencial com reason em cada expect.
+- signal: `gate_fail` · recurrence: 1 feature(s) · scope: `apps/popmundo_app/integration_test` · harmful: 0
+- features: mobile-e2e-tests
+- evidence: leancodepl/patrol#2005 (apps/popmundo_app/integration_test)
+- last seen: 2026-08-19T01:10:55Z
+
+### L-012 — Rode 'flutter analyze integration_test' antes de pedir qualquer execucao em device: uma rodada foi queimada em dois erros de compilacao Dart (import de flutter_test faltando) que o analisador acha em 2s sem Gradle.
+- signal: `gate_fail` · recurrence: 1 feature(s) · scope: `apps/popmundo_app/integration_test` · harmful: 0
+- features: mobile-e2e-tests
+- evidence: T2 device run (apps/popmundo_app/integration_test)
+- last seen: 2026-08-19T01:10:55Z
+
+### L-013 — Para saber se uma API de terceiro existe, leia a fonte do pacote instalado em ~/AppData/Local/Pub/Cache, nao a documentacao: os docs do Patrol omitem getNotifications(), que existe em patrol-4.9.0 native_automator.dart:205.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `dependencias-terceiros` · harmful: 0
+- features: mobile-e2e-tests
+- evidence: design.md Risks row 1 (dependencias-terceiros)
+- last seen: 2026-08-19T01:10:55Z
+
+### L-014 — Quando o erro vem de dependencia de terceiro, busque issues conhecidas do projeto ANTES de teorizar sobre o proprio codigo: duas hipoteses plausiveis (clearPackageData, FGS impedindo restart) custaram 3 execucoes e o sintoma era o titulo literal de uma issue aberta.
+- signal: `gate_fail` · recurrence: 1 feature(s) · scope: `debugging` · harmful: 0
+- features: mobile-e2e-tests
+- evidence: 3 rodadas perdidas em hipoteses (debugging)
+- last seen: 2026-08-19T01:10:56Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
