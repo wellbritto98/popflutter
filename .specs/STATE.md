@@ -126,12 +126,11 @@
 
 ## Handoff
 
-- **Feature**: mobile-e2e-tests / `.specs/features/mobile-e2e-tests`
-- **Phase / Task**: Execute — T1–T11 implemented and committed; **Verifier pass pending**
-- **Completed**: spec.md, design.md, tasks.md; T1 `f43805c`, T2 `0bec34e`, T3–T5 `315c27d`, battery-dialog automation + mutation proof `1e32a4b`, T6–T8 `dacb11c`, T9–T10 `45771fd`, T11 (CLAUDE.md + AD-015). All three device suites green on `emulator-5554`; `flutter test` still 55 passed.
-- **Mutation proof (the feature's acceptance bar)**: reverting `stopWithTask` to `true` in both `AndroidManifest.xml` and `FlutterForegroundTaskPlatform.initService` turns KA-05 **red** with `does not contain 'Popmundo is running'`. Both files restored from HEAD; tree clean.
+- **Feature**: app-i18n / `.specs/features/app-i18n`
+- **Phase / Task**: Execute complete (T1–T8 committed); **Verifier pending**
+- **Completed**: spec.md, design.md, tasks.md, context.md; T1 `262911b`, T2 `ea1c58b`, T3 `e3a6b3d`, T4 `767f76d`, T5 `c3a4dc7`, T6 `6c7ef5f`, T7 `ebb817e`. T8 gate: analyze ×3 clean; `dart test` utils 102; `flutter test` webview 24; `flutter test` app 68.
 - **In-progress**: none
-- **Next step**: dispatch the independent Verifier (author ≠ verifier) to write `.specs/features/mobile-e2e-tests/validation.md`, then distil lessons via `scripts/lessons.py`
-- **Blockers**: none for the feature. Standing environment constraint: **the agent session cannot run Gradle** — every JDK 17+ there fails `Selector.open()` (`IOException: Unable to establish loopback connection`, `sun.nio.ch.UnixDomainSockets.connect0`), reproduced with a bare 5-line Java program outside Gradle and Patrol. A human terminal on the same machine (java 17.0.12) builds fine. So `patrol test` / `flutter build apk` need a human terminal; `flutter analyze`, `flutter test`, `git` and all edits do not.
-- **Uncommitted files**: unrelated in-flight work by the user (i18n: `lib/app.dart`, `lib/main.dart`, `lib/l10n.dart`; repo-wide `.cursor/agents/` → `.agents/agents/` rename) — **not this feature's**. Also `apps/popmundo_app/patrol_test/` (Patrol-generated bundle; wants a `.gitignore` entry).
+- **Next step**: dispatch the independent Verifier (author ≠ verifier) to write `.specs/features/app-i18n/validation.md`
+- **Blockers**: none
+- **Uncommitted files**: unrelated repo-wide `.cursor/agents/` → `.agents/agents/` rename and skill copies — **not this feature's**
 - **Branch**: master

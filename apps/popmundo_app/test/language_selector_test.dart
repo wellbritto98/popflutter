@@ -39,16 +39,26 @@ void main() {
     expect(find.text('English'), findsOneWidget);
     expect(find.text('Português'), findsOneWidget);
 
-    final enTile = tester.widget<RadioListTile<String>>(
-      find.byKey(const Key('language-option-en')),
+    final group = tester.widget<RadioGroup<String>>(
+      find.byType(RadioGroup<String>),
     );
-    final ptTile = tester.widget<RadioListTile<String>>(
-      find.byKey(const Key('language-option-pt')),
+    expect(group.groupValue, 'en');
+    expect(
+      tester
+          .widget<RadioListTile<String>>(
+            find.byKey(const Key('language-option-en')),
+          )
+          .value,
+      'en',
     );
-    expect(enTile.groupValue, 'en');
-    expect(enTile.value, 'en');
-    expect(ptTile.groupValue, 'en');
-    expect(ptTile.value, 'pt');
+    expect(
+      tester
+          .widget<RadioListTile<String>>(
+            find.byKey(const Key('language-option-pt')),
+          )
+          .value,
+      'pt',
+    );
   });
 
   testWidgets('selecting Português re-renders shell strings live', (tester) async {
@@ -74,10 +84,10 @@ void main() {
     expect(find.text('Login automático'), findsOneWidget);
 
     await _openDialog(tester);
-    final ptTile = tester.widget<RadioListTile<String>>(
-      find.byKey(const Key('language-option-pt')),
+    final group = tester.widget<RadioGroup<String>>(
+      find.byType(RadioGroup<String>),
     );
-    expect(ptTile.groupValue, 'pt');
+    expect(group.groupValue, 'pt');
   });
 
   testWidgets('re-selecting the active locale closes the dialog', (tester) async {
