@@ -182,10 +182,10 @@ T8
 
 **Done when**:
 
-- [ ] No literal UI copy remains in the screen (example-URL hint excepted)
-- [ ] All 9 existing userscripts tests green through harness with unchanged EN expectations
-- [ ] Gate check passes: quick gate
-- [ ] Test count: unchanged vs T4 (conversions only)
+- [x] No literal UI copy remains in the screen (example-URL hint excepted)
+- [x] All 9 existing userscripts tests green through harness with unchanged EN expectations
+- [x] Gate check passes: quick gate
+- [x] Test count: 66 (unchanged vs T4; conversions only)
 
 **Tests**: widget
 **Gate**: quick

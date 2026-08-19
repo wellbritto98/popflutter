@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 
@@ -70,7 +71,7 @@ class _UserScriptsScreenState extends State<UserScriptsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           key: const Key('userscript-snackbar'),
-          content: Text("Imported '${installed.name}'"),
+          content: Text('userscripts.imported'.tr(args: [installed.name])),
         ),
       );
     } catch (e) {
@@ -104,18 +105,18 @@ class _UserScriptsScreenState extends State<UserScriptsScreen> {
       builder: (context) {
         return AlertDialog(
           key: const Key('userscript-delete-dialog'),
-          title: const Text('Delete userscript?'),
-          content: Text("Delete '${script.name}'? This cannot be undone."),
+          title: Text('userscripts.deleteTitle'.tr()),
+          content: Text('userscripts.deleteConfirm'.tr(args: [script.name])),
           actions: [
             TextButton(
               key: const Key('userscript-delete-cancel'),
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text('common.cancel'.tr()),
             ),
             TextButton(
               key: const Key('userscript-delete-confirm'),
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete'),
+              child: Text('common.delete'.tr()),
             ),
           ],
         );
@@ -135,11 +136,11 @@ class _UserScriptsScreenState extends State<UserScriptsScreen> {
     return Scaffold(
       key: const Key('userscripts-screen'),
       appBar: AppBar(
-        title: const Text('Userscripts'),
+        title: Text('userscripts.title'.tr()),
         actions: [
           IconButton(
             key: const Key('userscript-add'),
-            tooltip: 'Add userscript',
+            tooltip: 'userscripts.add'.tr(),
             onPressed: _importing ? null : _showAddDialog,
             icon: const Icon(Icons.add),
           ),
@@ -152,16 +153,16 @@ class _UserScriptsScreenState extends State<UserScriptsScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        'No userscripts yet',
-                        key: Key('userscripts-empty'),
+                      Text(
+                        'userscripts.empty'.tr(),
+                        key: const Key('userscripts-empty'),
                       ),
                       const SizedBox(height: 12),
                       FilledButton.icon(
                         key: const Key('userscripts-empty-add'),
                         onPressed: _importing ? null : _showAddDialog,
                         icon: const Icon(Icons.add),
-                        label: const Text('Add userscript'),
+                        label: Text('userscripts.add'.tr()),
                       ),
                     ],
                   ),
@@ -185,7 +186,7 @@ class _UserScriptsScreenState extends State<UserScriptsScreen> {
                           : (_) => _toggle(script),
                       secondary: IconButton(
                         key: Key('userscript-delete-${script.id}'),
-                        tooltip: 'Delete',
+                        tooltip: 'common.delete'.tr(),
                         icon: const Icon(Icons.delete_outline),
                         onPressed:
                             _importing ? null : () => _confirmDelete(script),
@@ -223,12 +224,12 @@ class _AddUserScriptDialogState extends State<_AddUserScriptDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       key: const Key('userscript-add-dialog'),
-      title: const Text('Add userscript'),
+      title: Text('userscripts.add'.tr()),
       content: TextField(
         key: const Key('userscript-url-field'),
         controller: _controller,
-        decoration: const InputDecoration(
-          labelText: 'URL',
+        decoration: InputDecoration(
+          labelText: 'common.url'.tr(),
           hintText: 'https://example.com/script.user.js',
         ),
         keyboardType: TextInputType.url,
@@ -238,12 +239,12 @@ class _AddUserScriptDialogState extends State<_AddUserScriptDialog> {
         TextButton(
           key: const Key('userscript-add-cancel'),
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text('common.cancel'.tr()),
         ),
         TextButton(
           key: const Key('userscript-add-confirm'),
           onPressed: () => Navigator.of(context).pop(_controller.text.trim()),
-          child: const Text('Import'),
+          child: Text('common.import'.tr()),
         ),
       ],
     );
