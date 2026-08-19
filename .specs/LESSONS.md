@@ -134,6 +134,36 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: I18N-05 localization_boot_test.dart:48 (app-shell)
 - last seen: 2026-08-19T02:23:59Z
 
+### L-021 — When adding a nested i18n namespace, check the prefix is not already a leaf key — the new map shadows the existing string and throws at render time
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `apps/popmundo_app/assets/translations` · harmful: 0
+- features: auto-login
+- evidence: autologin.status leaf shadowed by autologin.status.* (auto-login validation.md) (apps/popmundo_app/assets/translations)
+- last seen: 2026-08-19T16:18:38Z
+
+### L-022 — A WebView navigation callback fires before the new document commits — read location.href, readyState and markup in one evaluate and poll until they match the expected page, never parse on the first callback
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `packages/popmundo_utils/autologin` · harmful: 0
+- features: auto-login
+- evidence: live DOM read returned the previous document (auto-login validation.md) (packages/popmundo_utils/autologin)
+- last seen: 2026-08-19T16:50:23Z
+
+### L-023 — Masking structured field logs is not enough — a raw HTML dump carries submitted credentials as plain value attributes, so redact secrets in the dump path too
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `packages/popmundo_utils/autologin` · harmful: 0
+- features: auto-login
+- evidence: page dump printed the password in clear text (auto-login validation.md) (packages/popmundo_utils/autologin)
+- last seen: 2026-08-19T16:50:23Z
+
+### L-024 — An in-page fetch cannot follow a redirect that leaves the document origin — if a flow depends on a cross-host handover, plan for a transport outside the WebView from the start
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `packages/popmundo_utils/autologin` · harmful: 0
+- features: auto-login
+- evidence: in-page fetch blocked by CORS on the www to N.popmundo.com handover (AD-018) (packages/popmundo_utils/autologin)
+- last seen: 2026-08-19T17:12:30Z
+
+### L-025 — Authenticating over a native HTTP client logs in nobody until its cookies are copied into the WebView jar, host-only cookies written without a domain
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `packages/popmundo_utils/autologin` · harmful: 0
+- features: auto-login
+- evidence: dart:io jar is separate from the WebView jar (AD-018) (packages/popmundo_utils/autologin)
+- last seen: 2026-08-19T17:12:30Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

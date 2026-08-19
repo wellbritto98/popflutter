@@ -1,9 +1,16 @@
 library;
 
 export 'src/autologin/aspnet_form.dart';
+export 'src/autologin/auth_http.dart';
+export 'src/autologin/auth_http_io.dart';
+export 'src/autologin/aspnet_form_data.dart';
+export 'src/autologin/auto_login_requests.dart';
 export 'src/autologin/auto_login_controller.dart';
 export 'src/autologin/auto_login_settings.dart';
-export 'src/autologin/last_url_store.dart';
+export 'src/autologin/auto_login_status.dart';
+export 'src/autologin/auto_login_trace.dart';
+export 'src/autologin/cookie_sink.dart';
+export 'src/autologin/game_cookie.dart';
 export 'src/css_selector.dart';
 export 'src/events.dart';
 export 'src/host_tracker.dart';

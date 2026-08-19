@@ -10,7 +10,9 @@ resolution: workspace
 
 # Add regular dependencies here.
 dependencies:
-  # path: ^1.9.0
+  # HTML parsing for ASP.NET WebForms pages (login / ChooseCharacter).
+  # Pure Dart — keeps this package Flutter-free (AD-002).
+  html: ^0.15.6
 
 dev_dependencies:
   lints: ^6.0.0

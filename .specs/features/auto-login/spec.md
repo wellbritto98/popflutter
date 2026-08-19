@@ -2,13 +2,15 @@
 
 ## Problem Statement
 
-Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `/` ou `/Default.aspx`. O userscript de referência preenche o DOM e clica; no Popflutter o login deve ser um POST in-page via TimedFetch (throttle AD-006), com hop 302 como navegação real do WebView (host sticky AD-007), escolha de personagem e restore da última URL Popmundo visitada antes do disconnect — configurável pelo item de sidebar "Auto Login".
+Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `/` ou `/Default.aspx`. O userscript de referência preenche o DOM e clica; no Popflutter o ciclo é **silencioso e fora da WebView**: o handshake inteiro (GET do form, POST de login, handover de host, escolha de personagem) roda em HTTP nativo `dart:io`, os cookies resultantes são copiados para o jar da WebView, e a única coisa que o jogador vê é `{host}/World/Popmundo.aspx` carregando. O personagem é identificado pelo **nome completo**. Feedback vai por snackbars na shell. Se o transporte nativo falhar, o ciclo aborta com snackbar — não existe caminho visível (AD-018).
 
 ## Goals
 
-- [ ] Jogador configura usuário, senha, personagem e status no sidebar; senha fica em cofre seguro
-- [ ] Com Auto Login enabled, ao detectar página de login o app autentica via TimedFetch + `loadUrl` sem clicar no form
-- [ ] Após Choose Character, o WebView restaura a última URL Popmundo não-auth (ou World home)
+- [ ] Jogador configura usuário, senha, personagem (nome completo) e status no sidebar; senha fica em cofre seguro
+- [ ] Com Auto Login enabled, ao detectar página de login o app autentica via TimedFetch sem clicar no form
+- [ ] O personagem é identificado pelo `<h2>` da `div.box`, não pelo rótulo do botão (que só tem o primeiro nome)
+- [ ] Ao fim do ciclo o WebView vai sempre para `{origin}/World/Popmundo.aspx`
+- [ ] Cada etapa do ciclo aparece como snackbar localizado (EN/PT)
 
 ## Out of Scope
 
@@ -19,7 +21,8 @@ Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `
 | Telegram / notificações de logout | Userscript-only; não pedido |
 | Retry infinito / polling agressivo | Um ciclo por detecção; inFlight bloqueia |
 | E2E live contra popmundo.com | Wrapper policy / ToS |
-| i18n | Strings nativas em inglês |
+| Restore da última URL visitada | Substituído por World home fixo (pedido do usuário) |
+| Desambiguação por ID de personagem | Nome completo resolve; ID fica como hardening futuro |
 | Mutar intercept (AD-003) | Observe-only permanece |
 | Gameplay do userscript (saúde/humor/itens) | Outro produto |
 
@@ -29,13 +32,20 @@ Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
-| Hop 302 | TimedFetch `redirect: 'manual'` + `runtime.loadUrl(Location)` | Pedido explícito (discuss) | y |
+| Transporte | HTTP nativo `dart:io` (`AuthSession`), redirects seguidos à mão para capturar o `Set-Cookie` de cada hop | Fetch in-page morre no hop cross-origin (verificado em device) | y |
+| Cross-origin | O login em `www` responde 302 para `N.popmundo.com//Login.aspx?t=…`; CORS bloqueia o fetch in-page. O host é atribuído por balanceamento a cada login | Log do device: `74.` num run, `75.` no seguinte | y |
+| Sessão na WebView | Cookies do handshake copiados via `CookieSink` → `CookieManager.setCookie`; host-only gravado sem `domain` | O jar do `dart:io` é separado do da WebView | y |
+| User-Agent | Copiado da WebView (`navigator.userAgent`) para o jogo ver um cliente só | Pedido de coerência | y |
+| Corpo do POST | Serialização do `#aspnetForm` inteiro + overrides (`.set`), como `mass-item-sender.js:224-243` | Dialeto correto do WebForms | y |
+| Verdict | `GetPageNotifications` após o POST de escolha, como `mass-item-sender.js:272` | Corpo do POST não é confiável | y |
 | Senha | `flutter_secure_storage` via `SecretStore`; settings não-secretos em `KeyValueStore` | Pedido explícito (discuss) | y |
 | Gatilho | Form de login visível (`/` / `/Default.aspx` / campos `ucLogin`) + enabled + credenciais | Alinhado ao userscript | y (agent) |
-| Personagem | Nome; match no `value` do submit (`Escolher X` / `Choose X`); usa `name=` ASP.NET real | Captura + userscript | y (agent) |
+| Personagem | **Nome completo** do `<h2>` da `div.box`; o `name=` do submit dentro da mesma box vai no corpo. O `value` (`Escolher X`) só tem o primeiro nome e colide | Pedido explícito | y |
+| Nome duplicado | Duas boxes com o mesmo nome completo ⇒ aborta (`ambiguous`), nunca chuta | Pedido explícito | y |
 | `ddlStatus` | Default `0` (Normal); editável na UI | Captura de request | y (agent) |
-| Last URL | Persistir `NavigationEvent.url` Popmundo exceto paths de auth; cold start `initialUrl` | Pedido + HostTracker só guarda origin | y (agent) |
-| UI nativa | Inglês; item sempre visível | Padrão sidebar | y (agent) |
+| Destino final | Sempre `{origin}/World/Popmundo.aspx`; `LastUrlStore` removido | Pedido explícito | y |
+| UI nativa | Localizada EN/PT via `easy_localization` (AD-014); item sempre visível | Padrão sidebar | y |
+| Feedback | Stream `AutoLoginStatus` no controller → snackbars na shell | Pedido explícito | y |
 | Concurrency | Um auto-login por vez (`inFlight`); falha 200+form = parar | Evita loop / throttle abuse | y (agent) |
 
 **Open questions:** none — all resolved or logged above.
@@ -62,53 +72,80 @@ Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `
 
 ---
 
-### P1: Auto-login via TimedFetch + loadUrl ⭐ MVP
+### P1: Auto-login silencioso via HTTP nativo ⭐ MVP
 
-**User Story**: As a player with Auto Login enabled, when I land on the login page I want the app to POST credentials and follow the game redirect so I reach Choose Character without filling the form.
+**User Story**: As a player with Auto Login enabled, when my session expires I want to be signed back in without ever seeing the login or character pages.
 
 **Why P1**: É o núcleo da feature.
 
 **Acceptance Criteria**:
 
-1. WHEN Auto Login is enabled, credentials+character are present, and a Popmundo navigation URL indicates the login page (path `/` or `/Default.aspx`, or HTML containing login username field markers) THEN the system SHALL start at most one in-flight auto-login cycle.
-2. WHEN the cycle starts THEN the system SHALL GET the login page HTML via TimedFetch with `useCache: false`, parse `__VIEWSTATE`, `__VIEWSTATEGENERATOR`, `__EVENTVALIDATION`, and POST `application/x-www-form-urlencoded` to the current sticky origin path `/` (or `/Default.aspx` if that was the page) with fields `ctl00$cphRightColumn$ucLogin$txtUsername`, `txtPassword`, `ddlStatus`, `btnLogin=OK!` plus the ASP.NET tokens, using TimedFetch with `useCache: false` and `redirect: 'manual'` (accept 3xx).
-3. WHEN the login POST returns status 302 with a `Location` header to `*.popmundo.com/Login.aspx?t=…` THEN the system SHALL call `runtime.loadUrl` with that absolute Location (updating HostTracker via real navigation).
-4. WHEN the login POST returns status 200 (or any non-redirect success that still looks like the login form) THEN the system SHALL abort the cycle without Choose Character and without looping.
-5. WHEN Auto Login is disabled OR username/password/character missing THEN the system SHALL NOT start a cycle.
-6. WHEN a cycle is already in flight THEN a second trigger SHALL be ignored until the first finishes (success or abort).
+1. WHEN Auto Login is enabled, credentials+character are present, and a Popmundo navigation URL indicates the login page (path `/` or `/Default.aspx`) THEN the system SHALL start at most one in-flight cycle.
+2. WHEN the cycle starts THEN the system SHALL GET the login page over native HTTP and build the POST body by serializing the **entire** `#aspnetForm`, overriding `__EVENTTARGET`, `__EVENTARGUMENT`, `…ucLogin$txtUsername`, `$txtPassword`, `$ddlStatus` and `$btnLogin` (`OK!`).
+3. WHEN the login POST is sent THEN redirects SHALL be followed one hop at a time with `followRedirects` off, re-issuing each 302 as a GET, so every hop's `Set-Cookie` is captured — the auth cookie is only emitted by the final, numbered host.
+4. WHEN every request is sent THEN it SHALL carry the WebView's own `User-Agent`.
+5. WHEN the chain ends on a login path OR the body still contains the login form THEN the system SHALL abort with `invalidCredentials`, write no cookies, and not loop.
+6. WHEN the chain succeeds THEN every subsequent URL SHALL be resolved against the host the chain actually ended on, never a stored origin — the game assigns the host at login.
+7. WHEN the character has been chosen THEN the system SHALL copy the session cookies into the WebView's jar **before** navigating, preserving host-only scope (no `domain` where the server sent none), `HttpOnly`, `Secure` and `SameSite`.
+8. WHEN the cycle succeeds THEN the WebView SHALL perform exactly one navigation, to `{assignedHost}/World/Popmundo.aspx`, and SHALL NOT have submitted any form or run any in-page fetch.
+9. WHEN the native transport fails THEN the system SHALL abort with `networkError`. There is no visible fallback: the WebView is never navigated through the login flow.
+10. WHEN Auto Login is disabled OR username/password/character missing THEN no cycle SHALL start and no status SHALL be emitted.
+11. WHEN a cycle is already in flight THEN a second trigger SHALL be ignored.
+12. WHEN requests are sequential THEN they SHALL be at least 750 ms apart (AD-006).
 
-**Independent Test**: `FakePopmundoRuntime` + TimedFetch with virtual clock; assert POST options, `useCache: false`, `loadUrl` called with Location, no choose on 200+form.
+**Independent Test**: scripted fake server replaying the real `www` → `N` chain; assert the whole-form body, the hop-by-hop cookie capture, the UA, the single `loadUrl`, and that no in-page fetch or form submit happened.
 
 ---
 
-### P1: Choose character + restore last URL ⭐ MVP
+### P1: Choose character por nome completo ⭐ MVP
 
-**User Story**: As a player after successful login hop, I want my configured character selected and then return to the page I was on before disconnect.
+**User Story**: As a player with two characters sharing a first name, I want the app to select the exact one I configured, by full name.
 
-**Why P1**: Sem personagem o jogo não entra; sem last URL o cold start sempre cai em www.
+**Why P1**: O rótulo do botão só traz o primeiro nome — é onde a versão anterior errava.
 
 **Acceptance Criteria**:
 
-1. WHEN navigation reaches `/World/Popmundo.aspx/ChooseCharacter` during an in-flight cycle THEN the system SHALL GET that page via TimedFetch (`useCache: false`), find the submit whose `value` matches the configured character name with prefix `Escolher ` or `Choose `, and POST the button's `name` + ASP.NET tokens to `/World/Popmundo.aspx/ChooseCharacter` with `useCache: false`.
-2. WHEN the character POST succeeds (2xx after follow or document navigation equivalent) THEN the system SHALL `loadUrl` the persisted last URL if present and eligible; ELSE `loadUrl` `{currentOrigin}/World/Popmundo.aspx`.
-3. WHEN a Popmundo `NavigationEvent` fires for a URL that is NOT an auth path (`/`, `/Default.aspx`, `/Login.aspx`, `/World/Popmundo.aspx/ChooseCharacter`) THEN the system SHALL persist that full URL to `KeyValueStore` key `session.last_url.v1`.
-4. WHEN the WebView is first created THEN `initialUrl` SHALL be the persisted last eligible URL if any, ELSE `HostTracker.defaultOrigin`.
-5. WHEN the character button matching the configured name is not found THEN the system SHALL abort the cycle without restoring last URL via forced navigation (stay on Choose Character).
+1. WHEN the ChooseCharacter HTML is available THEN the system SHALL read one candidate per `div.box`, taking the full name from that box's `<h2>` (nested elements flattened, entities decoded, whitespace collapsed) and the POST field name from that same box's `input[type=submit]`.
+2. WHEN the configured name matches exactly one candidate (case- and whitespace-insensitive) THEN the system SHALL POST the whole `#aspnetForm` of that page with `__EVENTTARGET`/`__EVENTARGUMENT` empty and the matched button's `name`=`value` added.
+3. WHEN the configured name matches no candidate — including when it is only a first name — THEN the system SHALL abort with `characterNotFound` and SHALL NOT navigate.
+4. WHEN the configured name matches more than one candidate THEN the system SHALL abort with `characterAmbiguous` rather than choosing one.
+5. WHEN ChooseCharacter HTML has zero character boxes THEN the system SHALL abort with `noCharacters`.
+6. WHEN the choice POST completes THEN the system SHALL poll `GetPageNotifications`; on `error` it SHALL abort with `serverRejected` carrying the server text and SHALL NOT navigate.
+7. WHEN the choice succeeds THEN the system SHALL `loadUrl` `{origin}/World/Popmundo.aspx`, where `origin` is the host actually landed on — not `HostTracker.currentOrigin`, which is stale during a silent cycle.
 
-**Independent Test**: Unit tests for last-URL filter + character button match (PT/EN); controller test for choose POST + restore; widget/composition test that `initialUrl` is passed when store has a value (fake).
+**Independent Test**: fixture with two characters named `Deon *`; assert each resolves to its own `btnChooseCharacter2` index, that `Deon` alone is `notFound`, and that duplicates are `ambiguous`.
+
+---
+
+### P1: Feedback do ciclo ⭐ MVP
+
+**User Story**: As a player, I want to see what the auto-login is doing, so a silent cycle is not a black box.
+
+**Why P1**: Sem navegação visível, snackbar é o único sinal.
+
+**Acceptance Criteria**:
+
+1. WHEN a cycle runs THEN the controller SHALL emit `AutoLoginStatus` on a broadcast stream: `detected` → `authenticating` → `choosingCharacter` → `done`, or `failed` with a typed `AutoLoginFailure`.
+2. WHEN a status is emitted THEN the shell SHALL show exactly one snackbar for it, replacing the previous one, with `failed` in the error colour.
+3. WHEN a status carries a character name or server message THEN the snackbar SHALL interpolate it.
+4. WHEN any status is rendered in EN or PT THEN the text SHALL come from the catalogs — never a raw key, never an unfilled `{}` (AD-014).
+
+**Independent Test**: widget test resolving every `AutoLoginFailure` in both locales.
 
 ---
 
 ## Edge Cases
 
-- WHEN login HTML lacks VIEWSTATE tokens THEN cycle SHALL abort
-- WHEN Location is relative THEN system SHALL resolve against the response URL / current origin before `loadUrl`
-- WHEN Location host is not Popmundo THEN system SHALL abort (no openExternal for auth hop)
-- WHEN ChooseCharacter HTML has zero character buttons THEN cycle SHALL abort
-- WHEN TimedFetch throws (non-2xx without acceptRedirect, timeout, bridge not ready) THEN cycle SHALL abort and clear inFlight
-- WHEN GET tokens and POST login are sequential THEN throttle ≥750 ms between them (AD-006)
-- WHEN absolute `www.popmundo.com` is hardcoded after sticky host is already `N.` THEN system SHALL NOT do that — use `currentOrigin` (AD-007)
-- WHEN `getServerLink`/`resolve` would add trailing slash to ChooseCharacter THEN auto-login SHALL NOT use it for these paths
+- WHEN the login page has no `#aspnetForm` THEN cycle SHALL abort (`missingForm`)
+- WHEN the login POST throws THEN the cycle SHALL fall back to form navigation, not abort
+- WHEN the token GET throws THEN cycle SHALL abort with `networkError` and clear `inFlight`
+- WHEN the choice POST throws THEN cycle SHALL abort with `networkError` and clear `inFlight`
+- WHEN `GetPageNotifications` itself throws THEN the cycle SHALL proceed — a failed poll says nothing about the choice
+- WHEN a `<h2>` is pretty-printed across lines or wraps an `<a>` THEN the name SHALL still match
+- WHEN a `div.box` has no submit button (informational box) THEN it SHALL be skipped
+- WHEN sequential calls run THEN throttle >=750 ms between them (AD-006)
+- WHEN the sticky host is `N.` THEN no code path SHALL hardcode `www.popmundo.com` (AD-007)
+- WHEN building the ChooseCharacter URL THEN `HostTracker.resolve` SHALL NOT be used — it appends a trailing slash
 
 ---
 
@@ -116,29 +153,41 @@ Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| UI-01 | P1: Config sidebar | Design | Pending |
-| UI-02 | P1: Config screen fields | Design | Pending |
-| UI-03 | P1: Persist KV + SecretStore | Design | Pending |
-| UI-04 | P1: Save disabled in-flight | Design | Pending |
-| AUTH-01 | P1: Trigger + inFlight | Design | Pending |
-| AUTH-02 | P1: GET tokens + POST login | Design | Pending |
-| AUTH-03 | P1: 302 → loadUrl | Design | Pending |
-| AUTH-04 | P1: 200 abort | Design | Pending |
-| AUTH-05 | P1: Disabled/missing skip | Design | Pending |
-| AUTH-06 | P1: inFlight ignore | Design | Pending |
-| NAV-01 | P1: Choose character POST | Design | Pending |
-| NAV-02 | P1: Restore last URL | Design | Pending |
-| NAV-03 | P1: Persist last URL | Design | Pending |
-| NAV-04 | P1: Cold start initialUrl | Design | Pending |
-| NAV-05 | P1: Missing character abort | Design | Pending |
+| UI-01 | Config sidebar item | Execute | Done |
+| UI-02 | Config screen fields | Execute | Done |
+| UI-03 | Persist KV + SecretStore | Execute | Done |
+| UI-04 | Save disabled in-flight | Execute | Done |
+| UI-05 | Empty password keeps secret | Execute | Done |
+| AUTH-01 | Trigger + inFlight | Execute | Done |
+| AUTH-02 | Whole-form POST body | Execute | Done |
+| AUTH-03 | redirect follow + landing URL | Execute | Done |
+| AUTH-04 | Landed-on-login abort | Execute | Done |
+| AUTH-05 | Form-navigation fallback | Execute | Done |
+| AUTH-06 | Disabled/missing skip | Execute | Done |
+| AUTH-07 | inFlight ignore | Execute | Done |
+| AUTH-08 | 750 ms throttle | Execute | Done |
+| NAV-01 | Parse boxes by `<h2>` | Execute | Done |
+| NAV-02 | Exact full-name POST | Execute | Done |
+| NAV-03 | Not-found abort | Execute | Done |
+| NAV-04 | Ambiguous abort | Execute | Done |
+| NAV-05 | Zero characters abort | Execute | Done |
+| NAV-06 | Server-rejected abort | Execute | Done |
+| NAV-07 | Always World home on landing host | Execute | Done |
+| FDBK-01 | Status stream phases | Execute | Done |
+| FDBK-02 | One snackbar per status | Execute | Done |
+| FDBK-03 | Name/message interpolation | Execute | Done |
+| FDBK-04 | EN/PT catalog coverage | Execute | Done |
 
-**Coverage:** 15 total, 0 mapped to tasks, 15 unmapped
+**Coverage:** 24 total, 24 mapped to tests, 0 unmapped
 
 ---
 
 ## Success Criteria
 
-- [ ] Com Auto Login configured, landing on login page completes hop to Choose Character then selected character without DOM click
-- [ ] Password never appears in SharedPreferences/KeyValueStore dumps
-- [ ] After reconnect, WebView returns to last non-auth Popmundo path when one was stored
-- [ ] Unit/widget gates pass without live HTTP to popmundo.com
+- [x] Two characters sharing a first name resolve to different buttons; a first name alone no longer matches
+- [x] Duplicate full names abort instead of being guessed
+- [x] The POST body carries the whole form, not just the three VIEWSTATE tokens
+- [x] Password never appears in SharedPreferences/KeyValueStore dumps
+- [x] The cycle ends on `{origin}/World/Popmundo.aspx` on the host actually landed on
+- [x] Every status resolves in EN and PT
+- [x] Unit/widget gates pass without live HTTP to popmundo.com

@@ -1,0 +1,7 @@
+# `dart test` globs test/ only, so the live suite under test_live/ never runs by
+# accident. The tag is declared here so @Tags(['live']) does not warn, and so a
+# live file can still be excluded explicitly with `-x live`.
+tags:
+  live:
+    # Hits the real popmundo.com — see test_live/README.md.
+    skip: false

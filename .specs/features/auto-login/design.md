@@ -1,5 +1,16 @@
 # Auto Login Design
 
+> **Superseded in part by AD-017 (2026-08-19).** The `redirect: 'manual'` +
+> `loadUrl(Location)` hop described below is not implementable — browser fetch
+> returns an opaque redirect with no readable `Location`. The shipped flow is:
+> silent POST with the default `redirect: 'follow'`, landing host read from
+> `InPageFetchResult.url`, injected-`<form>` navigation as the cross-origin
+> fallback, POST bodies built by serializing the whole `#aspnetForm`
+> (`AspNetFormData`), characters matched by the full name in each
+> `div.box > h2`, and a single final navigation to `{origin}/World/Popmundo.aspx`.
+> `LastUrlStore` no longer exists. See `spec.md` and `validation.md` for the
+> current contract.
+
 **Spec**: `.specs/features/auto-login/spec.md`
 **Status**: Approved (plan confirmed)
 

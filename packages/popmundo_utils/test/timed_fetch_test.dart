@@ -122,7 +122,7 @@ void main() {
       acceptRedirect: true,
     );
     expect(result.status, 302);
-    expect(result.locationHeader, contains('74.popmundo.com/Login.aspx'));
+    expect(result.headers['location'], contains('74.popmundo.com/Login.aspx'));
   });
 
   test('fetchResponse without acceptRedirect throws on 302', () async {

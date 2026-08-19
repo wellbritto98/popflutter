@@ -88,7 +88,7 @@
 - **Trade-off**: Extensão do contrato `PopmundoRuntime` (`loadUrl` + headers em `InPageFetchResult`); plugin Flutter novo no app.
 - **Scope**: `popmundo_utils` (controller/stores/TimedFetch), `popmundo_webview` (hooks.js / loadUrl), `popmundo_app` (UI / secure storage)
 - **Date**: 2026-08-18
-- **Status**: active
+- **Status**: superseded by AD-017
 
 ### AD-012
 - **Decision**: Keepalive de sessão em segundo plano vive no app shell via `flutter_foreground_task` (Foreground Service `dataSync` + notificação + isenção de bateria no Android; pedido de notificação no iOS). O isolate do FGS só emite heartbeat — não executa TimedFetch nem toca o WebView. Cookies/sessão continuam AD-004; intercept observe-only AD-003.
@@ -133,11 +133,34 @@
 - **Date**: 2026-08-19
 - **Status**: active
 
+### AD-017
+
+- **Decision**: O ciclo do Auto Login passa a ser **silencioso e request-based**, com quatro mudanças em relação ao AD-011:
+  1. **Sem `redirect: 'manual'`.** O fetch do browser devolve resposta opaca (status 0, sem `Location`) nesse modo, então o POST de login usa o `redirect: 'follow'` padrão e o destino sai de `InPageFetchResult.url` (URL final após os redirects). O `loadUrl(Location)` do AD-011 nunca foi implementável.
+  2. **Fallback de navegação.** Quando o fetch de login lança — tipicamente o hop `www` → `N.popmundo.com`, que o CORS bloqueia porque o cookie de auth `popmundo.com=` é host-only (sem `domain=`) — o ciclo injeta um `<form>` e chama `form.submit()`, deixando a WebView atravessar o hop nativamente. Esse caminho já havia sido implementado sem registro; agora é explicitamente o fallback, não o caminho principal.
+  3. **Corpo do POST = `#aspnetForm` inteiro + overrides.** `AspNetFormData` serializa todo controle *successful* do form (regras de submissão HTML: sem `disabled`, sem submit/button/reset/image/file, só checkbox/radio marcados, `option` selecionada dos selects) e expõe `set()` com semântica de `FormData.set`. Substitui o cherry-pick de `__VIEWSTATE`/`__VIEWSTATEGENERATOR`/`__EVENTVALIDATION`, que descartava silenciosamente `ddlLanguage` e qualquer estado oculto extra. Porte direto do dialeto de `Popmundo-Utils` `features/mass-item-sender.js:224-243`.
+  4. **Personagem por nome completo.** `parseCharacterChoices` lê uma candidata por `div.box` usando o texto do `<h2>` (o `value` do submit só tem o primeiro nome e colide entre personagens) e o `name=` do submit da mesma box. Match exato, case/whitespace-insensitive; nome duplicado devolve `ambiguous` e aborta em vez de chutar. Usa `package:html` — primeira dependência do `popmundo_utils`, Dart puro, então AD-002 continua válido.
+  Além disso: o veredito do POST de escolha vem de `Notifications.getPageNotifications()` (padrão de `mass-item-sender.js:272`), o ciclo termina sempre em `{origin}/World/Popmundo.aspx` no host em que realmente aterrissou, e `LastUrlStore` foi removido (o app volta a abrir em `HostTracker.defaultOrigin`). Estado do controller cai de quatro flags para `_inFlight` + `_awaitingChooseCharacter`. AD-003 (observe-only), AD-006 (throttle 750 ms) e AD-007 (host sticky só por navegação real) permanecem.
+- **Reason**: O match por primeiro nome escolhia o personagem errado quando a conta tinha dois com o mesmo primeiro nome — a `div.box` do `<h2>` é o único identificador confiável na página. O resto veio junto porque o AD-011 descrevia um fluxo que o browser não permite (`redirect: 'manual'`) e um corpo de POST que diverge do dialeto validado no projeto de referência.
+- **Trade-off**: Dois caminhos de login para manter (silencioso + fallback de navegação); uma dependência nova no pacote antes zero-deps; sem restauração da última URL — depois do relog o jogador sempre cai na home do mundo.
+- **Scope**: `popmundo_utils` (`autologin/`, exports, pubspec), `popmundo_app` (`app.dart`, `autologin/auto_login_messages.dart`, catálogos EN/PT)
+- **Date**: 2026-08-19
+- **Status**: superseded by AD-018 (transporte do handshake; fallback de navegação removido)
+
+### AD-018
+
+- **Decision**: O handshake de Auto Login (GET do form, POST de login, handover de host e POST de escolha de personagem) roda em **HTTP nativo `dart:io`** via `AuthSession`, fora da WebView. Os cookies coletados em todos os hops são copiados para o jar da WebView por um port `CookieSink`, implementado em `popmundo_webview` como `InAppCookieSink` sobre `CookieManager.setCookie`. Redirects são seguidos **à mão** (`followRedirects = false`), um hop por vez, porque o cookie de auth só é emitido no último hop, pelo host numerado. O `User-Agent` é lido da própria WebView (`navigator.userAgent`) para o jogo ver um cliente só. O cooldown de 750 ms do AD-006 vale também aqui. Cookies host-only (sem `domain=`) são gravados sem `domain`, preservando o escopo. O submit de `<form>` na WebView e o polling de DOM do AD-017 foram **removidos**: existe um caminho só.
+- **Reason**: Comprovado em device: o POST de login em `www.popmundo.com` responde 302 para `N.popmundo.com//Login.aspx?t=…`, e o fetch in-page morre com *"No 'Access-Control-Allow-Origin' header"*. Esse hop cross-origin é estrutural — o cookie `popmundo.com` é host-only, então o jogo precisa do token na URL para transferir a sessão. `dart:io` não tem CORS, então o ciclo inteiro acontece fora da tela; o jogador só vê a home do mundo carregar. O host é atribuído por balanceamento a cada login (runs consecutivos caíram em `74.` e `75.`), então tudo depois do login resolve contra `finalUrl.host`, nunca contra um origin guardado.
+- **Trade-off**: Sem fallback visível — se o jogo recusar o cliente nativo, o Auto Login falha em vez de degradar para navegação (escolha do usuário, para manter um caminho só). A autenticação deixa de passar pelo contexto da página, então o TimedFetch in-page (AD-006) não cobre mais essa parte — o throttle foi reimplementado no `AuthSession`. Sync de cookie é código novo com falha sutil (sessão "quase" válida); mitigado por testes contra os `Set-Cookie` reais e 6 mutações. Um cliente HTTP fora do browser é mais distinguível para o servidor do que a própria WebView — decisão consciente do usuário após a alternativa headless ser apresentada.
+- **Scope**: `popmundo_utils` (`autologin/auth_http.dart`, `auth_http_io.dart`, `game_cookie.dart`, `cookie_sink.dart`, controller), `popmundo_webview` (`in_app_cookie_sink.dart`), `popmundo_app` (`app.dart`)
+- **Date**: 2026-08-19
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: gm-host-apis / `.specs/features/gm-host-apis`
+- **Feature**: auto-login (rework) / `.specs/features/auto-login`
 - **Phase / Task**: Execute complete
-- **Completed**: GM host APIs (Core+Host polyfill)
+- **Completed**: Full-name character matching, whole-form POST bodies, native-HTTP silent handshake with cookie sync into the WebView, status snackbars (EN/PT), LastUrlStore removed. See AD-017 and AD-018.
 - **In-progress**: none
 - **Next step**: device smoke-test with a real `.user.js` using GM_xmlhttpRequest + registerMenuCommand
 - **Blockers**: none

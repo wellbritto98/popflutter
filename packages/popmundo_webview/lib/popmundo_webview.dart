@@ -1,5 +1,6 @@
 library;
 
+export 'src/in_app_cookie_sink.dart';
 export 'src/in_app_runtime.dart';
 export 'src/js_bridge.dart';
 export 'src/popmundo_webview_widget.dart';
