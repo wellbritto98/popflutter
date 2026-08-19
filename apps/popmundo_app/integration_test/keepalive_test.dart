@@ -53,6 +53,10 @@ void main() {
     // awaited before granting — start it, answer the OS, then await.
     final bootstrapping = keepalive.bootstrap();
     await grantNotificationsIfAsked($);
+    // bootstrap() also asks Android to waive battery optimisation, which opens
+    // a separate system dialog that is NOT a runtime permission — unanswered,
+    // it covers the app and breaks the shade assertions below.
+    await grantBackgroundExemptionIfAsked($);
     await bootstrapping;
     await $.pumpAndSettle();
 

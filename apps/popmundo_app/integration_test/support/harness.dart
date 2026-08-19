@@ -56,6 +56,33 @@ Future<void> grantNotificationsIfAsked(PatrolIntegrationTester $) async {
   }
 }
 
+/// Answers the battery-optimisation exemption dialog if Android raised one.
+///
+/// This is NOT a runtime permission, so `grantPermissionWhenInUse()` does not
+/// cover it: `BackgroundKeepalive.bootstrap()` calls
+/// `requestIgnoreBatteryOptimization()`, which fires
+/// `ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, and Android answers with its
+/// own system dialog ("Allow … to run in the background?"). Left unanswered it
+/// sits on top of the app and breaks the notification-shade assertions.
+///
+/// Tries each known affirmative label in turn; a miss throws, which just means
+/// "not this label, or no dialog at all", so it is swallowed. Fully absent
+/// dialog (device already exempt) is the normal path and costs one timeout.
+Future<void> grantBackgroundExemptionIfAsked(PatrolIntegrationTester $) async {
+  const labels = ['Allow', 'ALLOW', 'Permitir', 'PERMITIR'];
+  for (final label in labels) {
+    try {
+      await $.platform.mobile.tap(
+        Selector(text: label),
+        timeout: const Duration(seconds: 3),
+      );
+      return;
+    } catch (_) {
+      // Not this label, or no dialog is showing — try the next one.
+    }
+  }
+}
+
 /// Stops the foreground service so the app process is free to terminate.
 ///
 /// Patrol runs ONE Dart test per app process: `PatrolAppService` builds its
