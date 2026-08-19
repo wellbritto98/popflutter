@@ -130,11 +130,11 @@ T8
 
 **Done when**:
 
-- [ ] No literal label/subtitle remains in the registry; sidebar empty state localized
-- [ ] Registry tests run through the harness and still assert EN labels ('Auto Login', 'Debug panel', ids, onTap wiring, kDebugMode default)
-- [ ] Sidebar tests green through harness (labels, subtitles, 'No options available.')
-- [ ] Gate check passes: quick gate
-- [ ] Test count: 58 tests pass (conversions, no deletions)
+- [x] No literal label/subtitle remains in the registry; sidebar empty state localized
+- [x] Registry tests run through the harness and still assert EN labels ('Auto Login', 'Debug panel', ids, onTap wiring, kDebugMode default)
+- [x] Sidebar tests green through harness (labels, subtitles, 'No options available.')
+- [x] Gate check passes: quick gate
+- [x] Test count: 61 tests pass (conversions, no deletions)
 
 **Tests**: widget
 **Gate**: quick

@@ -1,9 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:popmundo_app/menu/app_menu_registry.dart';
 
+import 'localization_helpers.dart';
+
 void main() {
-  test('always includes auto-login and userscripts', () {
+  testWidgets('always includes auto-login and userscripts', (tester) async {
+    await pumpLocalized(tester, const SizedBox());
     final items = buildAppMenuItems(
       onOpenDebugPanel: () {},
       onOpenUserScripts: () {},
@@ -13,10 +17,16 @@ void main() {
 
     expect(items.map((e) => e.id), ['auto-login', 'userscripts']);
     expect(items.first.label, 'Auto Login');
+    expect(
+      items.first.subtitle,
+      'Credentials and character for TimedFetch login',
+    );
   });
 
-  test('returns auto-login + userscripts + debug when includeDebugItem is true',
-      () {
+  testWidgets(
+      'returns auto-login + userscripts + debug when includeDebugItem is true',
+      (tester) async {
+    await pumpLocalized(tester, const SizedBox());
     final items = buildAppMenuItems(
       onOpenDebugPanel: () {},
       onOpenUserScripts: () {},
@@ -26,9 +36,15 @@ void main() {
 
     expect(items.map((e) => e.id), ['auto-login', 'userscripts', 'debug']);
     expect(items[2].label, 'Debug panel');
+    expect(
+      items[2].subtitle,
+      'Inspect host, network, console and eval JS',
+    );
   });
 
-  test("the debug item's onTap invokes onOpenDebugPanel exactly once", () {
+  testWidgets("the debug item's onTap invokes onOpenDebugPanel exactly once",
+      (tester) async {
+    await pumpLocalized(tester, const SizedBox());
     var callCount = 0;
     final items = buildAppMenuItems(
       onOpenDebugPanel: () => callCount++,
@@ -42,8 +58,10 @@ void main() {
     expect(callCount, 1);
   });
 
-  test("the userscripts item's onTap invokes onOpenUserScripts exactly once",
-      () {
+  testWidgets(
+      "the userscripts item's onTap invokes onOpenUserScripts exactly once",
+      (tester) async {
+    await pumpLocalized(tester, const SizedBox());
     var callCount = 0;
     final items = buildAppMenuItems(
       onOpenDebugPanel: () {},
@@ -55,9 +73,12 @@ void main() {
     items.firstWhere((e) => e.id == 'userscripts').onTap();
 
     expect(callCount, 1);
+    expect(items.firstWhere((e) => e.id == 'userscripts').label, 'Userscripts');
   });
 
-  test("the auto-login item's onTap invokes onOpenAutoLogin exactly once", () {
+  testWidgets("the auto-login item's onTap invokes onOpenAutoLogin exactly once",
+      (tester) async {
+    await pumpLocalized(tester, const SizedBox());
     var callCount = 0;
     final items = buildAppMenuItems(
       onOpenDebugPanel: () {},
@@ -71,7 +92,9 @@ void main() {
     expect(callCount, 1);
   });
 
-  test('defaults includeDebugItem to kDebugMode when omitted', () {
+  testWidgets('defaults includeDebugItem to kDebugMode when omitted',
+      (tester) async {
+    await pumpLocalized(tester, const SizedBox());
     final items = buildAppMenuItems(
       onOpenDebugPanel: () {},
       onOpenUserScripts: () {},
