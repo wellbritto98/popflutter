@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:popmundo_app/autologin/auto_login_screen.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 
+import 'localization_helpers.dart';
+
 void main() {
   late MemoryKeyValueStore kv;
   late MemorySecretStore secrets;
@@ -17,15 +19,13 @@ void main() {
   });
 
   Future<void> pumpScreen(WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: AutoLoginScreen(
-          settingsStore: settingsStore,
-          secretStore: secrets,
-        ),
+    await pumpLocalized(
+      tester,
+      AutoLoginScreen(
+        settingsStore: settingsStore,
+        secretStore: secrets,
       ),
     );
-    await tester.pumpAndSettle();
   }
 
   testWidgets('saves settings to KV and password only to SecretStore',
@@ -111,15 +111,13 @@ void main() {
     final gate = Completer<void>();
     final slowSecrets = _GatedSecretStore(secrets, gate);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: AutoLoginScreen(
-          settingsStore: settingsStore,
-          secretStore: slowSecrets,
-        ),
+    await pumpLocalized(
+      tester,
+      AutoLoginScreen(
+        settingsStore: settingsStore,
+        secretStore: slowSecrets,
       ),
     );
-    await tester.pumpAndSettle();
 
     await tester.enterText(
       find.byKey(const Key('autologin-password')),

@@ -1,12 +1,13 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 
-const _statusOptions = <({int value, String label})>[
-  (value: 0, label: 'Normal'),
-  (value: 1, label: 'Busy'),
-  (value: 2, label: 'Mobile'),
-  (value: 4, label: 'Away'),
-  (value: 3, label: 'Drunk'),
+const _statusOptions = <({int value, String key})>[
+  (value: 0, key: 'autologin.statusNormal'),
+  (value: 1, key: 'autologin.statusBusy'),
+  (value: 2, key: 'autologin.statusMobile'),
+  (value: 4, key: 'autologin.statusAway'),
+  (value: 3, key: 'autologin.statusDrunk'),
 ];
 
 /// Settings UI for Auto Login (password via [SecretStore] only).
@@ -91,9 +92,9 @@ class _AutoLoginScreenState extends State<AutoLoginScreen> {
         _password.clear();
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          key: Key('autologin-snackbar'),
-          content: Text('Auto Login settings saved'),
+        SnackBar(
+          key: const Key('autologin-snackbar'),
+          content: Text('autologin.saved'.tr()),
         ),
       );
     } catch (e) {
@@ -102,7 +103,7 @@ class _AutoLoginScreenState extends State<AutoLoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           key: const Key('autologin-snackbar-error'),
-          content: Text('Save failed: $e'),
+          content: Text('autologin.saveFailed'.tr(args: ['$e'])),
         ),
       );
     }
@@ -121,7 +122,7 @@ class _AutoLoginScreenState extends State<AutoLoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: const Key('autologin-screen'),
-      appBar: AppBar(title: const Text('Auto Login')),
+      appBar: AppBar(title: Text('autologin.title'.tr())),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
@@ -129,10 +130,8 @@ class _AutoLoginScreenState extends State<AutoLoginScreen> {
               children: [
                 SwitchListTile(
                   key: const Key('autologin-enabled'),
-                  title: const Text('Enabled'),
-                  subtitle: const Text(
-                    'POST login via TimedFetch when the login page appears',
-                  ),
+                  title: Text('autologin.enabled'.tr()),
+                  subtitle: Text('autologin.enabledSubtitle'.tr()),
                   value: _enabled,
                   onChanged: _saving
                       ? null
@@ -143,9 +142,9 @@ class _AutoLoginScreenState extends State<AutoLoginScreen> {
                   key: const Key('autologin-username'),
                   controller: _username,
                   enabled: !_saving,
-                  decoration: const InputDecoration(
-                    labelText: 'Username',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: 'autologin.username'.tr(),
+                    border: const OutlineInputBorder(),
                   ),
                   autocorrect: false,
                   enableSuggestions: false,
@@ -157,15 +156,15 @@ class _AutoLoginScreenState extends State<AutoLoginScreen> {
                   enabled: !_saving,
                   obscureText: true,
                   decoration: InputDecoration(
-                    labelText: 'Password',
+                    labelText: 'autologin.password'.tr(),
                     helperText: _hasStoredPassword
-                        ? 'Leave blank to keep the stored password'
-                        : 'Required for Auto Login',
+                        ? 'autologin.passwordKeep'.tr()
+                        : 'autologin.passwordRequired'.tr(),
                     border: const OutlineInputBorder(),
                     suffixIcon: _hasStoredPassword
                         ? IconButton(
                             key: const Key('autologin-clear-password'),
-                            tooltip: 'Clear stored password',
+                            tooltip: 'autologin.clearPassword'.tr(),
                             onPressed: _saving ? null : _clearPassword,
                             icon: const Icon(Icons.clear),
                           )
@@ -179,17 +178,17 @@ class _AutoLoginScreenState extends State<AutoLoginScreen> {
                   key: const Key('autologin-character'),
                   controller: _character,
                   enabled: !_saving,
-                  decoration: const InputDecoration(
-                    labelText: 'Character name',
-                    helperText: 'Must match Choose / Escolher button label',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: 'autologin.character'.tr(),
+                    helperText: 'autologin.characterHelp'.tr(),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 12),
                 InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Status',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: 'autologin.status'.tr(),
+                    border: const OutlineInputBorder(),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<int>(
@@ -201,7 +200,7 @@ class _AutoLoginScreenState extends State<AutoLoginScreen> {
                           DropdownMenuItem(
                             key: Key('autologin-status-${opt.value}'),
                             value: opt.value,
-                            child: Text(opt.label),
+                            child: Text(opt.key.tr()),
                           ),
                       ],
                       onChanged: _saving
@@ -222,7 +221,7 @@ class _AutoLoginScreenState extends State<AutoLoginScreen> {
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Save'),
+                      : Text('common.save'.tr()),
                 ),
               ],
             ),
