@@ -20,7 +20,7 @@ New features, bug fixes with any ambiguity, or changes touching more than one pa
 
 ## Specialist agents — use them for their area, don't freelance
 
-Five domain-specialist agents exist for this repo, defined at `.agents/agents/*.md` (Cursor) and mirrored at `.claude/agents/popmundo-greasemonkey.md` for Claude Code's Agent tool. **Whenever a change falls inside one of their areas, invoke that agent instead of editing directly** — each one carries a file-ownership list, non-negotiable rules, and lessons from past mistakes that aren't otherwise obvious from the code alone.
+Six domain-specialist agents exist for this repo, defined at `.agents/agents/*.md` (Cursor) and mirrored under `.claude/agents/` for Claude Code's Agent tool. **Whenever a change falls inside one of their areas, invoke that agent instead of editing directly** — each one carries a file-ownership list, non-negotiable rules, and lessons from past mistakes that aren't otherwise obvious from the code alone.
 
 | Agent | Area | Touch it when |
 | ----- | ---- | -------------- |
@@ -29,6 +29,7 @@ Five domain-specialist agents exist for this repo, defined at `.agents/agents/*.
 | `popmundo-app-shell` | Composition root + shell UI: `main.dart`, `app.dart`, debug overlay, Android manifest / iOS `Info.plist` | Editing `apps/popmundo_app`, outside the userscript-GM subtree |
 | `popmundo-domain` | Popmundo's own game rules: load-balanced hostnames, DOM selectors, webservice endpoints, the GPL port from Popmundo-Utils `common/` | Selectors, endpoints, throttle behavior, or porting more of the upstream extension |
 | `popmundo-greasemonkey` | The `GM_*`/`GM.*` (Greasemonkey/Tampermonkey) polyfill layer: `@grant` parsing, `UserScriptGmShim`, `GmValueStore`, navigation-time snapshot refresh | Any `GM_*`/`GM.*` implementation or maintenance, spanning both `popmundo_utils` and `popmundo_webview` |
+| `popmundo-e2e` | The device-real test tier: `integration_test/` + Patrol, `androidTest` bootstrap, instrumentation config. Carries the one-`patrolTest`-per-file rule, the "agent session can't run Gradle" split, and the mutation-proof requirement | Writing or debugging anything under `apps/popmundo_app/integration_test/`, or a request to test something "for real on the device" (foreground service, Keystore, prefs channel, real sockets) |
 
 Read the target agent's file-ownership list and rules before editing — don't just skim this table. When a change spans two areas (e.g. a new `GM_*` function that also needs a new domain selector), invoke both agents rather than having one agent freelance outside its own file list.
 
