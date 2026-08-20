@@ -125,13 +125,13 @@ Every ambiguity is resolved or recorded here — nothing is left silently unclea
 
 **Acceptance Criteria**:
 
-1. WHEN `div.idHolder` exists in the page THEN `Utils.getMyID` SHALL return that integer; WHEN it is missing THEN it SHALL return `0`.
-2. WHEN the character name node `#ppm-content > div.box.ofauto.charPresBox > h2` exists THEN `Utils.getMyName` SHALL return its text; otherwise `''`.
+1. WHEN TimedFetch GET `/World/Popmundo.aspx/Character` (sticky host, default cache) HTML contains `div.idHolder` THEN `Utils.getMyID` SHALL return that integer; WHEN it is missing or the fetch fails THEN it SHALL return `0`.
+2. WHEN that same HTML contains `#ppm-content > div.box.ofauto.charPresBox > h2` THEN `Utils.getMyName` SHALL return its text; otherwise `''`. A later `getMyID`/`getMyName`/`getMyCharDetails` SHALL reuse the TimedFetch `METHOD:URL` cache (no second network GET).
 3. WHEN `Notifications.createNotification` is called with level `success`|`error`|`normal` THEN the system SHALL create a notification div under `#notifications` with the corresponding CSS class; WHEN the container is missing THEN it SHALL not throw from Dart (result indicates failure).
 4. WHEN `getPageNotifications` runs THEN it SHALL POST JSON `{ ts: "<millis>" }` to `/WebServices/A/Open.asmx/GetPageNotifications` via TimedFetch (`useCache: false`) on the current host.
 5. WHEN `CssSelectorHelper.getSingle` / `getAll` are called THEN they SHALL run `querySelector` / `querySelectorAll` in page context and return serializable results (tag, id, class, text truncated).
 
-**Independent Test**: Fake runtime returning fixture JSON/DOM scrape maps.
+**Independent Test**: Fake runtime returning Character-page HTML fixtures via TimedFetch.
 
 ---
 

@@ -67,7 +67,7 @@ graph TD
 | ------ | ---- | -------------------- |
 | **Porta/Adapter** | `PopmundoRuntime` vs. `InAppPopmundoRuntime`; `CookieSink`/`CookieSource` vs. `InAppCookieSink`; `SecretStore` vs. `FlutterSecureSecretStore`; `KeyValueStore` vs. `SharedPreferencesStore` / `MemoryKeyValueStore`; `UserScriptWebViewPort` vs. `InAppUserScriptWebViewPort`; `BackgroundPlatform` vs. `FlutterForegroundTaskPlatform`; `NotificationService` vs. `LocalNotificationsService` / `FakeNotificationService` | Contratos em `popmundo_utils` (e `background_platform.dart`/`notifications/notification_service.dart` no app); implementações no adapter/app |
 | **Composition root** | `apps/popmundo_app/lib/main.dart` monta runtime, store, keepalive e `EasyLocalization`; `PopmundoHome` monta catalog, TimedFetch, AutoLogin, GM host | Nenhum outro ponto instancia `InAppPopmundoRuntime()` |
-| **Facade** | `Utils`, `Notifications`, `Scoring`, `CssSelectorHelper`, `XPathHelper` — `runtime.evaluate('window.__popmundo.<fn>(...)')` | `packages/popmundo_utils/lib/src/{utils,notifications,scoring,css_selector}.dart` |
+| **Facade** | `Notifications` / `Scoring` / `CssSelectorHelper` / `XPathHelper` — `runtime.evaluate('window.__popmundo.<fn>(...)')`; `Utils.getMyID`/`getMyName` — TimedFetch GET `/World/Popmundo.aspx/Character` + parse HTML | `packages/popmundo_utils/lib/src/{utils,notifications,scoring,css_selector}.dart` |
 | **Event Bus** | `PopmundoEventBus` com streams `network`, `console`, `navigation`, `gmValue`, `gmCall` | `packages/popmundo_utils/lib/src/events.dart` |
 | **Fila serial / rate limiter** | `TimedFetch` (in-page) e `AuthSession` (HTTP nativo do Auto Login) — delay padrão 750 ms | `timed_fetch.dart`, `auth_http.dart` |
 | **DI manual** | Construtores recebem portas explicitamente; sem framework de DI | Todo `popmundo_utils` e o composition root |
@@ -148,8 +148,10 @@ Navegação: callbacks nativos → `InAppPopmundoRuntime.onNativeNavigation` →
 ### 6.2 Dart → página (comandos)
 
 ```
-Utils / Notifications / Scoring / CssSelectorHelper
+Notifications / Scoring / CssSelectorHelper
   → runtime.evaluate('window.__popmundo.<fn>(...)')
+Utils.getMyID / getMyName / getMyCharDetails
+  → TimedFetch GET `/World/Popmundo.aspx/Character` (cache METHOD:URL) → parse `div.idHolder` / `#ppm-content > div.box.ofauto.charPresBox > h2`
 TimedFetch / fetchInPage
   → callAsyncJavaScript → window.__popmundo.fetch (fetch real na página)
 GM host reply
@@ -225,7 +227,7 @@ DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
 | `POST /WebServices/A/Open.asmx/GetPageNotifications` | domínio | `notifications.dart` | Alta para a facade Notifications; **o Auto Login atual não chama este endpoint** (veredicto de escolha = path ainda em ChooseCharacter) |
 | `POST /WebServices/A/Open.asmx/GetMenuNotificationCount` (observado, nunca chamado pelo app) / `GetMenuNotifications` (chamado via `TimedFetch`) | domínio | `menu_notifications/` | Alta — `MenuNotificationsWatcher` reage ao `NetworkEvent` da própria contagem que o jogo já poll a sozinho; ao mudar, busca a lista e emite só itens novos (dedupe por `UID`, persistido via `KeyValueStore`) |
 | Formulário ASP.NET (`#aspnetForm`, `ucLogin`, ChooseCharacter `div.box > h2`) | domínio | `autologin/` | Alta — Auto Login |
-| Seletores DOM em `helpers.js` | domínio | `getMyID` / `getMyName` / Scoring | Alta — o time não controla o HTML do jogo |
+| Seletores DOM em `helpers.js` e no parse Dart de `/World/Popmundo.aspx/Character` | domínio | `Utils.getMyID` / `getMyName` / Scoring | Alta — o time não controla o HTML do jogo |
 
 `dart:io` em `popmundo_utils` está **confinado** a `auth_http_io.dart` (transporte real do handshake). O restante do Auto Login injeta `AuthHttpSend` nos testes.
 

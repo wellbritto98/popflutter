@@ -35,19 +35,13 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 | Gate Level | When to Use | Command |
 | ---------- | ----------- | ------- |
 | Quick | After config-only or Dart-only tasks | `cd apps/popmundo_app && flutter analyze lib test integration_test` |
-| **Pre-device (mandatory)** | **Before asking a human to run anything on the device** | `cd apps/popmundo_app && flutter analyze integration_test` — must report `No issues found!` |
+| **Pre-device (mandatory)** | **Before any device run** | `cd apps/popmundo_app && flutter analyze integration_test` — must report `No issues found!` |
 | Full | After any task that adds a device test | Quick, then Pre-device, then `cd apps/popmundo_app && patrol test --target integration_test/<file>.dart -d emulator-5554` |
 | Build | End of each phase | Quick, then `flutter test`, then `patrol test -d emulator-5554` (whole device suite) |
 
-### Environment split (learned during T2 — applies to every remaining device task)
+The agent **runs** `patrol test` and any Gradle/`flutter build` step itself. Do not hand a paste-ready command to the user as a substitute for execution.
 
-The agent session **cannot run any Gradle/Android build**: every JDK 17+ spawned there fails `Selector.open()` with `IOException: Unable to establish loopback connection` (`sun.nio.ch.UnixDomainSockets.connect0`), reproduced with a bare 5-line Java program outside Gradle and Patrol. A human terminal on the same machine (java 17.0.12) builds fine. So work splits:
-
-| Runs in the agent session | Requires a human terminal |
-| ------------------------- | ------------------------- |
-| `flutter analyze` (incl. `integration_test`), `flutter test`, `dart test`, all file edits, `git` | `patrol test`, `flutter build apk`, anything invoking Gradle |
-
-**The Pre-device gate is not optional.** T2's first device run was burned on two Dart compile errors (`expect` / `findsOneWidget` undefined — missing `package:flutter_test/flutter_test.dart` import) that `flutter analyze integration_test` catches locally in under 2s. Never spend a human round-trip on an error the analyzer can find for free.
+**The Pre-device gate is not optional.** T2's first device run was burned on two Dart compile errors (`expect` / `findsOneWidget` undefined — missing `package:flutter_test/flutter_test.dart` import) that `flutter analyze integration_test` catches locally in under 2s. Never spend a device cycle on an error the analyzer can find for free.
 
 > **Analyze scoping note:** `flutter analyze` on the whole package already exits 1 today on a pre-existing `info` (`unnecessary_brace_in_string_interps`) at `test/userscripts_screen_test.dart:198` — recorded as Fix 3 in the previous feature's `validation.md`. It is not this feature's to fix. Gates treat that specific pre-existing info as known; any **new** analyze issue in changed paths fails the gate.
 

@@ -27,15 +27,16 @@ Você existe para que essa classe de bug falhe num teste. Se um teste seu nunca 
 
 5. **Todo teste limpa o que cria.** `addTearDown` para chaves de storage, `close(force: true)` para servidores, `stopKeepaliveService()` para o FGS. `clearPackageData=true` ajuda, mas não conte com ele.
 
-## Restrição de ambiente
+## Execução — o agente roda o Patrol
 
-A sessão de agente **não roda Gradle**. Qualquer JDK 17+ aqui falha em `Selector.open()` com `IOException: Unable to establish loopback connection` (`sun.nio.ch.UnixDomainSockets.connect0`) — reproduzido com um programa Java de 5 linhas, fora do Gradle e do Patrol. Um terminal humano na mesma máquina (java 17.0.12) constrói normalmente.
+O agente **executa** `patrol test`, `flutter build apk` e qualquer passo Gradle. Não entregue um comando para o usuário colar no lugar de rodar. Uma falha ambiental pontual é um incidente para diagnosticar e retry — não vira política de “isso é trabalho do humano”.
 
-| Você faz sozinho | Precisa de terminal humano |
-| --- | --- |
-| escrever/editar testes, `flutter analyze`, `flutter test`, `dart test`, `git`, ler XML de resultado e `adb logcat` | `patrol test`, `flutter build apk`, qualquer coisa com Gradle |
+Sequência obrigatória:
 
-Então: leve o código até `analyze` limpo, entregue **um** comando pronto pra colar, e diagnostique o resultado pelos artefatos. Não peça execução sem ter passado o gate local.
+1. `cd apps/popmundo_app && flutter analyze integration_test` — tem que estar limpo.
+2. `flutter devices` — pegue um device-id online.
+3. `cd apps/popmundo_app && patrol test --target integration_test/<file>.dart -d <device-id>`
+4. Se falhar: leia o XML em `apps/popmundo_app/build/app/outputs/androidTest-results/connected/debug/*.xml` e rode `adb logcat` você mesmo.
 
 ## Diagnóstico — leia isto antes de teorizar
 
@@ -47,7 +48,7 @@ apps/popmundo_app/build/app/outputs/androidTest-results/connected/debug/*.xml
 
 Fluxo quando algo falha:
 1. Leia o XML (contagem real, nome da classe, stack de cada falha).
-2. `adb logcat` — peça pra rodar com `adb logcat -c` antes e `adb logcat -d > arquivo` depois, e leia o arquivo.
+2. Rode `adb logcat -c` antes da execução e `adb logcat -d > arquivo` depois; leia o arquivo.
 3. Se o erro vem do Patrol ou de outra dependência, **busque issues conhecidas na web ANTES de teorizar sobre o nosso código.** Nesta feature, duas hipóteses plausíveis (`clearPackageData`; "o FGS sobrevive demais e impede o restart") custaram três execuções do usuário — e o sintoma era o título literal de uma issue aberta.
 4. Para saber se uma API existe, leia a **fonte do pacote instalado** em `~/AppData/Local/Pub/Cache/hosted/pub.dev/<pkg>-<versão>/`, não a documentação. Os docs do Patrol afirmam que não existe leitor de notificações; `getNotifications()` existe em `native_automator.dart:205`.
 

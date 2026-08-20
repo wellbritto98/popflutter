@@ -15,7 +15,7 @@ Rodar **na página**. Não decide política de interceptação (observe-only é 
 | Arquivo | Função |
 | ------- | ------ |
 | `hooks.js` | Wrap `fetch`/`XMLHttpRequest`/`console.*`; fila até `flutterInAppWebViewPlatformReady`; `callHandler('popmundo')`; `__popmundo.fetch`; `__popmundo.gmReply` (menuClick, notificationClick, callbacks XHR) |
-| `helpers.js` | `getMyID` (`div.idHolder`), `getMyName` (h2 char box), `createNotification` (`#notifications`), `querySingle`/`queryAll`/`xpathSingle`, `applyScoringNumbers` / `applyBarPercentage` |
+| `helpers.js` | `getMyID` / `getMyName` (scrape da página atual; a facade Dart `Utils` usa TimedFetch da Character page, não estes), `createNotification` (`#notifications`), `querySingle`/`queryAll`/`xpathSingle`, `applyScoringNumbers` / `applyBarPercentage` |
 
 `user_scripts.dart`: hooks = `AT_DOCUMENT_START`, helpers = `AT_DOCUMENT_END`.
 

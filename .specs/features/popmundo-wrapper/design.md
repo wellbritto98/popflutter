@@ -128,7 +128,7 @@ graph TD
 
 - **Purpose**: Facades Dart que `evaluate` JS injetado ou usam TimedFetch.
 - **Location**: `packages/popmundo_utils/lib/src/{utils,notifications,css_selector,scoring,logger}.dart`
-- **Interfaces**: métodos alinhados ao spec (getMyID, getMyName, getServerLink, createNotification, getPageNotifications, applyScoringNumbers não auto-chamado)
+- **Interfaces**: métodos alinhados ao spec (`getMyID`/`getMyName` via TimedFetch GET `/World/Popmundo.aspx/Character` + parse HTML, getServerLink, createNotification, getPageNotifications, applyScoringNumbers não auto-chamado)
 - **Dependencies**: Runtime, TimedFetch, Storage
 - **Reuses**: seletores e endpoints do `common/`
 

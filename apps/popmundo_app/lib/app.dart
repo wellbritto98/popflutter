@@ -141,7 +141,7 @@ class _PopmundoHomeState extends State<PopmundoHome>
       ? null
       : MenuNotificationsBridge(
           watcher: menuNotificationsWatcher,
-          utils: Utils(widget.runtime),
+          utils: Utils(widget.runtime, timedFetch),
           notificationService: widget.notificationService!,
         );
 

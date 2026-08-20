@@ -551,17 +551,17 @@
       "text": "Agent sandbox sessions on this machine cannot complete patrol test's Gradle build step (java.io.IOException: Unable to establish loopback connection, JDK17+ restriction); device-real Patrol runs must be executed from the user's own terminal, not delegated to an agent.",
       "signal": "gate_fail",
       "scope": "apps/popmundo_app/integration_test",
-      "status": "candidate",
+      "status": "quarantined",
       "features": [
         "local-notifications"
       ],
       "recurrence": 1,
-      "harmful": 0,
+      "harmful": 2,
       "evidence": [
         "patrol test --target integration_test/notifications_test.dart (apps/popmundo_app/integration_test)"
       ],
       "created": "2026-08-20T00:25:24Z",
-      "last_seen": "2026-08-20T00:25:24Z"
+      "last_seen": "2026-08-20T01:06:18Z"
     },
     {
       "id": "L-032",

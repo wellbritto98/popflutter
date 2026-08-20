@@ -24,7 +24,7 @@ Responda em ptbr.
 
 - URL inicial `https://www.popmundo.com`. Load balancing por hostname (`73.popmundo.com`, etc.). Helpers usam o **host atual** (`getServerLink` / `HostTracker`), nunca `www` fixo depois do redirect.
 - O jogo **throttla e desloga**. Qualquer fetch auxiliar passa por TimedFetch (750 ms, serial). Isso é regra de domínio, implementação em utils.
-- Personagem: `div.idHolder` → id; `#ppm-content > div.box.ofauto.charPresBox > h2` → nome; ausente/não numérico → `0` / `''`.
+- Personagem: GET `/World/Popmundo.aspx/Character` (TimedFetch, cache ligado); `div.idHolder` → id; `#ppm-content > div.box.ofauto.charPresBox > h2` → nome; ausente/não numérico/fetch falho → `0` / `''`. Não scrapar a página atual — `charPresBox` só existe em algumas rotas e no perfil alheio não é o personagem logado.
 - Notifications: container `#notifications`; POST `/WebServices/A/Open.asmx/GetPageNotifications` com JSON `{ ts }` e `useCache: false`. Status `0` normal, `1` success, resto error.
 - Links fora de `popmundo.com` / `*.popmundo.com` abrem no browser do SO; não trocam a origem sticky.
 - **Fora de escopo:** mass interact, call friends, autograph, mutar request/response, e2e contra o site ao vivo, stores.

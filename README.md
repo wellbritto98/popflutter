@@ -48,7 +48,7 @@ Um FAB (`menu-toggle`) abre o sidebar. Itens fixos vêm de `buildAppMenuItems` (
 ```dart
 final runtime = InAppPopmundoRuntime(); // só no composition root
 final timed = TimedFetch(runtime);
-final id = await Utils(runtime).getMyID();
+final id = await Utils(runtime, timed).getMyID();
 ```
 
 Scoring **não** roda no load. Storage: `KeyValueStore` (`MemoryKeyValueStore` nos testes, `SharedPreferencesStore` no app). Senha de Auto Login: `SecretStore` / `flutter_secure_storage`.

@@ -19,7 +19,7 @@ Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testáv
 | Política | `src/observe_policy.dart` | `allowInWebView` / `openExternal`; `observeOnlyResourceResponse()` = `null` |
 | Eventos | `src/events.dart` | `network`, `console`, `navigation`, `gmValue`, `gmCall`; `BodyCapture` 32 KiB |
 | Fetch | `src/timed_fetch.dart` | Fila serial, 750 ms, cache `METHOD:URL`, non-2xx → `TimedFetchException` |
-| Facades | `utils`, `notifications`, `css_selector`, `scoring` | DOM/`__popmundo.*`; Scoring `autoApplyOnLoad = false` |
+| Facades | `utils`, `notifications`, `css_selector`, `scoring` | `Utils.getMyID`/`getMyName` via TimedFetch+HTML; demais DOM/`__popmundo.*`; Scoring `autoApplyOnLoad = false` |
 | Menu notifications | `src/menu_notifications/` | `MenuNotificationsWatcher` observa o `NetworkEvent` de `GetMenuNotificationCount` (o jogo já poll sozinho); ao mudar, busca `GetMenuNotifications` via `TimedFetch`, faz parse em `MenuNotification` e emite só itens novos, deduplicados por `UID` e persistidos via `MenuNotificationStateStore`/`KeyValueStore` |
 | Storage | `src/storage.dart`, `src/secret_store.dart` | `KeyValueStore` + `MemoryKeyValueStore`; `SecretStore` + `MemorySecretStore`; `StorageService` |
 | Logger | `src/logger.dart` | Ring buffer 200 (`warn`/`error`) |
@@ -65,7 +65,7 @@ Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testáv
 
 - `StorageService.toggleExclusion` faz `int.parse(myCharKey)` sem `try` (`storage.dart`).
 - `Notifications.parsePageNotifications` falha silenciosamente para notificação vazia se o JSON ASP.NET mudar. O Auto Login **não** usa este endpoint (veredicto = path ChooseCharacter).
-- Facades DOM dependem de seletores em `helpers.js` (fora deste pacote).
+- `Utils.getMyID`/`getMyName` parseiam o HTML de `/World/Popmundo.aspx/Character` (TimedFetch com cache). Os helpers JS equivalentes em `helpers.js` continuam só para eval na página atual.
 - `test_live/` acessa o site real se o arquivo for passado ao `dart test`; o glob padrão **não** inclui essa pasta. Credenciais: `POPMUNDO_*`. Ver [test_live/README.md](test_live/README.md).
 - Testes em `test/` (29 arquivos, inclusive `fake_runtime.dart`). Gate: `dart test` neste pacote.
 
