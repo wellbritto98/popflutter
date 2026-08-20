@@ -65,3 +65,24 @@ flutter analyze packages/popmundo_utils && flutter analyze packages/popmundo_web
 Handoff, confirmed 3×), so Patrol and a real `flutter run` smoke stay with the user. The device tier
 is structurally unaffected — under Patrol the test file is the Dart entrypoint, so `main.dart` never
 runs and `AppWiring` is never constructed.
+
+## Execution record
+
+All tasks committed on `claude/project-architecture-scaling-530c6e`. Range `4ec5f50..HEAD`.
+
+| # | Status | Commit |
+| - | ------ | ------ |
+| — | ✅ T0 — **pre-existing breakage**, not part of this feature: `4ec5f50` left `menu_notifications_bridge_test.dart` calling `Utils(runtime)` with 1 of 2 args and stubbing `evaluateHandler` for a name that now comes from `TimedFetch`+HTML. The app did not analyze and 2 tests failed on HEAD. Fixed with zero assertion changes; mutation-verified | `1ebf55b` |
+| 1 | ✅ | `79afb10` |
+| 2 | ✅ | `bcffa2d` |
+| 3 | ✅ | `0449965` |
+| 4 | ✅ | `25d3e89` |
+| 5 | ✅ | `ee5c55a` |
+| 6 | ✅ — CRS-03 missed (216 LOC vs ≤180), recorded in `spec.md` | `891b9db` |
+| 7 | ✅ — 2 mutants injected and killed, both reverted | `e66dade` |
+| 8 | ✅ — also fixed the root `README.md`, which the doc surface below had missed | `d4ccd21` |
+
+Final gate: `flutter analyze` clean on all three packages **and** on `integration_test`;
+`dart test` 216 (utils), `flutter test` 31 (webview) and 111 (app, up from 95).
+
+Verifier: dispatched over `4ec5f50..HEAD`; report in `validation.md`.
