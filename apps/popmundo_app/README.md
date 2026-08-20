@@ -23,7 +23,7 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 | UserScripts UI | `lib/userscripts/` | [README](lib/userscripts/README.md) |
 | GM host | `lib/gm/` | [README](lib/gm/README.md) |
 | Keepalive | `lib/background/` | [README](lib/background/README.md) |
-| Notificações (debug) | `lib/notifications/` | `NotificationService`/`LocalNotificationsService`/`FakeNotificationService`; botão manual `debug-send-notification` no overlay |
+| Notificações | `lib/notifications/` | `NotificationService`/`LocalNotificationsService`/`FakeNotificationService` (`showNotification` genérico); botão manual `debug-send-notification` no overlay; `MenuNotificationsBridge` traduz `MenuNotificationsWatcher.newNotifications` (popmundo_utils) em notificações reais, uma por item novo do jogo, canal `popflutter_game_notifications_channel` |
 | Idioma | `lib/language/`, `lib/l10n.dart` | [README](lib/language/README.md) |
 | i18n assets | `assets/translations/{en,pt}.json` | Strings de release |
 | Patrol | `integration_test/` | [README](integration_test/README.md) |
@@ -53,6 +53,7 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 - **Navegação:** atualiza cookies do overlay e `gmMenuRegistry.clear()`.
 - **Lifecycle:** `didChangeAppLifecycleState` → keepalive.
 - **Notificação de teste:** `LocalNotificationsService().initialize()` roda antes do `runApp`; botão `debug-send-notification` pede permissão e mostra uma notificação fixa (id/canal fixos, negação/erro nunca derrubam o painel).
+- **Notificações do jogo:** `main.dart` chama `requestPermission()` logo após `initialize()` (não depende mais do painel de debug); `_PopmundoHomeState` inicia `menuNotificationsWatcher`/`menuNotificationsBridge` no `initState` e os finaliza no `dispose`. Cada lote novo de `MenuNotificationsWatcher` resolve `Utils.getMyName()` uma vez e chama `showNotification` por item (id = hash do `UID`, `Url` guardado como `payload` para uso futuro — tap ainda não navega).
 
 ## Arquivos críticos
 

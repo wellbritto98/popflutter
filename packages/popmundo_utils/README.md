@@ -20,6 +20,7 @@ Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testáv
 | Eventos | `src/events.dart` | `network`, `console`, `navigation`, `gmValue`, `gmCall`; `BodyCapture` 32 KiB |
 | Fetch | `src/timed_fetch.dart` | Fila serial, 750 ms, cache `METHOD:URL`, non-2xx → `TimedFetchException` |
 | Facades | `utils`, `notifications`, `css_selector`, `scoring` | DOM/`__popmundo.*`; Scoring `autoApplyOnLoad = false` |
+| Menu notifications | `src/menu_notifications/` | `MenuNotificationsWatcher` observa o `NetworkEvent` de `GetMenuNotificationCount` (o jogo já poll sozinho); ao mudar, busca `GetMenuNotifications` via `TimedFetch`, faz parse em `MenuNotification` e emite só itens novos, deduplicados por `UID` e persistidos via `MenuNotificationStateStore`/`KeyValueStore` |
 | Storage | `src/storage.dart`, `src/secret_store.dart` | `KeyValueStore` + `MemoryKeyValueStore`; `SecretStore` + `MemorySecretStore`; `StorageService` |
 | Logger | `src/logger.dart` | Ring buffer 200 (`warn`/`error`) |
 | Auto Login | `src/autologin/` | Ver [README do submódulo](lib/src/autologin/README.md) |
@@ -49,6 +50,7 @@ Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testáv
 - **TimedFetch:** enfileira, espera `delay` desde `_lastCall`, `waitUntilReady`, `fetchInPage`. Relativos resolvem no host atual.
 - **Auto Login:** ver submódulo; transporte injetável (`AuthHttpSend`) nos testes.
 - **GM values:** eventos `gmValue` aplicados em `GmValueStore` (o app assina o bus).
+- **Menu notifications:** `MenuNotificationsWatcher.start()` assina `events.network`; ao ver uma contagem diferente da persistida, chama `MenuNotificationsService.fetch()` (`TimedFetch`, `useCache: false`), difere `UID`s contra `MenuNotificationState.notifiedUids` e emite só os novos em `newNotifications`; persiste `{lastCount, notifiedUids}` só em caso de sucesso (falha não corrompe o estado — a próxima contagem diferente tenta de novo).
 
 ## Arquivos críticos
 
@@ -57,6 +59,7 @@ Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testáv
 - `src/events.dart` — forma dos eventos (webview + app).
 - `src/autologin/auto_login_controller.dart` — ciclo de sessão.
 - `src/userscript/userscript_parser.dart` — grants aceitos no import.
+- `src/menu_notifications/menu_notifications_watcher.dart` — mudar o filtro de URL/contagem quebra a detecção; `menu_notification_state_store.dart` guarda `lastCount`+`notifiedUids` num único blob (evita dessincronia entre save parcial).
 
 ## Observações técnicas e débitos
 
@@ -64,7 +67,7 @@ Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testáv
 - `Notifications.parsePageNotifications` falha silenciosamente para notificação vazia se o JSON ASP.NET mudar. O Auto Login **não** usa este endpoint (veredicto = path ChooseCharacter).
 - Facades DOM dependem de seletores em `helpers.js` (fora deste pacote).
 - `test_live/` acessa o site real se o arquivo for passado ao `dart test`; o glob padrão **não** inclui essa pasta. Credenciais: `POPMUNDO_*`. Ver [test_live/README.md](test_live/README.md).
-- Testes em `test/` (24 arquivos, inclusive `fake_runtime.dart`). Gate: `dart test` neste pacote.
+- Testes em `test/` (29 arquivos, inclusive `fake_runtime.dart`). Gate: `dart test` neste pacote.
 
 ## Testes
 

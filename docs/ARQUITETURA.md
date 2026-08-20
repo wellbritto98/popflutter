@@ -218,11 +218,12 @@ DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
 | `shared_preferences: ^2.5.3` | pub.dev | app | Média — `KeyValueStore` de produção |
 | `flutter_secure_storage: ^9.2.4` | pub.dev | app | Alta para Auto Login — senha |
 | `flutter_foreground_task: ^11.0.0` | pub.dev | app | Alta para keepalive Android (`dataSync`, `stopWithTask=false`) |
-| `flutter_local_notifications: ^22.3.0` | pub.dev | app | Média — só o botão de teste do debug overlay (`LocalNotificationsService`); nenhum outro código importa o plugin |
+| `flutter_local_notifications: ^22.3.0` | pub.dev | app | Média — botão de teste do debug overlay e as notificações reais de `MenuNotificationsBridge` (`LocalNotificationsService`); nenhum outro código importa o plugin |
 | `easy_localization: ^3.0.8` | pub.dev | app | Média — strings de release da shell |
 | `url_launcher: ^6.3.1` | pub.dev | webview + app | Média — links externos e `GM.openInTab` |
 | `patrol: ^4.9.0` + `patrol_cli` | pub.dev / global | app `dev_dependencies` | Média — só o tier device-real |
 | `POST /WebServices/A/Open.asmx/GetPageNotifications` | domínio | `notifications.dart` | Alta para a facade Notifications; **o Auto Login atual não chama este endpoint** (veredicto de escolha = path ainda em ChooseCharacter) |
+| `POST /WebServices/A/Open.asmx/GetMenuNotificationCount` (observado, nunca chamado pelo app) / `GetMenuNotifications` (chamado via `TimedFetch`) | domínio | `menu_notifications/` | Alta — `MenuNotificationsWatcher` reage ao `NetworkEvent` da própria contagem que o jogo já poll a sozinho; ao mudar, busca a lista e emite só itens novos (dedupe por `UID`, persistido via `KeyValueStore`) |
 | Formulário ASP.NET (`#aspnetForm`, `ucLogin`, ChooseCharacter `div.box > h2`) | domínio | `autologin/` | Alta — Auto Login |
 | Seletores DOM em `helpers.js` | domínio | `getMyID` / `getMyName` / Scoring | Alta — o time não controla o HTML do jogo |
 
@@ -242,6 +243,8 @@ DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
 | `isInspectable: true` fixo | `web_settings.dart` | DevTools também em release | Nenhuma flag `kReleaseMode`. **Hipótese:** aceitável por ser ferramenta de desenvolvedor |
 | `StorageService.toggleExclusion` → `int.parse` | `storage.dart` | `FormatException` se a chave não for numérica | Sem validação no pacote |
 | `Notifications.parsePageNotifications` | `notifications.dart` | Backend muda → fallback silencioso para notificação vazia | Não usado pelo Auto Login atual |
+| `MenuNotificationsWatcher` reentrância | `menu_notifications/menu_notifications_watcher.dart` | Uma segunda mudança de contagem chegando enquanto um fetch está em voo é descartada, não enfileirada | Aceito — o jogo repoll a contagem sozinho, então o próximo poll recupera o estado real |
+| Hash GUID→int para id de notificação | `apps/popmundo_app/lib/notifications/menu_notifications_bridge.dart` | Colisão teórica entre dois `UID`s distintos (espaço de 31 bits) | Aceito — dedupe real depende do `Set<String>` persistido, não do hash |
 | GPL-3 herdada | repositório | Sem relicenciar enquanto houver código derivado | `LICENSE` / `NOTICE` |
 | Patrol: um teste Dart por processo | `integration_test/` | Segundo `patrolTest` no mesmo arquivo falha 500 | Um `patrolTest` por arquivo (AD-015) |
 | `test_live/` vs. política "sem e2e live" | `packages/popmundo_utils/test_live` | Suite opt-in **acessa** popmundo.com com credenciais de env; o `dart test` padrão **não** a inclui (`dart_test.yaml` globa só `test/`) | Não é CI; `.env` / `.envexample` não devem ser commitados com segredos. **Hipótese:** `.envexample` usa `TEST_*` enquanto o código lê `POPMUNDO_*` — nomes divergem |
