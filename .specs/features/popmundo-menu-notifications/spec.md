@@ -87,17 +87,17 @@ No P2/P3 stories — everything beyond this vertical slice is listed in Out of S
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| MENUNOTIF-01 | P1 | Tasks | Implementing — `dart test` |
-| MENUNOTIF-02 | P1 | Tasks | Implementing — `dart test` |
-| MENUNOTIF-03 | P1 | Tasks | Implementing — `dart test` |
-| MENUNOTIF-04 | P1 | Tasks | Implementing — `dart test` |
-| MENUNOTIF-05 | P1 | Tasks | Implementing — `dart test` |
-| MENUNOTIF-06 | P1 | Tasks | Implementing — `dart test` + `flutter test` |
-| MENUNOTIF-07 | P1 | Tasks | Implementing — `dart test` |
-| MENUNOTIF-08 | P1 | Tasks | Implementing — `dart test` |
-| MENUNOTIF-09 | P1 | Tasks | Implementing — `dart test` |
-| MENUNOTIF-10 | P1 | Tasks | Implementing — wired, no automated test (see spec Independent Test); manual smoke pending |
-| MENUNOTIF-11 | P1 | Tasks | Implementing — `dart test` |
+| MENUNOTIF-01 | P1 | Verified | Verified — `dart test`, mutation-proof (network-event filter) |
+| MENUNOTIF-02 | P1 | Verified | Verified — `dart test` |
+| MENUNOTIF-03 | P1 | Verified | Verified — `dart test` |
+| MENUNOTIF-04 | P1 | Verified | Verified — `dart test`, mutation-proof (`useCache:false` flip killed by tests) |
+| MENUNOTIF-05 | P1 | Verified | Verified — `dart test`, mutation-proof (double-decode removal killed by tests); PascalCase key casing cross-checked against real code |
+| MENUNOTIF-06 | P1 | Verified | Verified — `dart test` + `flutter test` (repeat-batch no-duplicate case included) |
+| MENUNOTIF-07 | P1 | Verified | Verified — `dart test` |
+| MENUNOTIF-08 | P1 | Verified | Verified — `dart test`, mutation-proof (persist-on-failure bug killed by tests) |
+| MENUNOTIF-09 | P1 | Verified | Verified — `dart test`, mutation-proof (UID-pruning bypass killed by tests) |
+| MENUNOTIF-10 | P1 | Implementing | Wired (`main.dart` calls `requestPermission()` after `initialize()`); no automated test exists — Verifier-accepted documented gap, manual smoke test still pending (see validation.md) |
+| MENUNOTIF-11 | P1 | Verified | Verified — `dart test` |
 
 **ID format:** `MENUNOTIF-NN`
 
