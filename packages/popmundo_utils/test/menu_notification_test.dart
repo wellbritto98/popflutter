@@ -1,6 +1,4 @@
-// Imported directly (not via the barrel yet) — the barrel export lands in
-// task 5, and this file switches to it then, matching the rest of test/.
-import 'package:popmundo_utils/src/menu_notifications/menu_notification.dart';
+import 'package:popmundo_utils/popmundo_utils.dart';
 import 'package:test/test.dart';
 
 void main() {
