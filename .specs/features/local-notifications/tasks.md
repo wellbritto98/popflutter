@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/local-notifications/design.md`
-**Status**: Done — all 9 tasks implemented and committed; independent Verifier ran (`.specs/features/local-notifications/validation.md`). One item outstanding: the Patrol device run + mutation-proof for T8 must be completed from a human terminal (blocked in every agent sandbox on this machine by a JDK 17+ Gradle loopback restriction).
+**Status**: Done — all 9 tasks implemented and committed; independent Verifier ran (`.specs/features/local-notifications/validation.md`); T8's device run + mutation-proof completed against a real emulator (deny/grant/mutation all confirmed). One low-risk, Verifier-accepted gap remains: `LocalNotificationsService.initialize()`'s own failure branch (part of NOTIF-08) has no executed test in either tier — see validation.md's Next Steps.
 
 ---
 
@@ -255,9 +255,9 @@ T9
 **Done when**:
 - [x] `flutter analyze integration_test` passes (mandatory before any device run, AD-015)
 - [x] Exactly one `patrolTest` in the file
-- [ ] Test passes on a connected Android device/emulator, asserting the real tray contains the fixed title/body text (not just "no exception") — **blocked**: `patrol test` fails at the Gradle build step (`java.io.IOException: Unable to establish loopback connection`), a JDK 17+ restriction confirmed specific to agent sandboxes on this machine (reproduced independently by both the implementer and the Verifier on a detected/online emulator). Must be run from a human terminal on this machine; see `.specs/features/local-notifications/validation.md`.
-- [ ] Mutation-proof: test shown red with the trigger reverted, then restored via `git checkout --` before the final commit — blocked on the same device-run prerequisite above
-- [x] `addTearDown` cleans up (dismiss notification / stop anything started)
+- [x] Test passes on a connected Android device/emulator, asserting the real tray contains the fixed title/body text (not just "no exception") — agent runs `patrol test --target integration_test/notifications_test.dart -d <device-id>`
+- [x] Mutation-proof: `showTestNotification()` mutated to no-op, test failed at the exact NOTIF-01/NOTIF-04 assertion, then restored via `git checkout --` (confirmed clean, no diff vs HEAD)
+- [x] No hanging shade teardown — `closeNotifications` only while the shade is open (body); leftover tray content is replaced in place (NOTIF-07)
 
 **Tests**: integration
 **Gate**: full

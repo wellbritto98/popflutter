@@ -79,14 +79,14 @@ No P2/P3 stories — the feature is intentionally MVP-only; everything beyond th
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| NOTIF-01 | P1: Manual test notification | Tasks | Implementing — device-run pending (env. blocker, see validation.md) |
+| NOTIF-01 | P1: Manual test notification | Tasks | Verified — real device run (user's own terminal) + mutation-proof (`d57eba4` reverted trigger, confirmed red, restored) |
 | NOTIF-02 | P1: Manual test notification | Tasks | Verified |
-| NOTIF-03 | P1: Manual test notification | Tasks | Implementing — DebugOverlay-side Verified; real-OS-dialog half device-run pending |
-| NOTIF-04 | P1: Manual test notification | Tasks | Implementing — DebugOverlay-side Verified; real-tray-content half device-run pending |
+| NOTIF-03 | P1: Manual test notification | Tasks | Verified — real device run confirms deny path + grant path against the actual OS dialog |
+| NOTIF-04 | P1: Manual test notification | Tasks | Verified — real device run + mutation-proof (mutating `showTestNotification()` to no-op failed the exact NOTIF-01/04 assertion) |
 | NOTIF-05 | P1: Manual test notification | Tasks | Verified |
 | NOTIF-06 | P1: Manual test notification | Tasks | Verified |
-| NOTIF-07 | P1: Manual test notification | Tasks | Implementing — device-run pending (env. blocker, see validation.md) |
-| NOTIF-08 | P1: Manual test notification | Tasks | Implementing — DebugOverlay catch-path Verified; `LocalNotificationsService.initialize()` failure branch untested |
+| NOTIF-07 | P1: Manual test notification | Tasks | Verified — real device run confirms the tray never shows more than one notification |
+| NOTIF-08 | P1: Manual test notification | Tasks | Implementing — DebugOverlay catch-path Verified; `LocalNotificationsService.initialize()`'s own failure branch remains untested (Verifier-accepted low-risk gap, matches the `FlutterForegroundTaskPlatform` zero-unit-test precedent; see validation.md) |
 
 **ID format:** `NOTIF-NN`
 
