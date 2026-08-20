@@ -2,6 +2,21 @@ import 'dart:async';
 
 import 'notification_service.dart';
 
+/// One recorded call to [FakeNotificationService.showNotification].
+class ShownNotification {
+  const ShownNotification({
+    required this.id,
+    required this.title,
+    required this.body,
+    this.payload,
+  });
+
+  final int id;
+  final String title;
+  final String body;
+  final String? payload;
+}
+
 /// Test double for [NotificationService]. Records call counts and lets a
 /// test configure denial, init failure, and an in-flight delay — never a
 /// real OS notification or permission dialog.
@@ -26,6 +41,9 @@ class FakeNotificationService implements NotificationService {
   int requestPermissionCalls = 0;
   int showCalls = 0;
 
+  /// Every [showNotification] call, in order.
+  final List<ShownNotification> shownNotifications = [];
+
   @override
   Future<void> initialize() async {
     initializeCalls++;
@@ -48,5 +66,17 @@ class FakeNotificationService implements NotificationService {
       await Future<void>.delayed(delay);
     }
     showCalls++;
+  }
+
+  @override
+  Future<void> showNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    shownNotifications.add(
+      ShownNotification(id: id, title: title, body: body, payload: payload),
+    );
   }
 }

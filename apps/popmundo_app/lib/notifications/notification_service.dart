@@ -16,4 +16,15 @@ abstract class NotificationService {
 
   /// Shows the fixed test notification using a fixed channel/notification id.
   Future<void> showTestNotification();
+
+  /// Shows one notification for a game-observed event (e.g. a menu
+  /// notification). Caller supplies a stable [id] so repeat calls for the
+  /// same underlying item replace rather than stack; [payload] is opaque
+  /// data carried for a future tap-to-navigate feature, not acted on here.
+  Future<void> showNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  });
 }

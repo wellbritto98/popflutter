@@ -17,6 +17,14 @@ const kTestNotificationChannelDescription =
 const kTestNotificationTitle = 'Popflutter debug';
 const kTestNotificationBody = 'This is a test notification.';
 
+/// Channel for game-observed notifications (e.g. menu notifications),
+/// distinct from both `popmundo_keepalive` (foreground service) and
+/// [kTestNotificationChannelId] (debug MVP).
+const kGameNotificationChannelId = 'popflutter_game_notifications_channel';
+const kGameNotificationChannelName = 'Game notifications';
+const kGameNotificationChannelDescription =
+    'Notifications mirrored from in-game menu notifications.';
+
 /// Real [NotificationService] backed by `flutter_local_notifications`. The
 /// only class in the app that imports the plugin.
 class LocalNotificationsService implements NotificationService {
@@ -88,6 +96,31 @@ class LocalNotificationsService implements NotificationService {
       title: kTestNotificationTitle,
       body: kTestNotificationBody,
       notificationDetails: details,
+    );
+  }
+
+  @override
+  Future<void> showNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    if (!_initialized) return;
+    const androidDetails = AndroidNotificationDetails(
+      kGameNotificationChannelId,
+      kGameNotificationChannelName,
+      channelDescription: kGameNotificationChannelDescription,
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+    const details = NotificationDetails(android: androidDetails);
+    await _plugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: details,
+      payload: payload,
     );
   }
 }

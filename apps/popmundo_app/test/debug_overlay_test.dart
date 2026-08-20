@@ -22,6 +22,16 @@ class _ThrowingNotificationService implements NotificationService {
   Future<void> showTestNotification() async {
     throw Exception('boom');
   }
+
+  @override
+  Future<void> showNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    throw Exception('boom');
+  }
 }
 
 void main() {
