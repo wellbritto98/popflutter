@@ -17,8 +17,10 @@ Persistir settings não-secretos no `KeyValueStore` e a senha no `SecretStore`. 
 | `auto_login_screen.dart` | Form: toggle, username, password (obscure), character full name, ddlStatus, Save |
 | `secure_secret_store.dart` | `FlutterSecureStorage` (iOS `first_unlock`) |
 | `auto_login_messages.dart` | `autoLoginStatusMessage` → chaves `autologin.cycle.*` |
+| `auto_login_status_snackbar.dart` | `showAutoLoginStatusSnackBar(...)` — renderiza o snackbar a partir de `AutoLoginStatus` |
+| `auto_login_menu_item.dart` | `autoLoginMenuItem({required onTap})` — `AppMenuItem` desta feature, consumido em `app.dart`'s `items:` |
 
-Wiring: `PopmundoHome` cria um `InAppCookieSink()` compartilhado como `cookieSink` e `cookieSource`, `start()`, escuta `status`.
+Wiring: `AppWiring` (`app_wiring.dart`) cria um `InAppCookieSink()` compartilhado (`cookieJar`) como `cookieSink`/`cookieSource` do `AutoLoginController` e chama `start()`. `_PopmundoHomeState` (`app.dart`) assina `wiring.autoLoginStatus` (precisa de `BuildContext` para a cor do snackbar de erro) e chama `showAutoLoginStatusSnackBar`.
 
 ## Dependências
 

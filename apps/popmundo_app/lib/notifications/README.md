@@ -25,11 +25,11 @@ Init do plugin, permissão, exibição (teste fixo e genérica). Não decide *qu
 
 ## Relacionados
 
-`packages/popmundo_utils/lib/src/menu_notifications/` (watcher/service/state store que produzem os lotes); `DebugOverlay` (botão `debug-send-notification`, sempre em inglês por AD-014); `AppSidebar`/`app.dart` (wiring de `menuNotificationsWatcher`/`menuNotificationsBridge`).
+`packages/popmundo_utils/lib/src/menu_notifications/` (watcher/service/state store que produzem os lotes); `DebugOverlay` (botão `debug-send-notification`, sempre em inglês por AD-014); `AppWiring` (`app_wiring.dart`, wiring de `menuNotificationsWatcher`/`menuNotificationsBridge`).
 
 ## Pontos de entrada
 
-`main.dart`: `LocalNotificationsService().initialize()` seguido de `requestPermission()` antes de `runApp` — no *startup*, não atrás do painel de debug, porque a ponte de notificações do jogo não tem gatilho manual (MENUNOTIF-10). `_PopmundoHomeState` (`app.dart`) inicia `menuNotificationsWatcher`/`menuNotificationsBridge` no `initState` e finaliza ambos no `dispose`; a bridge só é construída se `widget.notificationService` não for nulo.
+`main.dart`: `LocalNotificationsService().initialize()` seguido de `requestPermission()` antes de `runApp` — no *startup*, não atrás do painel de debug, porque a ponte de notificações do jogo não tem gatilho manual (MENUNOTIF-10). `AppWiring.start()`/`dispose()` (`app_wiring.dart`) iniciam `menuNotificationsWatcher`/`menuNotificationsBridge` e finalizam ambos; a bridge só é construída se `notificationService` não for nulo.
 
 ## Observações e débitos
 

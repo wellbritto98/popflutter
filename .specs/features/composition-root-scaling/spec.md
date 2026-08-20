@@ -226,29 +226,29 @@ repo-wide grep.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| CRS-01 | P1: Composition root stops growing | Design | Pending |
-| CRS-02 | P1: Composition root stops growing | Design | Pending |
-| CRS-03 | P1: Composition root stops growing | Design | Pending |
-| CRS-04 | P1: Composition root stops growing | Design | Pending |
-| CRS-05 | P1: Composition root stops growing | Design | Pending |
-| CRS-06 | P1: Composition root stops growing | Design | Pending |
-| CRS-07 | P1: Composition root stops growing | Design | Pending |
-| CRS-08 | P1: Behavior-neutral | Design | Pending |
-| CRS-09 | P1: Behavior-neutral | Design | Pending |
-| CRS-10 | P1: Behavior-neutral | Design | Pending |
-| CRS-11 | P1: Behavior-neutral | Design | Pending |
-| CRS-12 | P1: Behavior-neutral | Design | Pending |
-| CRS-13 | P1: Behavior-neutral | Design | Pending |
-| CRS-14 | P2: Wiring becomes testable | Design | Pending |
-| CRS-15 | P2: Structural consistency | Design | Pending |
-| CRS-16 | P2: Structural consistency | Design | Pending |
-| CRS-17 | P2: Structural consistency | Design | Pending |
-| CRS-18 | P2: Structural consistency | Design | Pending |
+| CRS-01 | P1: Composition root stops growing | T6 | Implemented |
+| CRS-02 | P1: Composition root stops growing | T4 | Implemented |
+| CRS-03 | P1: Composition root stops growing | T6 | **MISSED** (216 vs ≤180) |
+| CRS-04 | P1: Composition root stops growing | T5 | Implemented |
+| CRS-05 | P1: Composition root stops growing | T4 | Partial (see note) |
+| CRS-06 | P1: Composition root stops growing | T4 | Implemented |
+| CRS-07 | P1: Composition root stops growing | T4 | Implemented |
+| CRS-08 | P1: Behavior-neutral | T6 | Implemented |
+| CRS-09 | P1: Behavior-neutral | T5,T7 | Implemented |
+| CRS-10 | P1: Behavior-neutral | T5,T7 | Implemented |
+| CRS-11 | P1: Behavior-neutral | T5,T7 | Implemented |
+| CRS-12 | P1: Behavior-neutral | T5,T7 | Implemented |
+| CRS-13 | P1: Behavior-neutral | T6 | Implemented |
+| CRS-14 | P2: Wiring becomes testable | T7 | Implemented |
+| CRS-15 | P2: Structural consistency | T3 | Implemented |
+| CRS-16 | P2: Structural consistency | T3 | Implemented |
+| CRS-17 | P2: Structural consistency | T1 | Implemented |
+| CRS-18 | P2: Structural consistency | T2 | Implemented |
 
 **ID format:** `CRS-[NUMBER]` (Composition Root Scaling). AC numbering in the stories above is
 1:1 with these IDs.
 
-**Coverage:** 18 total, 0 mapped to tasks yet, 0 unmapped ⚠️ (mapping happens in `tasks.md`).
+**Coverage:** 18 total, 18 mapped to tasks, 0 unmapped. 16 Implemented, 1 Partial (CRS-05), 1 **Missed** (CRS-03). Status becomes `Verified` only after the independent Verifier pass writes `validation.md`.
 
 ---
 

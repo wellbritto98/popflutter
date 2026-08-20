@@ -15,17 +15,17 @@ Responda em ptbr.
 
 ## Arquivos que você dono
 
-- `packages/popmundo_utils/lib/src/popmundo_runtime.dart`
-- `packages/popmundo_utils/lib/src/timed_fetch.dart`
-- `packages/popmundo_utils/lib/src/host_tracker.dart`
-- `packages/popmundo_utils/lib/src/observe_policy.dart`
-- `packages/popmundo_utils/lib/src/events.dart`
-- `packages/popmundo_utils/lib/src/notifications.dart`
-- `packages/popmundo_utils/lib/src/utils.dart`
-- `packages/popmundo_utils/lib/src/storage.dart`
-- `packages/popmundo_utils/lib/src/css_selector.dart`
-- `packages/popmundo_utils/lib/src/scoring.dart`
-- `packages/popmundo_utils/lib/src/logger.dart`
+- `packages/popmundo_utils/lib/src/core/popmundo_runtime.dart`
+- `packages/popmundo_utils/lib/src/core/timed_fetch.dart`
+- `packages/popmundo_utils/lib/src/core/host_tracker.dart`
+- `packages/popmundo_utils/lib/src/core/observe_policy.dart`
+- `packages/popmundo_utils/lib/src/core/events.dart`
+- `packages/popmundo_utils/lib/src/facades/notifications.dart`
+- `packages/popmundo_utils/lib/src/facades/utils.dart`
+- `packages/popmundo_utils/lib/src/core/storage.dart`
+- `packages/popmundo_utils/lib/src/facades/css_selector.dart`
+- `packages/popmundo_utils/lib/src/facades/scoring.dart`
+- `packages/popmundo_utils/lib/src/core/logger.dart`
 - `packages/popmundo_utils/test/` (inclui `fake_runtime.dart`)
 
 Arquivos preferencialmente com no máximo 200–300 linhas. Divida em vez de crescer um god-file.

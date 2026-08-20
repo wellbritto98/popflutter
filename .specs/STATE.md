@@ -165,12 +165,34 @@
 - **Date**: 2026-08-19
 - **Status**: active
 
+### AD-020
+
+- **Decision**: O composition root do `popmundo_app` é um objeto simples, `AppWiring` (`lib/app_wiring.dart`), construído em `main.dart` e passado inteiro para `PopmundoApp`/`PopmundoHome` (um único parâmetro `wiring`). `AppWiring` detém os 15 colaboradores e o ciclo `start()`/`dispose()`, não referencia `BuildContext`/`State`/`Navigator`/widget algum, e expõe estado observável como `ValueListenable` (`userscripts`, `cookieWatcher.cookies`) em vez de campos `setState`. `_PopmundoHomeState` fica só com o que é genuinamente widget: `WidgetsBindingObserver`, a assinatura de `autoLoginStatus` (precisa de `Theme.of(context)`), os `Navigator.push`/dialog, `_debugPanelVisible` e `build`. O `MaterialApp` permanece **textualmente** em `lib/app.dart`. Junto: (a) `buildAppMenuItems` deixa de conhecer as features — recebe a lista pronta e só preserva a ordem do chamador e anexa o item de debug por último quando o gate permite; cada feature possui o seu `AppMenuItem` na própria pasta; (b) `packages/popmundo_utils/lib/src` passa a ter zero arquivos soltos, em `core/` + `facades/` além das 3 slices existentes; (c) o `PopmundoScope` morto e a instância órfã de `StorageService` no app são removidos.
+- **Reason**: `app.dart` tinha 402 LOC (15% do `lib/` do app) e aparecia em praticamente todo commit de feature (19 de 136). Adicionar uma feature exigia edições em 7 pontos espalhados e obrigava um agente a carregar ~650 LOC só para descobrir onde plugar — custo que crescia O(n features). O gargalo era pontual: **não** faltava camada. A arquitetura macro (3 pacotes, ports & adapters, slices feature-first, DI manual, README por pasta) já é o que as convenções atuais recomendam, e a "domain layer" já existe como `popmundo_utils`. Efeito colateral relevante: a lógica de bootstrap/sync de userscripts/cookies estava presa dentro de um `State` e **não tinha teste unitário nenhum**; extraí-la a tornou testável (`test/app_wiring_test.dart`).
+- **Trade-off**: `build()` ficou mais verboso — três wrappers `ValueListenableBuilder`/`ListenableBuilder` mais o ramo de `keepalive` nulo custam ~55 linhas que a versão `setState` ganhava de graça lendo campos direto; por isso `app.dart` parou em 216 LOC e não nos ≤180 estimados (registrado como falha em `spec.md`, não retroajustado). Em troca, os rebuilds passaram a ser escopados — a WebView é passada como `child` de builder e não é mais reconstruída a cada cookie ou tick de background, o que o `setState` global fazia. Duas garantias que o `initState` dava de graça viraram explícitas em `AppWiring`: `start()` idempotente (`_started`) e recusa de escrita pós-`dispose` (`_disposed`). Os ports de cookie viraram injetáveis (default inalterado) porque `InAppCookieSink` constrói um `CookieManager` avidamente e impedia construir `AppWiring` sob `flutter test`. A ordem concreta do menu (`auto-login, userscripts, language`) deixou de ser testável sem montar a shell — delta aceito e registrado no `spec.md`.
+- **Supersedes**: a nota "PopmundoScope mantido por decisão / zero call sites" em `.specs/features/app-sidebar-menu/design.md` e a linha correspondente na tabela de código morto do `docs/ARQUITETURA.md`. Aqueles arquivos de execução histórica não são editados; o `spec.md` daquela feature nunca citou `PopmundoScope`, então não há `SPEC_DEVIATION` a marcar.
+- **Scope**: `popmundo_utils` (`lib/src/core/`, `lib/src/facades/`, barrel), `popmundo_app` (`main.dart`, `app.dart`, `app_wiring.dart`, `cookie_watcher.dart`, `menu/`, `autologin/`, `userscripts/`, `language/`, `notifications/README.md`)
+- **Date**: 2026-08-20
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: local-notifications (debug-panel test-notification button) / `.specs/features/local-notifications` — **DONE**
-- **Phase / Task**: Execute + Verifier complete, device-real proof + mutation-proof complete. `.specs/features/local-notifications/validation.md` has the full record.
-- **Completed**: T1-T9 committed, plus 3 follow-up fixes surfaced only by an actual on-device run: `a938592` (Android core library desugaring, required by `flutter_local_notifications`), `f9cb868`+`d57eba4` (fixed a hanging `notifications_test.dart` teardown). User ran `patrol test` from their own terminal (agent sandboxes on this machine cannot complete any Gradle build — confirmed independently 3 times, including a plain `flutter build apk --debug`) and it passed end-to-end. Mutation-proof done: `showTestNotification()` mutated to no-op, test failed at the exact NOTIF-01/04 assertion, reverted (`git checkout --`, tree clean). NOTIF-01/02/03/04/05/06/07 all `Verified` in `spec.md`. NOTIF-08 has one accepted low-risk gap: `LocalNotificationsService.initialize()`'s own failure branch is untested in either tier (Verifier-judged not worth a fix task, matches the existing `FlutterForegroundTaskPlatform` zero-unit-test precedent).
-- **In-progress**: none
-- **Next step**: none — feature closed. If `LocalNotificationsService.initialize()`'s catch branch ever becomes a real concern, it would need the plugin made injectable (out of this MVP's scope).
-- **Blockers**: none.
-- **Branch**: master
+- **Feature**: composition-root-scaling / `.specs/features/composition-root-scaling` — **Execute complete, Verifier pending**
+- **Phase / Task**: T0-T7 committed. T8 (doc sync) in progress. Verifier not yet dispatched.
+- **Completed**:
+  - `T0` (`1ebf55b`) — **pre-existing breakage, not part of this feature**: commit `4ec5f50` moved `Utils.getMyID/getMyName` to a cached `TimedFetch` + HTML parse but left `menu_notifications_bridge_test.dart` on `Utils(runtime)` (1 of 2 args) and on an `evaluateHandler` stub. `apps/popmundo_app` did not analyze and 2 tests failed — the app suite was red on HEAD before any work here. Fixed with zero assertion changes; `_CountingUtils` replaces the old evaluate-call counter because `TimedFetch` caches the character page, so counting fetches would have silently stopped discriminating "once per batch" from "once per item". Mutation-verified.
+  - `T1` (`79afb10`) CRS-17 — `PopmundoScope` + orphaned `StorageService` deleted.
+  - `T2` (`bcffa2d`) CRS-18 — `lib/notifications/README.md` added.
+  - `T3` (`0449965`) CRS-15/16 — `popmundo_utils/lib/src` → `core/` + `facades/`; barrel symbol set verified identical by diff.
+  - `T4` (`25d3e89`) CRS-02/05/06/07 — contributive menu registry; tests redistributed, all 15 original assertions preserved.
+  - `T5` (`ee5c55a`) CRS-04/09/10/11/12 — `AppWiring` + `CookieWatcher` added unwired.
+  - `T6` (`891b9db`) CRS-01/08/13 — shell rewired onto `AppWiring`; auto-login SnackBar extracted to its feature folder with a `mounted` guard.
+  - `T7` (`e66dade`) CRS-09/10/11/12/14 — `app_wiring_test.dart`, 8 tests; both mutants killed and reverted.
+- **In-progress**: T8 doc sync — `AD-020` written; module/global docs being updated (`docs/ARQUITETURA.md`, both package READMEs, `menu/`+`notifications/`+`autologin/` READMEs, `CLAUDE.md`'s `flutter_inappwebview` bullet, the four mirrored agent files).
+- **Next step**: finish T8, then dispatch the Verifier (author ≠ verifier) over the `4ec5f50..HEAD` range against `spec.md`; write `validation.md`.
+- **Known gaps to hand the Verifier** (both recorded in `spec.md`, neither papered over):
+  - **CRS-03 MISSED** — `app.dart` is 216 LOC, not the estimated ≤180. 402 → 216 is −46%; the estimate predated `build()` and ignored the ~55 lines the scoped-rebuild wrappers cost. CRS-01/CRS-02, which actually encode the goal, are met.
+  - **CRS-05 partial** — "debug last" and "caller order preserved" are tested; the concrete production sequence `auto-login, userscripts, language` is now data at the single call site and no test pumps `_PopmundoHomeState`.
+- **Blockers**: none for the agent tier. **Gradle builds still cannot complete in the agent sandbox** (unchanged from the previous handoff), so Patrol and a real `flutter run` smoke remain with the user. The device tier is structurally unaffected: under Patrol the test file is the Dart entrypoint, so `main.dart` never runs and `AppWiring` is never constructed.
+- **Uncommitted files**: T8 doc edits.
+- **Branch**: `claude/project-architecture-scaling-530c6e` (worktree)

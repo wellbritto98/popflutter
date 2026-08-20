@@ -14,15 +14,15 @@ Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testáv
 
 | Área | Arquivos | Função |
 | ---- | -------- | ------ |
-| Contrato | `src/popmundo_runtime.dart` | `PopmundoRuntime` (`evaluate`, `fetchInPage`, `loadUrl`, `waitUntilReady`); `InPageFetchResult` (inclui `headers`, `url`); `PopmundoRuntimeException` |
-| Host | `src/host_tracker.dart` | Origem sticky `https://www.popmundo.com`; `isPopmundoUri`; `resolve(path)` |
-| Política | `src/observe_policy.dart` | `allowInWebView` / `openExternal`; `observeOnlyResourceResponse()` = `null` |
-| Eventos | `src/events.dart` | `network`, `console`, `navigation`, `gmValue`, `gmCall`; `BodyCapture` 32 KiB |
-| Fetch | `src/timed_fetch.dart` | Fila serial, 750 ms, cache `METHOD:URL`, non-2xx → `TimedFetchException` |
-| Facades | `utils`, `notifications`, `css_selector`, `scoring` | `Utils.getMyID`/`getMyName` via TimedFetch+HTML; demais DOM/`__popmundo.*`; Scoring `autoApplyOnLoad = false` |
+| Contrato | `src/core/popmundo_runtime.dart` | `PopmundoRuntime` (`evaluate`, `fetchInPage`, `loadUrl`, `waitUntilReady`); `InPageFetchResult` (inclui `headers`, `url`); `PopmundoRuntimeException` |
+| Host | `src/core/host_tracker.dart` | Origem sticky `https://www.popmundo.com`; `isPopmundoUri`; `resolve(path)` |
+| Política | `src/core/observe_policy.dart` | `allowInWebView` / `openExternal`; `observeOnlyResourceResponse()` = `null` |
+| Eventos | `src/core/events.dart` | `network`, `console`, `navigation`, `gmValue`, `gmCall`; `BodyCapture` 32 KiB |
+| Fetch | `src/core/timed_fetch.dart` | Fila serial, 750 ms, cache `METHOD:URL`, non-2xx → `TimedFetchException` |
+| Facades | `src/facades/{utils,notifications,css_selector,scoring}.dart` | `Utils.getMyID`/`getMyName` via TimedFetch+HTML; demais DOM/`__popmundo.*`; Scoring `autoApplyOnLoad = false` |
 | Menu notifications | `src/menu_notifications/` | `MenuNotificationsWatcher` observa o `NetworkEvent` de `GetMenuNotificationCount` (o jogo já poll sozinho); ao mudar, busca `GetMenuNotifications` via `TimedFetch`, faz parse em `MenuNotification` e emite só itens novos, deduplicados por `UID` e persistidos via `MenuNotificationStateStore`/`KeyValueStore` |
-| Storage | `src/storage.dart`, `src/secret_store.dart` | `KeyValueStore` + `MemoryKeyValueStore`; `SecretStore` + `MemorySecretStore`; `StorageService` |
-| Logger | `src/logger.dart` | Ring buffer 200 (`warn`/`error`) |
+| Storage | `src/core/storage.dart`, `src/core/secret_store.dart` | `KeyValueStore` + `MemoryKeyValueStore`; `SecretStore` + `MemorySecretStore`; `StorageService` |
+| Logger | `src/core/logger.dart` | Ring buffer 200 (`warn`/`error`) |
 | Auto Login | `src/autologin/` | Ver [README do submódulo](lib/src/autologin/README.md) |
 | UserScripts / GM | `src/userscript/` | Ver [README do submódulo](lib/src/userscript/README.md) |
 | Barrel | `popmundo_utils.dart` | Único export público |
@@ -54,9 +54,9 @@ Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testáv
 
 ## Arquivos críticos
 
-- `src/popmundo_runtime.dart` — mudar a porta quebra adapter e fakes.
-- `src/host_tracker.dart`, `src/timed_fetch.dart` — host sticky e throttle (deslogin no jogo real).
-- `src/events.dart` — forma dos eventos (webview + app).
+- `src/core/popmundo_runtime.dart` — mudar a porta quebra adapter e fakes.
+- `src/core/host_tracker.dart`, `src/core/timed_fetch.dart` — host sticky e throttle (deslogin no jogo real).
+- `src/core/events.dart` — forma dos eventos (webview + app).
 - `src/autologin/auto_login_controller.dart` — ciclo de sessão.
 - `src/userscript/userscript_parser.dart` — grants aceitos no import.
 - `src/menu_notifications/menu_notifications_watcher.dart` — mudar o filtro de URL/contagem quebra a detecção; `menu_notification_state_store.dart` guarda `lastCount`+`notifiedUids` num único blob (evita dessincronia entre save parcial).
