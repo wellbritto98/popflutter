@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:popmundo_app/app_wiring.dart';
 import 'package:popmundo_app/gm/gm_menu_registry.dart';
@@ -22,6 +24,31 @@ AppWiring _wiring({KeyValueStore? store}) {
     cookieSink: jar,
     cookieSource: jar,
   );
+}
+
+/// A store whose reads resolve only when released, so `catalog.list()` can be
+/// made to land *after* `dispose()`. With `MemoryKeyValueStore` the read always
+/// wins the race, which is why an earlier version of the dispose test could not
+/// tell the `_disposed` guard from its absence.
+class _GatedStore implements KeyValueStore {
+  _GatedStore(this._inner);
+
+  final KeyValueStore _inner;
+  final _gate = Completer<void>();
+
+  void release() => _gate.complete();
+
+  @override
+  Future<Object?> get(String key) async {
+    await _gate.future;
+    return _inner.get(key);
+  }
+
+  @override
+  Future<void> set(String key, Object? value) => _inner.set(key, value);
+
+  @override
+  Future<void> remove(String key) => _inner.remove(key);
 }
 
 InstalledUserScript _script(
@@ -175,15 +202,34 @@ void main() {
     await expectLater(wiring.dispose(), completes);
   });
 
-  test('dispose() while the catalog read is still in flight does not throw '
+  test('a catalog read that lands after dispose() is dropped, not published '
       '— CRS-11', () async {
-    final wiring = _wiring();
+    final store = _GatedStore(MemoryKeyValueStore());
+    final jar = MemoryCookieSink();
+    final wiring = AppWiring(
+      runtime: InAppPopmundoRuntime(),
+      store: store,
+      secretStore: MemorySecretStore(),
+      cookieSink: jar,
+      cookieSource: jar,
+    );
 
-    // start() fires catalog.list() unawaited; disposing immediately means the
-    // read completes against already-disposed notifiers.
+    // start() fires catalog.list() unawaited. Holding the read open until
+    // after dispose() forces the exact race the _disposed guard exists for;
+    // without gating, the read always wins and the guard is never exercised.
     wiring.start();
-    await expectLater(wiring.dispose(), completes);
+    await wiring.dispose();
+    store.release();
     await pumpEventQueue();
+
+    // _publish assigns before notifyListeners() throws, so without the guard
+    // `ready` flips to true observably — asserting "does not throw" alone
+    // would not discriminate.
+    expect(
+      wiring.userscripts.value.ready,
+      isFalse,
+      reason: 'nothing may be published into a disposed notifier',
+    );
   });
 
   test('connectHeadersFor returns the script @connect list, and empty for an '
