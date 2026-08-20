@@ -47,22 +47,11 @@ void main() {
       final service = LocalNotificationsService();
       await service.initialize();
 
-      // Best-effort cleanup: just make sure the shade is closed so it
-      // doesn't bleed into the next run. Deliberately does NOT open the
-      // shade and tap-to-dismiss the posted notification first — that
-      // combination hung indefinitely on-device (openNotifications +
-      // tapOnNotificationByIndex + closeNotifications), unlike the plain
-      // openNotifications-then-closeNotifications pattern used successfully
-      // twice above. The leftover notification is harmless: it carries the
-      // fixed kTestNotificationId, so the next run's own grant step replaces
-      // it in place (NOTIF-07) rather than stacking.
-      addTearDown(() async {
-        try {
-          await $.platform.mobile.closeNotifications();
-        } catch (_) {
-          // Shade already closed — fine outcome for a teardown.
-        }
-      });
+      // Do not closeNotifications() in tearDown. Patrol documents that call
+      // as undefined unless the shade is visible (native impl: pressBack).
+      // After the body already closed the shade, a second call hung as
+      // native step 13 (Gradle exit 1, Successful:0/Failed:0). Leftover
+      // tray content is replaced in place on the next grant (NOTIF-07).
 
       final bus = PopmundoEventBus();
       await pumpHarness(
