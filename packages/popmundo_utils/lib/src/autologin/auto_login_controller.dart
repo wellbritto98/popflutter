@@ -4,11 +4,11 @@ import 'dart:convert';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 
-import '../events.dart';
-import '../host_tracker.dart';
-import '../popmundo_runtime.dart';
-import '../secret_store.dart';
-import '../timed_fetch.dart' show ClockNow;
+import '../core/events.dart';
+import '../core/host_tracker.dart';
+import '../core/popmundo_runtime.dart';
+import '../core/secret_store.dart';
+import '../core/timed_fetch.dart' show ClockNow;
 import 'aspnet_form.dart';
 import 'aspnet_form_data.dart';
 import 'auth_http.dart';

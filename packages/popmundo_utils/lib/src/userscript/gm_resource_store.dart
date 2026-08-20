@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../storage.dart';
+import '../core/storage.dart';
 
 /// One persisted `@resource` body keyed by resource name.
 class GmResourceEntry {

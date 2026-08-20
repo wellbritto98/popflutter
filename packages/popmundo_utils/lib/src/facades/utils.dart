@@ -1,9 +1,9 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 
-import 'host_tracker.dart';
-import 'popmundo_runtime.dart';
-import 'timed_fetch.dart';
+import '../core/host_tracker.dart';
+import '../core/popmundo_runtime.dart';
+import '../core/timed_fetch.dart';
 
 /// Character id/name and host helpers. Id/name come from a cached TimedFetch of
 /// `/World/Popmundo.aspx/Character` — the live page's `charPresBox` is absent

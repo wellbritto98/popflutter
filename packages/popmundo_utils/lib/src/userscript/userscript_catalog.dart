@@ -1,4 +1,4 @@
-import '../storage.dart';
+import '../core/storage.dart';
 import 'userscript_parser.dart';
 
 class UserScriptCatalogException implements Exception {

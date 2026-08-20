@@ -1,4 +1,4 @@
-import 'popmundo_runtime.dart';
+import '../core/popmundo_runtime.dart';
 
 class Scoring {
   Scoring(this.runtime);
