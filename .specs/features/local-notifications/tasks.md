@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/local-notifications/design.md`
-**Status**: Approved
+**Status**: Done — all 9 tasks implemented and committed; independent Verifier ran (`.specs/features/local-notifications/validation.md`). One item outstanding: the Patrol device run + mutation-proof for T8 must be completed from a human terminal (blocked in every agent sandbox on this machine by a JDK 17+ Gradle loopback restriction).
 
 ---
 
@@ -253,11 +253,11 @@ T9
 - Skill: NONE (this task falls under the `popmundo-e2e` specialist agent's file ownership — dispatch via the Agent tool rather than editing inline, per CLAUDE.md)
 
 **Done when**:
-- [ ] `flutter analyze integration_test` passes (mandatory before any device run, AD-015)
-- [ ] Exactly one `patrolTest` in the file
-- [ ] Test passes on a connected Android device/emulator, asserting the real tray contains the fixed title/body text (not just "no exception")
-- [ ] Mutation-proof: test shown red with the trigger reverted, then restored via `git checkout --` before the final commit
-- [ ] `addTearDown` cleans up (dismiss notification / stop anything started)
+- [x] `flutter analyze integration_test` passes (mandatory before any device run, AD-015)
+- [x] Exactly one `patrolTest` in the file
+- [ ] Test passes on a connected Android device/emulator, asserting the real tray contains the fixed title/body text (not just "no exception") — **blocked**: `patrol test` fails at the Gradle build step (`java.io.IOException: Unable to establish loopback connection`), a JDK 17+ restriction confirmed specific to agent sandboxes on this machine (reproduced independently by both the implementer and the Verifier on a detected/online emulator). Must be run from a human terminal on this machine; see `.specs/features/local-notifications/validation.md`.
+- [ ] Mutation-proof: test shown red with the trigger reverted, then restored via `git checkout --` before the final commit — blocked on the same device-run prerequisite above
+- [x] `addTearDown` cleans up (dismiss notification / stop anything started)
 
 **Tests**: integration
 **Gate**: full
@@ -279,9 +279,9 @@ T9
 - Skill: NONE
 
 **Done when**:
-- [ ] `docs/ARQUITETURA.md` describes the `notifications/` module and its wiring
-- [ ] Module README updated if one exists for `apps/popmundo_app`
-- [ ] `spec.md` traceability table's Status column updated
+- [x] `docs/ARQUITETURA.md` describes the `notifications/` module and its wiring
+- [x] Module README updated if one exists for `apps/popmundo_app`
+- [x] `spec.md` traceability table's Status column updated
 
 **Tests**: none
 **Gate**: build

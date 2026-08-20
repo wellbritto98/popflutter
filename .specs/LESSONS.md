@@ -194,6 +194,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: HB-07 FGS isolate (apps/popmundo_app/background)
 - last seen: 2026-08-19T19:09:21Z
 
+### L-031 — Agent sandbox sessions on this machine cannot complete patrol test's Gradle build step (java.io.IOException: Unable to establish loopback connection, JDK17+ restriction); device-real Patrol runs must be executed from the user's own terminal, not delegated to an agent.
+- signal: `gate_fail` · recurrence: 1 feature(s) · scope: `apps/popmundo_app/integration_test` · harmful: 0
+- features: local-notifications
+- evidence: patrol test --target integration_test/notifications_test.dart (apps/popmundo_app/integration_test)
+- last seen: 2026-08-20T00:25:24Z
+
+### L-032 — When a real-plugin implementation wraps its own initialize() in a swallow-all try/catch (matching the FlutterForegroundTaskPlatform zero-unit-test precedent), explicitly note in the Test Coverage Matrix that the catch branch itself has no forced-failure test in either tier, so it isn't silently assumed covered by the device-real test alone.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `apps/popmundo_app/lib/notifications` · harmful: 0
+- features: local-notifications
+- evidence: NOTIF-08 / apps/popmundo_app/lib/notifications/local_notifications_service.dart:27-46 (apps/popmundo_app/lib/notifications)
+- last seen: 2026-08-20T00:25:31Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

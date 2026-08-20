@@ -167,10 +167,10 @@
 
 ## Handoff
 
-- **Feature**: auto-login (session heartbeat) / `.specs/features/auto-login`
-- **Phase / Task**: Execute complete — awaiting Verifier
-- **Completed**: T1 CookieSource, T2 AuthSession.probe, T3 checkSession, T4 InAppCookieSink.read, T5 wiring+docs. AD-019.
+- **Feature**: local-notifications (debug-panel test-notification button) / `.specs/features/local-notifications`
+- **Phase / Task**: Execute complete (T1-T9 committed), independent Verifier ran — `.specs/features/local-notifications/validation.md`
+- **Completed**: T1-T9 (`flutter_local_notifications` dependency, `NotificationService`/`LocalNotificationsService`/`FakeNotificationService`, composition-root wiring, debug button + fast tests, Patrol test file, docs sync). 84 fast-tier tests passing, 3/3 discrimination-sensor mutations killed. NOTIF-02/05/06 marked `Verified` in `spec.md`; NOTIF-01/03/04/07/08 stay `Implementing` — see next step.
 - **In-progress**: none
-- **Next step**: Verifier (author ≠ verifier) on HB-01…HB-10
-- **Blockers**: none
+- **Next step**: from a human terminal on this machine (not an agent sandbox — every agent session hit the same JDK 17+ Gradle loopback restriction, `java.io.IOException: Unable to establish loopback connection`, confirmed independently twice), run `cd apps/popmundo_app && patrol test --target integration_test/notifications_test.dart -d <device-id>`. If it passes: do the T8 mutation-proof (temporarily revert the trigger in `debug_overlay.dart`, confirm `notifications_test.dart` goes red, restore with `git checkout --`), tick the remaining `tasks.md` T8 boxes, and flip NOTIF-01/03/04/07 to `Verified` in `spec.md`.
+- **Blockers**: Patrol device run only completable outside an agent sandbox on this machine (see above) — not a code defect.
 - **Branch**: master

@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 31,
+  "next_id": 33,
   "lessons": [
     {
       "id": "L-001",
@@ -544,6 +544,42 @@
       ],
       "created": "2026-08-19T19:09:21Z",
       "last_seen": "2026-08-19T19:09:21Z"
+    },
+    {
+      "id": "L-031",
+      "key": "gate_fail::agent sandbox sessions on this machine cannot complete patrol test s gradle build step java io ioexception unable to establish loopback connection jdk17 restriction device real patrol runs must be executed from the user s own terminal not delegated to an agent",
+      "text": "Agent sandbox sessions on this machine cannot complete patrol test's Gradle build step (java.io.IOException: Unable to establish loopback connection, JDK17+ restriction); device-real Patrol runs must be executed from the user's own terminal, not delegated to an agent.",
+      "signal": "gate_fail",
+      "scope": "apps/popmundo_app/integration_test",
+      "status": "candidate",
+      "features": [
+        "local-notifications"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "patrol test --target integration_test/notifications_test.dart (apps/popmundo_app/integration_test)"
+      ],
+      "created": "2026-08-20T00:25:24Z",
+      "last_seen": "2026-08-20T00:25:24Z"
+    },
+    {
+      "id": "L-032",
+      "key": "ac_gap::when a real plugin implementation wraps its own initialize in a swallow all try catch matching the flutterforegroundtaskplatform zero unit test precedent explicitly note in the test coverage matrix that the catch branch itself has no forced failure test in either tier so it isn t silently assumed covered by the device real test alone",
+      "text": "When a real-plugin implementation wraps its own initialize() in a swallow-all try/catch (matching the FlutterForegroundTaskPlatform zero-unit-test precedent), explicitly note in the Test Coverage Matrix that the catch branch itself has no forced-failure test in either tier, so it isn't silently assumed covered by the device-real test alone.",
+      "signal": "ac_gap",
+      "scope": "apps/popmundo_app/lib/notifications",
+      "status": "candidate",
+      "features": [
+        "local-notifications"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "NOTIF-08 / apps/popmundo_app/lib/notifications/local_notifications_service.dart:27-46 (apps/popmundo_app/lib/notifications)"
+      ],
+      "created": "2026-08-20T00:25:31Z",
+      "last_seen": "2026-08-20T00:25:31Z"
     }
   ]
 }

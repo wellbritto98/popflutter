@@ -79,14 +79,14 @@ No P2/P3 stories — the feature is intentionally MVP-only; everything beyond th
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| NOTIF-01 | P1: Manual test notification | Tasks | Implementing |
-| NOTIF-02 | P1: Manual test notification | Tasks | Implementing |
-| NOTIF-03 | P1: Manual test notification | Tasks | Implementing |
-| NOTIF-04 | P1: Manual test notification | Tasks | Implementing |
-| NOTIF-05 | P1: Manual test notification | Tasks | Implementing |
-| NOTIF-06 | P1: Manual test notification | Tasks | Implementing |
-| NOTIF-07 | P1: Manual test notification | Tasks | Implementing |
-| NOTIF-08 | P1: Manual test notification | Tasks | Implementing |
+| NOTIF-01 | P1: Manual test notification | Tasks | Implementing — device-run pending (env. blocker, see validation.md) |
+| NOTIF-02 | P1: Manual test notification | Tasks | Verified |
+| NOTIF-03 | P1: Manual test notification | Tasks | Implementing — DebugOverlay-side Verified; real-OS-dialog half device-run pending |
+| NOTIF-04 | P1: Manual test notification | Tasks | Implementing — DebugOverlay-side Verified; real-tray-content half device-run pending |
+| NOTIF-05 | P1: Manual test notification | Tasks | Verified |
+| NOTIF-06 | P1: Manual test notification | Tasks | Verified |
+| NOTIF-07 | P1: Manual test notification | Tasks | Implementing — device-run pending (env. blocker, see validation.md) |
+| NOTIF-08 | P1: Manual test notification | Tasks | Implementing — DebugOverlay catch-path Verified; `LocalNotificationsService.initialize()` failure branch untested |
 
 **ID format:** `NOTIF-NN`
 
