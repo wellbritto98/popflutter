@@ -19,6 +19,7 @@ import 'gm/gm_notification_overlay.dart';
 import 'language/language_selector.dart';
 import 'menu/app_menu_registry.dart';
 import 'menu/gm_menu_command_item.dart';
+import 'notifications/notification_service.dart';
 import 'userscripts/userscript_http.dart';
 import 'userscripts/userscripts_screen.dart';
 
@@ -29,12 +30,14 @@ class PopmundoApp extends StatelessWidget {
     required this.store,
     this.secretStore,
     this.keepalive,
+    this.notificationService,
   });
 
   final InAppPopmundoRuntime runtime;
   final KeyValueStore store;
   final SecretStore? secretStore;
   final BackgroundKeepalive? keepalive;
+  final NotificationService? notificationService;
 
   /// Lets the auto-login listener show snackbars from above the [Scaffold].
   static final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -53,6 +56,7 @@ class PopmundoApp extends StatelessWidget {
         store: store,
         secretStore: secretStore ?? FlutterSecureSecretStore(),
         keepalive: keepalive,
+        notificationService: notificationService,
       ),
     );
   }
@@ -65,12 +69,14 @@ class PopmundoHome extends StatefulWidget {
     required this.store,
     required this.secretStore,
     this.keepalive,
+    this.notificationService,
   });
 
   final InAppPopmundoRuntime runtime;
   final KeyValueStore store;
   final SecretStore secretStore;
   final BackgroundKeepalive? keepalive;
+  final NotificationService? notificationService;
 
   @override
   State<PopmundoHome> createState() => _PopmundoHomeState();
@@ -330,6 +336,7 @@ class _PopmundoHomeState extends State<PopmundoHome>
                     evaluate: widget.runtime.evaluate,
                     cookies: _cookies,
                     backgroundStatus: _backgroundStatus,
+                    notificationService: widget.notificationService,
                     visible: _debugPanelVisible,
                     onClose: () => setState(() => _debugPanelVisible = false),
                     child: PopmundoWebView(
