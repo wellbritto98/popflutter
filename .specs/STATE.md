@@ -177,22 +177,17 @@
 
 ## Handoff
 
-- **Feature**: composition-root-scaling / `.specs/features/composition-root-scaling` — **Execute complete, Verifier pending**
-- **Phase / Task**: T0-T7 committed. T8 (doc sync) in progress. Verifier not yet dispatched.
-- **Completed**:
-  - `T0` (`1ebf55b`) — **pre-existing breakage, not part of this feature**: commit `4ec5f50` moved `Utils.getMyID/getMyName` to a cached `TimedFetch` + HTML parse but left `menu_notifications_bridge_test.dart` on `Utils(runtime)` (1 of 2 args) and on an `evaluateHandler` stub. `apps/popmundo_app` did not analyze and 2 tests failed — the app suite was red on HEAD before any work here. Fixed with zero assertion changes; `_CountingUtils` replaces the old evaluate-call counter because `TimedFetch` caches the character page, so counting fetches would have silently stopped discriminating "once per batch" from "once per item". Mutation-verified.
-  - `T1` (`79afb10`) CRS-17 — `PopmundoScope` + orphaned `StorageService` deleted.
-  - `T2` (`bcffa2d`) CRS-18 — `lib/notifications/README.md` added.
-  - `T3` (`0449965`) CRS-15/16 — `popmundo_utils/lib/src` → `core/` + `facades/`; barrel symbol set verified identical by diff.
-  - `T4` (`25d3e89`) CRS-02/05/06/07 — contributive menu registry; tests redistributed, all 15 original assertions preserved.
-  - `T5` (`ee5c55a`) CRS-04/09/10/11/12 — `AppWiring` + `CookieWatcher` added unwired.
-  - `T6` (`891b9db`) CRS-01/08/13 — shell rewired onto `AppWiring`; auto-login SnackBar extracted to its feature folder with a `mounted` guard.
-  - `T7` (`e66dade`) CRS-09/10/11/12/14 — `app_wiring_test.dart`, 8 tests; both mutants killed and reverted.
-- **In-progress**: T8 doc sync — `AD-020` written; module/global docs being updated (`docs/ARQUITETURA.md`, both package READMEs, `menu/`+`notifications/`+`autologin/` READMEs, `CLAUDE.md`'s `flutter_inappwebview` bullet, the four mirrored agent files).
-- **Next step**: finish T8, then dispatch the Verifier (author ≠ verifier) over the `4ec5f50..HEAD` range against `spec.md`; write `validation.md`.
-- **Known gaps to hand the Verifier** (both recorded in `spec.md`, neither papered over):
-  - **CRS-03 MISSED** — `app.dart` is 216 LOC, not the estimated ≤180. 402 → 216 is −46%; the estimate predated `build()` and ignored the ~55 lines the scoped-rebuild wrappers cost. CRS-01/CRS-02, which actually encode the goal, are met.
-  - **CRS-05 partial** — "debug last" and "caller order preserved" are tested; the concrete production sequence `auto-login, userscripts, language` is now data at the single call site and no test pumps `_PopmundoHomeState`.
-- **Blockers**: none for the agent tier. **Gradle builds still cannot complete in the agent sandbox** (unchanged from the previous handoff), so Patrol and a real `flutter run` smoke remain with the user. The device tier is structurally unaffected: under Patrol the test file is the Dart entrypoint, so `main.dart` never runs and `AppWiring` is never constructed.
-- **Uncommitted files**: T8 doc edits.
-- **Branch**: `claude/project-architecture-scaling-530c6e` (worktree)
+- **Feature**: composition-root-scaling / `.specs/features/composition-root-scaling` — **DONE**
+- **Phase / Task**: Execute complete, Verifier **PASS** at iteration 2. `validation.md` holds the full record.
+- **Completed**: T0-T8 plus one fix round. Commits `1ebf55b`, `9fc711f`, `79afb10`, `bcffa2d`, `0449965`, `25d3e89`, `ee5c55a`, `891b9db`, `e66dade`, `d4ccd21`, `e905314`, `160a4d8`, `8984376`. Decision recorded as **AD-020**.
+  - `T0` (`1ebf55b`) was a **pre-existing breakage, not part of this feature**: `4ec5f50` left `menu_notifications_bridge_test.dart` calling `Utils(runtime)` with 1 of 2 args and stubbing `evaluateHandler` for a name that now comes from `TimedFetch`+HTML, so `apps/popmundo_app` did not analyze and 2 tests failed on HEAD. Fixed with zero assertion changes.
+  - Verifier iteration 1 returned **FAIL** on two surviving mutants — `CookieWatcher` had no test file at all, and `AppWiring._publish`'s `_disposed` guard was never exercised because `MemoryKeyValueStore` always won the race. Both fixed in `160a4d8` and re-killed at iteration 2, which found no new gaps.
+- **In-progress**: none.
+- **Next step**: none — feature closed. Optional follow-up if it ever matters: `AppWiring`'s `start()` and `dispose()` are the only place a future feature needs to register itself, and `lib/<feature>/<feature>_menu_item.dart` is the only place a sidebar entry needs to exist.
+- **Accepted, disclosed gaps** (both in `spec.md`, both confirmed by the Verifier):
+  - **CRS-03 MISSED** — `app.dart` is 216 LOC, not the estimated ≤180. 402 → 216 is −46%; the estimate predated `build()` and ignored the ~55 lines the scoped-rebuild wrappers cost. CRS-01/CRS-02, which encode the actual goal, are met and verified.
+  - **CRS-05 partial** — "debug last" and "caller order preserved" are tested; the concrete production sequence `auto-login, userscripts, language` is now data at the single call site and no test pumps `_PopmundoHomeState`. Closing it would mean undoing CRS-02.
+- **Lessons**: `L-034`..`L-037` recorded (three from the grounded discrimination failures, one from the CRS-03 miss). All `candidate` — they confirm on recurrence.
+- **Blockers**: none for the agent tier. **Gradle builds still cannot complete in the agent sandbox**, so Patrol and a real `flutter run` smoke remain with the user. Suggested manual smoke: open the sidebar (4 items, debug last in debug builds), open Userscripts / Auto Login / Language, toggle a userscript and confirm it still syncs into the WebView, open the debug panel and confirm cookies and background status still populate. The device tier is structurally unaffected — under Patrol the test file is the Dart entrypoint, so `main.dart` never runs and `AppWiring` is never constructed.
+- **Uncommitted files**: none.
+- **Branch**: `claude/project-architecture-scaling-530c6e` (worktree; not merged to `master`).
