@@ -22,6 +22,10 @@ Future<void> main() async {
   );
   final notificationService = LocalNotificationsService();
   await notificationService.initialize();
+  // This feature (menu-notification → local-notification bridge) has no
+  // manual UI trigger, so permission must be requested at startup rather
+  // than gated behind the debug panel (MENUNOTIF-10).
+  await notificationService.requestPermission();
   runApp(
     EasyLocalization(
       supportedLocales: supportedAppLocales,

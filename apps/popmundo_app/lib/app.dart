@@ -19,6 +19,7 @@ import 'gm/gm_notification_overlay.dart';
 import 'language/language_selector.dart';
 import 'menu/app_menu_registry.dart';
 import 'menu/gm_menu_command_item.dart';
+import 'notifications/menu_notifications_bridge.dart';
 import 'notifications/notification_service.dart';
 import 'userscripts/userscript_http.dart';
 import 'userscripts/userscripts_screen.dart';
@@ -124,6 +125,25 @@ class _PopmundoHomeState extends State<PopmundoHome>
     cookieSink: cookieJar,
     cookieSource: cookieJar,
   );
+  late final menuNotificationsService = MenuNotificationsService(
+    widget.runtime,
+    timedFetch,
+  );
+  late final menuNotificationsStateStore = MenuNotificationStateStore(
+    widget.store,
+  );
+  late final menuNotificationsWatcher = MenuNotificationsWatcher(
+    runtime: widget.runtime,
+    service: menuNotificationsService,
+    stateStore: menuNotificationsStateStore,
+  );
+  late final menuNotificationsBridge = widget.notificationService == null
+      ? null
+      : MenuNotificationsBridge(
+          watcher: menuNotificationsWatcher,
+          utils: Utils(widget.runtime),
+          notificationService: widget.notificationService!,
+        );
 
   StreamSubscription<NavigationEvent>? _navSub;
   StreamSubscription<GmCallEvent>? _gmCallSub;
@@ -142,6 +162,8 @@ class _PopmundoHomeState extends State<PopmundoHome>
     gmMenuRegistry.addListener(_onGmMenuChanged);
     _refreshCookies();
     autoLogin.start();
+    menuNotificationsWatcher.start();
+    menuNotificationsBridge?.start();
     _bootstrap();
     final keepalive = widget.keepalive;
     if (keepalive != null) {
@@ -162,6 +184,8 @@ class _PopmundoHomeState extends State<PopmundoHome>
     _autoLoginSub?.cancel();
     gmMenuRegistry.removeListener(_onGmMenuChanged);
     unawaited(autoLogin.dispose());
+    unawaited(menuNotificationsWatcher.dispose());
+    unawaited(menuNotificationsBridge?.dispose());
     super.dispose();
   }
 
