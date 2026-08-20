@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 
 import 'background/background_status.dart';
+import 'notifications/notification_service.dart';
 
 class CookieSummary {
   const CookieSummary({required this.name, required this.domain});
@@ -18,6 +19,7 @@ class DebugOverlay extends StatefulWidget {
     required this.evaluate,
     this.cookies = const [],
     this.backgroundStatus,
+    this.notificationService,
     this.visible = false,
     this.onClose,
     this.child,
@@ -28,6 +30,7 @@ class DebugOverlay extends StatefulWidget {
   final Future<String?> Function(String source) evaluate;
   final List<CookieSummary> cookies;
   final BackgroundStatus? backgroundStatus;
+  final NotificationService? notificationService;
   final bool visible;
   final VoidCallback? onClose;
   final Widget? child;
@@ -40,6 +43,7 @@ class _DebugOverlayState extends State<DebugOverlay> {
   final _consoles = <ConsoleEvent>[];
   final _evalController = TextEditingController();
   String? _evalResult;
+  var _sendingNotification = false;
 
   @override
   void initState() {
@@ -75,6 +79,22 @@ class _DebugOverlayState extends State<DebugOverlay> {
     }
   }
 
+  Future<void> _sendTestNotification() async {
+    final service = widget.notificationService;
+    if (service == null || _sendingNotification) return;
+    setState(() => _sendingNotification = true);
+    try {
+      final granted = await service.requestPermission();
+      if (granted) {
+        await service.showTestNotification();
+      }
+    } catch (_) {
+      // Never let a plugin/service error crash the debug panel (NOTIF-05, NOTIF-08).
+    } finally {
+      if (mounted) setState(() => _sendingNotification = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -85,7 +105,7 @@ class _DebugOverlayState extends State<DebugOverlay> {
             left: 0,
             right: 0,
             bottom: 0,
-            height: 320,
+            height: 380,
             child: Material(
               key: const Key('debug-panel'),
               color: Colors.black.withValues(alpha: 0.92),
@@ -121,6 +141,20 @@ class _DebugOverlayState extends State<DebugOverlay> {
                 onPressed: widget.onClose,
               ),
             ],
+          ),
+        ),
+        ListTile(
+          dense: true,
+          title: const Text(
+            'notifications',
+            style: TextStyle(color: Colors.white70),
+          ),
+          trailing: TextButton(
+            key: const Key('debug-send-notification'),
+            onPressed: widget.notificationService == null || _sendingNotification
+                ? null
+                : _sendTestNotification,
+            child: const Text('send test notification'),
           ),
         ),
         if (widget.backgroundStatus != null) ..._backgroundLines(widget.backgroundStatus!),

@@ -2,7 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:popmundo_app/background/background_status.dart';
 import 'package:popmundo_app/debug_overlay.dart';
+import 'package:popmundo_app/notifications/fake_notification_service.dart';
+import 'package:popmundo_app/notifications/notification_service.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
+
+/// Minimal [NotificationService] stub whose calls throw, used to prove
+/// [DebugOverlay] never crashes on a plugin/service-level error (NOTIF-08).
+/// Kept local to this test file rather than added to
+/// [FakeNotificationService], whose configurable fields don't include a
+/// throw-on-show toggle per design.md's Components section.
+class _ThrowingNotificationService implements NotificationService {
+  @override
+  Future<void> initialize() async {}
+
+  @override
+  Future<bool> requestPermission() async => true;
+
+  @override
+  Future<void> showTestNotification() async {
+    throw Exception('boom');
+  }
+}
 
 void main() {
   testWidgets('collapsed overlay renders no debug control and no panel', (tester) async {
@@ -154,4 +174,172 @@ void main() {
     await tester.pump();
     expect(find.byKey(const Key('debug-panel')), findsNothing);
   });
+
+  testWidgets('send-notification button renders with fixed English label', (
+    tester,
+  ) async {
+    final bus = PopmundoEventBus();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DebugOverlay(
+          host: HostTracker(),
+          events: bus,
+          evaluate: (source) async => source,
+          notificationService: FakeNotificationService(),
+          visible: true,
+          child: const SizedBox.expand(),
+        ),
+      ),
+    );
+
+    expect(find.byKey(const Key('debug-send-notification')), findsOneWidget);
+    expect(find.text('send test notification'), findsOneWidget);
+  });
+
+  testWidgets(
+    'tapping send-notification requests permission and shows a notification when granted',
+    (tester) async {
+      final bus = PopmundoEventBus();
+      final service = FakeNotificationService(permissionGranted: true);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: DebugOverlay(
+            host: HostTracker(),
+            events: bus,
+            evaluate: (source) async => source,
+            notificationService: service,
+            visible: true,
+            child: const SizedBox.expand(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(const Key('debug-send-notification')));
+      await tester.pumpAndSettle();
+
+      expect(service.requestPermissionCalls, 1);
+      expect(service.showCalls, 1);
+    },
+  );
+
+  testWidgets(
+    'denied permission: no notification shown, no crash, panel stays interactive (NOTIF-05)',
+    (tester) async {
+      final bus = PopmundoEventBus();
+      final service = FakeNotificationService(permissionGranted: false);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: DebugOverlay(
+            host: HostTracker(),
+            events: bus,
+            evaluate: (source) async => source,
+            notificationService: service,
+            visible: true,
+            child: const SizedBox.expand(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(const Key('debug-send-notification')));
+      await tester.pumpAndSettle();
+
+      expect(service.requestPermissionCalls, 1);
+      expect(service.showCalls, 0, reason: 'denied permission must not show a notification');
+      expect(find.byKey(const Key('debug-panel')), findsOneWidget);
+      final button = tester.widget<TextButton>(
+        find.byKey(const Key('debug-send-notification')),
+      );
+      expect(
+        button.onPressed,
+        isNotNull,
+        reason: 'panel must remain interactive after a denial',
+      );
+
+      // Panel is provably still usable: another control still responds.
+      await tester.tap(find.byKey(const Key('debug-clear')));
+      await tester.pump();
+    },
+  );
+
+  testWidgets(
+    'repeat tap while a request is in flight is ignored until it completes (NOTIF-06)',
+    (tester) async {
+      final bus = PopmundoEventBus();
+      final service = FakeNotificationService(
+        permissionGranted: true,
+        showDelay: const Duration(milliseconds: 200),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: DebugOverlay(
+            host: HostTracker(),
+            events: bus,
+            evaluate: (source) async => source,
+            notificationService: service,
+            visible: true,
+            child: const SizedBox.expand(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(const Key('debug-send-notification')));
+      await tester.pump();
+
+      // Still in flight: button must be disabled, so a second tap is inert.
+      final inFlightButton = tester.widget<TextButton>(
+        find.byKey(const Key('debug-send-notification')),
+      );
+      expect(
+        inFlightButton.onPressed,
+        isNull,
+        reason: 'button must be disabled while the first tap is in flight',
+      );
+      await tester.tap(find.byKey(const Key('debug-send-notification')));
+      await tester.pump(const Duration(milliseconds: 250));
+      await tester.pumpAndSettle();
+
+      expect(
+        service.requestPermissionCalls,
+        1,
+        reason: 'the in-flight repeat tap must not trigger a second request',
+      );
+      expect(
+        service.showCalls,
+        1,
+        reason: 'the system tray must never show more than one such notification at once',
+      );
+    },
+  );
+
+  testWidgets(
+    'showTestNotification throwing is caught and never crashes the panel (NOTIF-08)',
+    (tester) async {
+      final bus = PopmundoEventBus();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: DebugOverlay(
+            host: HostTracker(),
+            events: bus,
+            evaluate: (source) async => source,
+            notificationService: _ThrowingNotificationService(),
+            visible: true,
+            child: const SizedBox.expand(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(const Key('debug-send-notification')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('debug-panel')), findsOneWidget);
+      final button = tester.widget<TextButton>(
+        find.byKey(const Key('debug-send-notification')),
+      );
+      expect(
+        button.onPressed,
+        isNotNull,
+        reason: 'a thrown error must not leave the button stuck disabled, and must not crash the panel',
+      );
+    },
+  );
 }
