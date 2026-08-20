@@ -54,6 +54,9 @@ graph TD
   GmHost --> TimedFetch
   TimedFetch --> Runtime
   Keepalive[BackgroundKeepalive] --> FGS[flutter_foreground_task]
+  Overlay --> NotifSvc[NotificationService]
+  NotifSvc --> LocalNotif[LocalNotificationsService]
+  LocalNotif --> FLN[flutter_local_notifications]
 ```
 
 ---
@@ -62,7 +65,7 @@ graph TD
 
 | Padrão | Onde | Evidência no código |
 | ------ | ---- | -------------------- |
-| **Porta/Adapter** | `PopmundoRuntime` vs. `InAppPopmundoRuntime`; `CookieSink`/`CookieSource` vs. `InAppCookieSink`; `SecretStore` vs. `FlutterSecureSecretStore`; `KeyValueStore` vs. `SharedPreferencesStore` / `MemoryKeyValueStore`; `UserScriptWebViewPort` vs. `InAppUserScriptWebViewPort`; `BackgroundPlatform` vs. `FlutterForegroundTaskPlatform` | Contratos em `popmundo_utils` (e `background_platform.dart` no app); implementações no adapter/app |
+| **Porta/Adapter** | `PopmundoRuntime` vs. `InAppPopmundoRuntime`; `CookieSink`/`CookieSource` vs. `InAppCookieSink`; `SecretStore` vs. `FlutterSecureSecretStore`; `KeyValueStore` vs. `SharedPreferencesStore` / `MemoryKeyValueStore`; `UserScriptWebViewPort` vs. `InAppUserScriptWebViewPort`; `BackgroundPlatform` vs. `FlutterForegroundTaskPlatform`; `NotificationService` vs. `LocalNotificationsService` / `FakeNotificationService` | Contratos em `popmundo_utils` (e `background_platform.dart`/`notifications/notification_service.dart` no app); implementações no adapter/app |
 | **Composition root** | `apps/popmundo_app/lib/main.dart` monta runtime, store, keepalive e `EasyLocalization`; `PopmundoHome` monta catalog, TimedFetch, AutoLogin, GM host | Nenhum outro ponto instancia `InAppPopmundoRuntime()` |
 | **Facade** | `Utils`, `Notifications`, `Scoring`, `CssSelectorHelper`, `XPathHelper` — `runtime.evaluate('window.__popmundo.<fn>(...)')` | `packages/popmundo_utils/lib/src/{utils,notifications,scoring,css_selector}.dart` |
 | **Event Bus** | `PopmundoEventBus` com streams `network`, `console`, `navigation`, `gmValue`, `gmCall` | `packages/popmundo_utils/lib/src/events.dart` |
@@ -91,7 +94,7 @@ Registradas em `.specs/STATE.md` (AD-001 a AD-018; AD-011 e AD-017 **superseded*
 10. **UserScripts do jogador nunca chamam `removeAllUserScripts` (AD-010).** Grupos `userscript:<id>`; builtins `hooks.js`/`helpers.js` permanecem.
 11. **Download de `.user.js` / `@require` / `@resource` não usa TimedFetch (AD-010).** Fetcher HTTP do app (`userscript_http.dart`).
 12. **Keepalive não toca WebView nem TimedFetch (AD-012).** Isolate do FGS só emite heartbeat. `stopWithTask` é `false` (AD-013).
-13. **i18n da shell (AD-014).** `easy_localization`, catálogos `en`/`pt`. `popmundo_utils`/`popmundo_webview` e o DebugOverlay permanecem em inglês.
+13. **i18n da shell (AD-014).** `easy_localization`, catálogos `en`/`pt`. `popmundo_utils`/`popmundo_webview` e o DebugOverlay permanecem em inglês — inclui o título/corpo fixos da notificação de teste do debug (`LocalNotificationsService`, `kTestNotificationTitle`/`kTestNotificationBody`), que reusa a mesma exceção por só ser alcançável pelo botão debug-only.
 14. **Dois tiers de teste no app (AD-015).** `flutter test` (fakes) vs. Patrol em `integration_test/` (device-real, **nunca** carrega popmundo.com). Exatamente um `patrolTest` por arquivo.
 15. **Auto Login autentica fora da WebView (AD-018).** `AuthSession` em `dart:io`, redirects manuais, cookies copiados via `CookieSink`. Sem fallback de `form.submit()`. Observe-only (AD-003) permanece.
 16. **Heartbeat de sessão (AD-019).** GET nativo 60 s em `{N.popmundo.com}/World/Popmundo.aspx/Character` com jar da WebView (`CookieSource`); 302 para login dispara AD-018. Timer no isolate do app; FGS não fala com o jogo.
@@ -106,7 +109,7 @@ Registradas em `.specs/STATE.md` (AD-001 a AD-018; AD-011 e AD-017 **superseded*
 - **Serialização JS↔Dart:** `jsonEncode`/`jsonDecode` nas facades; sem interpolar input cru em JS.
 - **Fakes por camada:** `FakePopmundoRuntime`, `MemoryKeyValueStore`, `MemorySecretStore`, `MemoryCookieSink`, `FakeBackgroundPlatform`.
 - **Assets JS** em `packages/popmundo_webview/assets/js/`, com fallback de path em `user_scripts.dart`.
-- **Keys de widget:** kebab-case (`menu-toggle`, `menu-item-<id>`, `debug-panel`, `autologin-status-<phase>`, `language-dialog`, …).
+- **Keys de widget:** kebab-case (`menu-toggle`, `menu-item-<id>`, `debug-panel`, `debug-send-notification`, `autologin-status-<phase>`, `language-dialog`, …).
 - **Erros tipados:** `PopmundoRuntimeException`, `TimedFetchException`, `AuthHttpException`, `UserScriptParseException`, `UserScriptImportException`, `UserScriptCatalogException`.
 - **Workspace:** `resolution: workspace` em todos os `pubspec.yaml`. `melos.yaml` só lista globs — **não há scripts Melos**.
 - **Chaves de storage (produção, via `KeyValueStore`):** `userscripts.v1`, `autologin.v1`, `userscript:<id>:gmvalues`, `userscript:<id>:gmresources`. Senha: `autologin.password` no `SecretStore`.
@@ -120,7 +123,7 @@ Registradas em `.specs/STATE.md` (AD-001 a AD-018; AD-011 e AD-017 **superseded*
 | ------ | ----------------- | ------- |
 | `packages/popmundo_utils` | Contrato `PopmundoRuntime`; host sticky; TimedFetch; parsing ASP.NET; Auto Login (orquestração + HTTP abstrato); catálogo/parser/shim GM; storage lógico; eventos | Não renderiza UI; não importa Flutter; persistência de disco é injetada (`KeyValueStore`/`SecretStore`); `CookieManager` fica atrás de `CookieSink` |
 | `packages/popmundo_webview` | `InAppPopmundoRuntime`; widget `PopmundoWebView`; JS bridge; UserScripts builtins + injector; `InAppCookieSink`; back navigation; settings do WebView | Não decide throttle, parsing de login, catálogo persistido, i18n, FGS |
-| `apps/popmundo_app` | Composition root; shell (`AppShell`/sidebar); telas Auto Login / UserScripts / idioma; `GmHostHandler`; keepalive; i18n; `SharedPreferencesStore` / `FlutterSecureSecretStore` | Não implementa parsing de form ASP.NET nem política de host; **ainda** importa `flutter_inappwebview` em `app.dart` para ler nomes de cookies |
+| `apps/popmundo_app` | Composition root; shell (`AppShell`/sidebar); telas Auto Login / UserScripts / idioma; `GmHostHandler`; keepalive; notificação de teste local (debug-only, `lib/notifications/`); i18n; `SharedPreferencesStore` / `FlutterSecureSecretStore` | Não implementa parsing de form ASP.NET nem política de host; **ainda** importa `flutter_inappwebview` em `app.dart` para ler nomes de cookies; não dispara notificações a partir de eventos de jogo (fora de escopo, MVP é só o botão manual) |
 | `packages/popmundo_webview/assets/js` | Hooks de `fetch`/`XHR`/`console` e helpers DOM **na página** | Não decide política — só captura e `callHandler` |
 | `apps/popmundo_app/integration_test` | Tier device-real (Patrol): FGS, Keystore, prefs, sockets loopback | Não constrói `PopmundoApp` / `InAppPopmundoRuntime`; não carrega o jogo |
 | `packages/popmundo_utils/test_live` | Suite **opt-in** contra o site real (credenciais em env); `dart test` **não** a executa | Não substitui o tier fake; não é CI |
@@ -191,6 +194,18 @@ GM.registerMenuCommand → GmMenuRegistry → seção extra no AppSidebar (limpa
 
 `main()` chama `FlutterForegroundTask.initCommunicationPort()`. `BackgroundKeepalive.bootstrap()` pede notificação + isenção de bateria (Android) e sobe o FGS. O isolate só manda heartbeat; o WebView não é tocado. Lifecycle do app (`WidgetsBindingObserver`) atualiza o status visível no overlay de debug.
 
+### 6.6 Notificação de teste local (debug)
+
+```
+main() → LocalNotificationsService().initialize() (antes do runApp; erro é capturado, nunca propaga)
+DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
+  → NotificationService.requestPermission()
+      concedida ⇒ NotificationService.showTestNotification() → tray do SO
+      negada    ⇒ no-op; painel permanece interativo
+```
+
+`apps/popmundo_app/lib/notifications/` — `NotificationService` (contrato), `LocalNotificationsService` (única classe que importa `flutter_local_notifications`; canal fixo `popflutter_debug_channel`, id fixo, título/corpo fixos em inglês), `FakeNotificationService` (dublê do tier rápido). Instanciado e inicializado em `main.dart` junto do `keepalive`, encaminhado por `PopmundoApp`/`PopmundoHome` até `DebugOverlay` como parâmetro opcional (`notificationService`). Sem lifecycle contínuo (ao contrário do `BackgroundKeepalive`): é uma ação única disparada manualmente, debug-only (herda o gate do sidebar, AD-009), sem toque na WebView/TimedFetch e sem gatilho de gameplay (fora de escopo). Prova de plumbing real fica no tier device-real (`integration_test/notifications_test.dart`), já que o canal de plugin não roda sob `flutter test`.
+
 ---
 
 ## 7. Dependências críticas
@@ -203,6 +218,7 @@ GM.registerMenuCommand → GmMenuRegistry → seção extra no AppSidebar (limpa
 | `shared_preferences: ^2.5.3` | pub.dev | app | Média — `KeyValueStore` de produção |
 | `flutter_secure_storage: ^9.2.4` | pub.dev | app | Alta para Auto Login — senha |
 | `flutter_foreground_task: ^11.0.0` | pub.dev | app | Alta para keepalive Android (`dataSync`, `stopWithTask=false`) |
+| `flutter_local_notifications: ^22.3.0` | pub.dev | app | Média — só o botão de teste do debug overlay (`LocalNotificationsService`); nenhum outro código importa o plugin |
 | `easy_localization: ^3.0.8` | pub.dev | app | Média — strings de release da shell |
 | `url_launcher: ^6.3.1` | pub.dev | webview + app | Média — links externos e `GM.openInTab` |
 | `patrol: ^4.9.0` + `patrol_cli` | pub.dev / global | app `dev_dependencies` | Média — só o tier device-real |

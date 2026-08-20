@@ -23,6 +23,7 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 | UserScripts UI | `lib/userscripts/` | [README](lib/userscripts/README.md) |
 | GM host | `lib/gm/` | [README](lib/gm/README.md) |
 | Keepalive | `lib/background/` | [README](lib/background/README.md) |
+| Notificações (debug) | `lib/notifications/` | `NotificationService`/`LocalNotificationsService`/`FakeNotificationService`; botão manual `debug-send-notification` no overlay |
 | Idioma | `lib/language/`, `lib/l10n.dart` | [README](lib/language/README.md) |
 | i18n assets | `assets/translations/{en,pt}.json` | Strings de release |
 | Patrol | `integration_test/` | [README](integration_test/README.md) |
@@ -30,7 +31,7 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 ## Dependências internas e externas
 
 - **Internas:** `popmundo_utils`, `popmundo_webview` (`path:`).
-- **Externas:** `easy_localization`, `shared_preferences`, `flutter_secure_storage`, `flutter_inappwebview` (cookies no overlay), `flutter_foreground_task`, `url_launcher` (`GM.openInTab`), `cupertino_icons`. Dev: `flutter_lints`, `patrol`.
+- **Externas:** `easy_localization`, `shared_preferences`, `flutter_secure_storage`, `flutter_inappwebview` (cookies no overlay), `flutter_foreground_task`, `flutter_local_notifications` (só `LocalNotificationsService`), `url_launcher` (`GM.openInTab`), `cupertino_icons`. Dev: `flutter_lints`, `patrol`.
 - **Não depende de** um backend próprio.
 
 ## Módulos relacionados
@@ -51,6 +52,7 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 - **UserScripts:** `syncUserScripts` após import/toggle; delete limpa GM values/resources.
 - **Navegação:** atualiza cookies do overlay e `gmMenuRegistry.clear()`.
 - **Lifecycle:** `didChangeAppLifecycleState` → keepalive.
+- **Notificação de teste:** `LocalNotificationsService().initialize()` roda antes do `runApp`; botão `debug-send-notification` pede permissão e mostra uma notificação fixa (id/canal fixos, negação/erro nunca derrubam o painel).
 
 ## Arquivos críticos
 

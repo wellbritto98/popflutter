@@ -79,20 +79,20 @@ No P2/P3 stories — the feature is intentionally MVP-only; everything beyond th
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| NOTIF-01 | P1: Manual test notification | Tasks | In Tasks |
-| NOTIF-02 | P1: Manual test notification | Tasks | In Tasks |
-| NOTIF-03 | P1: Manual test notification | Tasks | In Tasks |
-| NOTIF-04 | P1: Manual test notification | Tasks | In Tasks |
-| NOTIF-05 | P1: Manual test notification | Tasks | In Tasks |
-| NOTIF-06 | P1: Manual test notification | Tasks | In Tasks |
-| NOTIF-07 | P1: Manual test notification | Tasks | In Tasks |
-| NOTIF-08 | P1: Manual test notification | Tasks | In Tasks |
+| NOTIF-01 | P1: Manual test notification | Tasks | Implementing |
+| NOTIF-02 | P1: Manual test notification | Tasks | Implementing |
+| NOTIF-03 | P1: Manual test notification | Tasks | Implementing |
+| NOTIF-04 | P1: Manual test notification | Tasks | Implementing |
+| NOTIF-05 | P1: Manual test notification | Tasks | Implementing |
+| NOTIF-06 | P1: Manual test notification | Tasks | Implementing |
+| NOTIF-07 | P1: Manual test notification | Tasks | Implementing |
+| NOTIF-08 | P1: Manual test notification | Tasks | Implementing |
 
 **ID format:** `NOTIF-NN`
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 8 total, 0 mapped to tasks, 8 unmapped ⚠️ (mapped during Tasks phase)
+**Coverage:** 8 total, 8 mapped to tasks (T1-T8), 0 unmapped
 
 ---
 
