@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 33,
+  "next_id": 34,
   "lessons": [
     {
       "id": "L-001",
@@ -580,6 +580,24 @@
       ],
       "created": "2026-08-20T00:25:31Z",
       "last_seen": "2026-08-20T00:25:31Z"
+    },
+    {
+      "id": "L-033",
+      "key": "gate_fail::before wiring a new flutter plugin with native android setup requirements e g flutter local notifications check its pub dev gradle setup section via context7 for build gradle kts prerequisites like core library desugaring a plugin can compile analyze cleanly while still failing the first real gradle build over a missing native setup step",
+      "text": "Before wiring a new Flutter plugin with native Android setup requirements (e.g. flutter_local_notifications), check its pub.dev Gradle setup section (via Context7) for build.gradle.kts prerequisites like core library desugaring - a plugin can compile/analyze cleanly while still failing the first real Gradle build over a missing native setup step.",
+      "signal": "gate_fail",
+      "scope": "android-gradle",
+      "status": "candidate",
+      "features": [
+        "local-notifications"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "apps/popmundo_app/android/app/build.gradle.kts checkDebugAarMetadata (android-gradle)"
+      ],
+      "created": "2026-08-20T00:53:47Z",
+      "last_seen": "2026-08-20T00:53:47Z"
     }
   ]
 }

@@ -206,6 +206,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: NOTIF-08 / apps/popmundo_app/lib/notifications/local_notifications_service.dart:27-46 (apps/popmundo_app/lib/notifications)
 - last seen: 2026-08-20T00:25:31Z
 
+### L-033 — Before wiring a new Flutter plugin with native Android setup requirements (e.g. flutter_local_notifications), check its pub.dev Gradle setup section (via Context7) for build.gradle.kts prerequisites like core library desugaring - a plugin can compile/analyze cleanly while still failing the first real Gradle build over a missing native setup step.
+- signal: `gate_fail` · recurrence: 1 feature(s) · scope: `android-gradle` · harmful: 0
+- features: local-notifications
+- evidence: apps/popmundo_app/android/app/build.gradle.kts checkDebugAarMetadata (android-gradle)
+- last seen: 2026-08-20T00:53:47Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
