@@ -83,8 +83,8 @@ T9
 - Skill: NONE
 
 **Done when**:
-- [ ] Dependency present in `pubspec.yaml` under `dependencies:`
-- [ ] `flutter pub get` succeeds with no version-solver conflicts against `easy_localization`/`flutter_foreground_task`/`flutter_inappwebview`
+- [x] Dependency present in `pubspec.yaml` under `dependencies:`
+- [x] `flutter pub get` succeeds with no version-solver conflicts against `easy_localization`/`flutter_foreground_task`/`flutter_inappwebview`
 
 **Tests**: none
 **Gate**: build
@@ -106,9 +106,9 @@ T9
 - Skill: NONE
 
 **Done when**:
-- [ ] Abstract class with the three methods from `design.md`'s Components section
-- [ ] No Flutter/plugin imports beyond `dart:async` (interface stays plugin-free)
-- [ ] `flutter analyze apps/popmundo_app` passes
+- [x] Abstract class with the three methods from `design.md`'s Components section
+- [x] No Flutter/plugin imports beyond `dart:async` (interface stays plugin-free)
+- [x] `flutter analyze apps/popmundo_app` passes
 
 **Tests**: none
 **Gate**: build
@@ -130,9 +130,9 @@ T9
 - Skill: NONE
 
 **Done when**:
-- [ ] Implements `NotificationService` fully
-- [ ] `showDelay` support lets a test hold `showTestNotification()` pending, to exercise the in-flight/debounce path
-- [ ] `flutter analyze apps/popmundo_app` passes
+- [x] Implements `NotificationService` fully
+- [x] `showDelay` support lets a test hold `showTestNotification()` pending, to exercise the in-flight/debounce path
+- [x] `flutter analyze apps/popmundo_app` passes
 
 **Tests**: none
 **Gate**: build
@@ -154,10 +154,10 @@ T9
 - Skill: NONE
 
 **Done when**:
-- [ ] `initialize()` builds Android/Darwin settings per design, catches its own errors (NOTIF-08), verified against a real launcher-icon resource path under `android/app/src/main/res/mipmap-*/`
-- [ ] `requestPermission()` branches Android/iOS per design; other platforms return `true`
-- [ ] `showTestNotification()` no-ops if not initialized; uses fixed channel id `popflutter_debug_channel` (distinct from keepalive's `popmundo_keepalive`) and fixed notification id so repeat calls replace, not stack (NOTIF-07)
-- [ ] `flutter analyze apps/popmundo_app` passes
+- [x] `initialize()` builds Android/Darwin settings per design, catches its own errors (NOTIF-08), verified against a real launcher-icon resource path under `android/app/src/main/res/mipmap-*/`
+- [x] `requestPermission()` branches Android/iOS per design; other platforms return `true`
+- [x] `showTestNotification()` no-ops if not initialized; uses fixed channel id `popflutter_debug_channel` (distinct from keepalive's `popmundo_keepalive`) and fixed notification id so repeat calls replace, not stack (NOTIF-07)
+- [x] `flutter analyze apps/popmundo_app` passes
 
 **Tests**: integration — satisfied by T8's Patrol test (see Test Coverage Matrix: structural constraint, not deferral; matches the `FlutterForegroundTaskPlatform` precedent of zero unit tests)
 **Gate**: build now; full gate re-run as part of T8
@@ -179,9 +179,9 @@ T9
 - Skill: NONE
 
 **Done when**:
-- [ ] `notificationService` constructed and initialized before `runApp`
-- [ ] Passed into `PopmundoApp(...)`
-- [ ] `flutter analyze apps/popmundo_app` passes
+- [x] `notificationService` constructed and initialized before `runApp`
+- [x] Passed into `PopmundoApp(...)`
+- [x] `flutter analyze apps/popmundo_app` passes
 
 **Tests**: none
 **Gate**: build
@@ -203,9 +203,9 @@ T9
 - Skill: NONE
 
 **Done when**:
-- [ ] `PopmundoApp` and `PopmundoHome` both accept the optional param and forward it unchanged
-- [ ] `DebugOverlay(...)` call site passes `notificationService: widget.notificationService`
-- [ ] `flutter analyze apps/popmundo_app` passes
+- [x] `PopmundoApp` and `PopmundoHome` both accept the optional param and forward it unchanged
+- [x] `DebugOverlay(...)` call site passes `notificationService: widget.notificationService`
+- [x] `flutter analyze apps/popmundo_app` passes
 
 **Tests**: none
 **Gate**: build
@@ -227,11 +227,11 @@ T9
 - Skill: NONE
 
 **Done when**:
-- [ ] Button renders with the required key, fixed English label (AD-014 carve-out)
-- [ ] Denial path (fake returns `permissionGranted: false`): no notification call, no exception, panel stays interactive
-- [ ] In-flight repeat tap (fake with `showDelay`): second tap during the delay is a no-op (button disabled)
-- [ ] `initialize()`/`showTestNotification()` throwing (fake with `initializeError`/thrown error): caught, no crash
-- [ ] `flutter test test/debug_overlay_test.dart` passes, test count increases by the new cases above (no silent deletions of existing cases)
+- [x] Button renders with the required key, fixed English label (AD-014 carve-out)
+- [x] Denial path (fake returns `permissionGranted: false`): no notification call, no exception, panel stays interactive
+- [x] In-flight repeat tap (fake with `showDelay`): second tap during the delay is a no-op (button disabled)
+- [x] `initialize()`/`showTestNotification()` throwing (fake with `initializeError`/thrown error): caught, no crash
+- [x] `flutter test test/debug_overlay_test.dart` passes, test count increases by the new cases above (no silent deletions of existing cases)
 
 **Tests**: unit (widget)
 **Gate**: quick
