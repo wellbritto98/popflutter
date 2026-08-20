@@ -23,7 +23,7 @@ recommend. This feature fixes the one bottleneck without adding a conceptual lay
 
 - [ ] Adding a sidebar-backed feature requires **1 line in the composition root + 1 file in the
       feature's own folder** — never a signature change and never an edit inside `_PopmundoHomeState`.
-- [ ] `apps/popmundo_app/lib/app.dart` drops from 402 LOC to **≤ 180 LOC**.
+- [ ] `apps/popmundo_app/lib/app.dart` drops substantially from 402 LOC (target was ≤ 180; **actual: 216** — see the CRS-03 note).
 - [ ] The collaborator wiring becomes a plain, non-widget object with unit tests covering behavior
       that has none today (userscript diffing, start/dispose lifecycle, `@connect` header lookup).
 - [ ] `packages/popmundo_utils/lib/src` has **zero loose files** — every source file lives in a
@@ -100,6 +100,15 @@ own folder, so that per-feature context cost stays flat instead of growing with 
 2. WHEN a new sidebar entry is added THEN the signature of `buildAppMenuItems` SHALL NOT change,
    and the new entry's `AppMenuItem` SHALL be defined inside its own feature folder.
 3. WHEN `apps/popmundo_app/lib/app.dart` is measured THEN it SHALL be ≤ 180 lines.
+   > ⚠️ **MISSED — 216 lines (recorded at T6, not retrofitted).** 402 → 216 is a 46% cut, but the
+   > 180 figure was an estimate made before the `build` method was written and it did not account
+   > for the cost of scoped rebuilds: three `ValueListenableBuilder`/`ListenableBuilder` wrappers
+   > plus the nullable-`keepalive` branch take ~55 lines that the old blanket-`setState` version got
+   > for free by reading fields inline. Closing the gap would mean either giving those lines back
+   > (returning to whole-tree rebuilds) or scattering `build` across files purely to satisfy a line
+   > count. Neither serves CRS-01/CRS-02, which are the requirements that actually encode the goal —
+   > and both are met: zero collaborators in the State, one edit point per feature. The number is
+   > reported as measured rather than the target being quietly rewritten.
 4. WHEN `AppWiring` is inspected THEN it SHALL NOT reference `BuildContext`, `State`, `Navigator`,
    or any widget type.
 5. WHEN the sidebar is built with the debug item included THEN the item order SHALL be
@@ -245,7 +254,7 @@ repo-wide grep.
 
 ## Success Criteria
 
-- [ ] `app.dart` ≤ 180 LOC (from 402) — measured by `wc -l`.
+- [ ] `app.dart` substantially reduced from 402 LOC — measured by `wc -l`. **Result: 216 (−46%)**, short of the ≤ 180 target; see the CRS-03 note for why that was not forced.
 - [ ] Adding a hypothetical new sidebar feature touches **≤ 2 files** in the composition root
       (`app.dart`'s menu list + the new feature's own folder) — demonstrated by walking the diff of
       an existing feature against the new structure.

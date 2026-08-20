@@ -5,6 +5,7 @@ import 'package:popmundo_webview/popmundo_webview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
+import 'app_wiring.dart';
 import 'l10n.dart';
 import 'background/background_keepalive.dart';
 import 'background/flutter_foreground_task_platform.dart';
@@ -26,6 +27,14 @@ Future<void> main() async {
   // manual UI trigger, so permission must be requested at startup rather
   // than gated behind the debug panel (MENUNOTIF-10).
   await notificationService.requestPermission();
+  // The single composition root: everything non-UI is assembled here and
+  // handed to the shell as one object.
+  final wiring = AppWiring(
+    runtime: InAppPopmundoRuntime(),
+    store: SharedPreferencesStore(prefs),
+    keepalive: keepalive,
+    notificationService: notificationService,
+  );
   runApp(
     EasyLocalization(
       supportedLocales: supportedAppLocales,
@@ -33,12 +42,7 @@ Future<void> main() async {
       fallbackLocale: fallbackAppLocale,
       useOnlyLangCode: true,
       useFallbackTranslations: true,
-      child: PopmundoApp(
-        runtime: InAppPopmundoRuntime(),
-        store: SharedPreferencesStore(prefs),
-        keepalive: keepalive,
-        notificationService: notificationService,
-      ),
+      child: PopmundoApp(wiring: wiring),
     ),
   );
 }
