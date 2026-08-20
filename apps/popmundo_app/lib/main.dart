@@ -8,6 +8,7 @@ import 'app.dart';
 import 'l10n.dart';
 import 'background/background_keepalive.dart';
 import 'background/flutter_foreground_task_platform.dart';
+import 'notifications/local_notifications_service.dart';
 import 'prefs_store.dart';
 
 Future<void> main() async {
@@ -19,6 +20,8 @@ Future<void> main() async {
     platform: FlutterForegroundTaskPlatform(),
     translator: (key) => key.tr(),
   );
+  final notificationService = LocalNotificationsService();
+  await notificationService.initialize();
   runApp(
     EasyLocalization(
       supportedLocales: supportedAppLocales,
@@ -30,6 +33,7 @@ Future<void> main() async {
         runtime: InAppPopmundoRuntime(),
         store: SharedPreferencesStore(prefs),
         keepalive: keepalive,
+        notificationService: notificationService,
       ),
     ),
   );
