@@ -58,6 +58,8 @@ class AppWiring {
     required this.runtime,
     required this.store,
     SecretStore? secretStore,
+    this.cookieSink,
+    this.cookieSource,
     this.keepalive,
     this.notificationService,
   }) : secretStore = secretStore ?? FlutterSecureSecretStore();
@@ -67,6 +69,12 @@ class AppWiring {
   final SecretStore secretStore;
   final BackgroundKeepalive? keepalive;
   final NotificationService? notificationService;
+
+  /// Overrides for the WebView cookie jar. Both default to [cookieJar]; tests
+  /// pass `MemoryCookieSink` because [InAppCookieSink] builds a
+  /// `CookieManager` eagerly, which needs a live platform channel.
+  final CookieSink? cookieSink;
+  final CookieSource? cookieSource;
 
   // ── observable state ────────────────────────────────────────────────────
   final userscripts = ValueNotifier<UserscriptsState>(
@@ -111,8 +119,8 @@ class AppWiring {
     secretStore: secretStore,
     // The native handshake authenticates over dart:io; without this the
     // WebView's own jar never learns about it and stays logged out.
-    cookieSink: cookieJar,
-    cookieSource: cookieJar,
+    cookieSink: cookieSink ?? cookieJar,
+    cookieSource: cookieSource ?? cookieJar,
   );
   late final menuNotificationsService = MenuNotificationsService(
     runtime,
