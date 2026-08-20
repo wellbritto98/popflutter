@@ -1,158 +1,76 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:popmundo_app/menu/app_menu_item.dart';
 import 'package:popmundo_app/menu/app_menu_registry.dart';
 
-import 'localization_helpers.dart';
+/// The registry no longer knows which features exist — each feature owns its
+/// own `AppMenuItem` builder (tested in `*_menu_item_test.dart`). What is left
+/// to prove here is ordering and the debug gate, so stubs are the right input:
+/// using the real feature builders would couple this back to feature identity.
+AppMenuItem _stub(String id, {VoidCallback? onTap}) => AppMenuItem(
+  id: id,
+  icon: Icons.circle,
+  label: id,
+  onTap: onTap ?? () {},
+);
 
 void main() {
-  testWidgets('always includes auto-login and userscripts', (tester) async {
-    await pumpLocalized(tester, const SizedBox());
+  test('preserves the order the caller passed', () {
     final items = buildAppMenuItems(
-      onOpenDebugPanel: () {},
-      onOpenUserScripts: () {},
-      onOpenAutoLogin: () {},
-      onOpenLanguage: () {},
+      items: [_stub('a'), _stub('b'), _stub('c')],
       includeDebugItem: false,
     );
 
-    expect(items.map((e) => e.id), ['auto-login', 'userscripts', 'language']);
-    expect(items.first.label, 'Auto Login');
-    expect(
-      items.first.subtitle,
-      'Credentials and character for TimedFetch login',
-    );
+    expect(items.map((e) => e.id), ['a', 'b', 'c']);
   });
 
-  testWidgets(
-      'returns auto-login + userscripts + debug when includeDebugItem is true',
-      (tester) async {
-    await pumpLocalized(tester, const SizedBox());
+  test('appends the debug item last when includeDebugItem is true', () {
     final items = buildAppMenuItems(
-      onOpenDebugPanel: () {},
-      onOpenUserScripts: () {},
-      onOpenAutoLogin: () {},
-      onOpenLanguage: () {},
+      items: [_stub('a'), _stub('b'), _stub('c')],
+      debugItem: _stub('debug'),
       includeDebugItem: true,
     );
 
-    expect(
-      items.map((e) => e.id),
-      ['auto-login', 'userscripts', 'language', 'debug'],
-    );
-    expect(items[3].label, 'Debug panel');
-    expect(
-      items[3].subtitle,
-      'Inspect host, network, console and eval JS',
-    );
+    expect(items.map((e) => e.id), ['a', 'b', 'c', 'debug']);
+    expect(items.last.id, 'debug');
   });
 
-  testWidgets("the debug item's onTap invokes onOpenDebugPanel exactly once",
-      (tester) async {
-    await pumpLocalized(tester, const SizedBox());
-    var callCount = 0;
+  test('omits the debug item when includeDebugItem is false', () {
     final items = buildAppMenuItems(
-      onOpenDebugPanel: () => callCount++,
-      onOpenUserScripts: () {},
-      onOpenAutoLogin: () {},
-      onOpenLanguage: () {},
-      includeDebugItem: true,
-    );
-
-    items.firstWhere((e) => e.id == 'debug').onTap();
-
-    expect(callCount, 1);
-  });
-
-  testWidgets(
-      "the userscripts item's onTap invokes onOpenUserScripts exactly once",
-      (tester) async {
-    await pumpLocalized(tester, const SizedBox());
-    var callCount = 0;
-    final items = buildAppMenuItems(
-      onOpenDebugPanel: () {},
-      onOpenUserScripts: () => callCount++,
-      onOpenAutoLogin: () {},
-      onOpenLanguage: () {},
+      items: [_stub('a')],
+      debugItem: _stub('debug'),
       includeDebugItem: false,
     );
 
-    items.firstWhere((e) => e.id == 'userscripts').onTap();
-
-    expect(callCount, 1);
-    expect(items.firstWhere((e) => e.id == 'userscripts').label, 'Userscripts');
+    expect(items.map((e) => e.id), ['a']);
   });
 
-  testWidgets("the auto-login item's onTap invokes onOpenAutoLogin exactly once",
-      (tester) async {
-    await pumpLocalized(tester, const SizedBox());
-    var callCount = 0;
-    final items = buildAppMenuItems(
-      onOpenDebugPanel: () {},
-      onOpenUserScripts: () {},
-      onOpenAutoLogin: () => callCount++,
-      onOpenLanguage: () {},
-      includeDebugItem: false,
-    );
+  test('omits the debug entry when no debugItem is supplied', () {
+    final items = buildAppMenuItems(items: [_stub('a')], includeDebugItem: true);
 
-    items.firstWhere((e) => e.id == 'auto-login').onTap();
-
-    expect(callCount, 1);
+    expect(items.map((e) => e.id), ['a']);
   });
 
-  testWidgets('defaults includeDebugItem to kDebugMode when omitted',
-      (tester) async {
-    await pumpLocalized(tester, const SizedBox());
+  test('defaults includeDebugItem to kDebugMode when omitted', () {
     final items = buildAppMenuItems(
-      onOpenDebugPanel: () {},
-      onOpenUserScripts: () {},
-      onOpenAutoLogin: () {},
-      onOpenLanguage: () {},
+      items: [_stub('a')],
+      debugItem: _stub('debug'),
     );
 
-    expect(items.any((e) => e.id == 'auto-login'), isTrue);
-    expect(items.any((e) => e.id == 'userscripts'), isTrue);
-    expect(items.any((e) => e.id == 'language'), isTrue);
+    expect(items.any((e) => e.id == 'a'), isTrue);
     expect(items.any((e) => e.id == 'debug'), kDebugMode);
   });
 
-  testWidgets("the language item's onTap invokes onOpenLanguage exactly once",
-      (tester) async {
-    await pumpLocalized(tester, const SizedBox());
-    var callCount = 0;
+  test('passes each item through untouched, onTap included', () {
+    var calls = 0;
     final items = buildAppMenuItems(
-      onOpenDebugPanel: () {},
-      onOpenUserScripts: () {},
-      onOpenAutoLogin: () {},
-      onOpenLanguage: () => callCount++,
+      items: [_stub('a', onTap: () => calls++)],
       includeDebugItem: false,
     );
 
-    items.firstWhere((e) => e.id == 'language').onTap();
+    items.single.onTap();
 
-    expect(callCount, 1);
-    expect(items.firstWhere((e) => e.id == 'language').label, 'Language');
-  });
-
-  testWidgets('PT locale resolves registry labels from the catalog',
-      (tester) async {
-    await pumpLocalized(
-      tester,
-      const SizedBox(),
-      startLocale: const Locale('pt'),
-    );
-    final items = buildAppMenuItems(
-      onOpenDebugPanel: () {},
-      onOpenUserScripts: () {},
-      onOpenAutoLogin: () {},
-      onOpenLanguage: () {},
-      includeDebugItem: false,
-    );
-
-    expect(
-      items.firstWhere((e) => e.id == 'auto-login').label,
-      'Login automático',
-    );
-    expect(items.firstWhere((e) => e.id == 'language').label, 'Idioma');
+    expect(calls, 1);
   });
 }

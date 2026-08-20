@@ -7,6 +7,7 @@ import 'package:popmundo_utils/popmundo_utils.dart';
 import 'package:popmundo_webview/popmundo_webview.dart';
 
 import 'app_shell.dart';
+import 'autologin/auto_login_menu_item.dart';
 import 'autologin/auto_login_messages.dart';
 import 'autologin/auto_login_screen.dart';
 import 'autologin/secure_secret_store.dart';
@@ -16,12 +17,15 @@ import 'debug_overlay.dart';
 import 'gm/gm_host_handler.dart';
 import 'gm/gm_menu_registry.dart';
 import 'gm/gm_notification_overlay.dart';
+import 'language/language_menu_item.dart';
 import 'language/language_selector.dart';
 import 'menu/app_menu_registry.dart';
+import 'menu/debug_menu_item.dart';
 import 'menu/gm_menu_command_item.dart';
 import 'notifications/menu_notifications_bridge.dart';
 import 'notifications/notification_service.dart';
 import 'userscripts/userscript_http.dart';
+import 'userscripts/userscripts_menu_item.dart';
 import 'userscripts/userscripts_screen.dart';
 
 class PopmundoApp extends StatelessWidget {
@@ -329,10 +333,14 @@ class _PopmundoHomeState extends State<PopmundoHome>
   Widget build(BuildContext context) {
     return AppShell(
       items: buildAppMenuItems(
-        onOpenDebugPanel: () => setState(() => _debugPanelVisible = true),
-        onOpenUserScripts: _openUserScripts,
-        onOpenAutoLogin: _openAutoLogin,
-        onOpenLanguage: _openLanguage,
+        items: [
+          autoLoginMenuItem(onTap: _openAutoLogin),
+          userscriptsMenuItem(onTap: _openUserScripts),
+          languageMenuItem(onTap: _openLanguage),
+        ],
+        debugItem: debugMenuItem(
+          onTap: () => setState(() => _debugPanelVisible = true),
+        ),
       ),
       gmMenuCommands: _gmMenuItems,
       onGmMenuCommand: (cmd) {

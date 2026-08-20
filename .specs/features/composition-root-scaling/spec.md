@@ -112,6 +112,14 @@ own folder, so that per-feature context cost stays flat instead of growing with 
 **Independent Test**: `flutter test test/app_menu_registry_test.dart` plus a line count of
 `app.dart` and a grep of `_PopmundoHomeState` for collaborator constructors.
 
+> ⚠️ **Known coverage delta on CRS-05 (recorded at T4, for the Verifier to rule on).**
+> "debug is always last" and "the caller's order is preserved" are both structurally guaranteed and
+> directly tested in `app_menu_registry_test.dart`, and every feature's own id is asserted in its
+> `*_menu_item_test.dart`. What is **no longer** covered is the concrete production sequence
+> `auto-login, userscripts, language` — that is now data in `app.dart`'s single call site, and no
+> test pumps `_PopmundoHomeState`. Closing it would require reintroducing a registry that knows the
+> feature identities, i.e. undoing CRS-02. Recorded deliberately rather than papered over.
+
 ---
 
 ### P1: The refactor is behavior-neutral ⭐ MVP

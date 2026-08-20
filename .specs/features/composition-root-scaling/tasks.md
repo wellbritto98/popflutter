@@ -35,6 +35,7 @@ Verified references that go stale; each must be fixed:
 | `apps/popmundo_app/README.md` — Responsabilidade principal / Fluxos importantes | Navigation/cookie/bootstrap flows are now `AppWiring`'s job, not `_PopmundoHomeState`'s |
 | `apps/popmundo_app/lib/menu/README.md` — "Pontos de entrada" | Currently states *"Novo item nativo = nova entrada em `buildAppMenuItems` **somente**"* — now **wrong**. Rewrite to: item-builder function in the feature's own folder + one line in `app.dart`'s `items:` list |
 | `apps/popmundo_app/lib/menu/README.md` — Funcionalidades table | Update the `app_menu_registry.dart` row; add `debug_menu_item.dart` |
+| `apps/popmundo_app/lib/notifications/README.md` | Its "Pontos de entrada" section says `_PopmundoHomeState` starts the watcher/bridge in `initState`. T6 moves that to `AppWiring.start()` — repoint it |
 | `packages/popmundo_utils/README.md` | Repath every `src/*.dart` cell in "Funcionalidades existentes" and "Arquivos críticos" to `src/core/…` / `src/facades/…` |
 | `CLAUDE.md` | The bullet naming `apps/popmundo_app/lib/app.dart` as the direct `flutter_inappwebview` importer must point at `lib/cookie_watcher.dart` |
 | `.claude/agents/popmundo-app-shell.md` **and** `.agents/agents/popmundo-app-shell.md` | File-ownership lists name `app.dart`; add `app_wiring.dart` and `cookie_watcher.dart` |

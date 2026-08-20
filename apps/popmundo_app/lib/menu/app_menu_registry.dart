@@ -1,49 +1,19 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 import 'app_menu_item.dart';
 
-/// Single source of truth for the sidebar's item list.
+/// Assembles the sidebar's fixed item list.
 ///
-/// Adding a new entry here is the only change required to surface it in
-/// `AppSidebar` — no existing widget or menu item needs to change.
+/// This function knows nothing about which features exist — each feature owns
+/// its own `AppMenuItem` builder in its own folder (see `lib/menu/README.md`).
+/// All this does is preserve the caller's order and append the debug entry
+/// last, when the gate allows it. Adding a feature therefore never changes
+/// this signature.
 List<AppMenuItem> buildAppMenuItems({
-  required VoidCallback onOpenDebugPanel,
-  required VoidCallback onOpenUserScripts,
-  required VoidCallback onOpenAutoLogin,
-  required VoidCallback onOpenLanguage,
+  required List<AppMenuItem> items,
+  AppMenuItem? debugItem,
   bool includeDebugItem = kDebugMode,
-}) {
-  return [
-    AppMenuItem(
-      id: 'auto-login',
-      icon: Icons.key,
-      label: 'menu.autoLogin'.tr(),
-      subtitle: 'menu.autoLoginSubtitle'.tr(),
-      onTap: onOpenAutoLogin,
-    ),
-    AppMenuItem(
-      id: 'userscripts',
-      icon: Icons.extension,
-      label: 'menu.userscripts'.tr(),
-      subtitle: 'menu.userscriptsSubtitle'.tr(),
-      onTap: onOpenUserScripts,
-    ),
-    AppMenuItem(
-      id: 'language',
-      icon: Icons.language,
-      label: 'menu.language'.tr(),
-      subtitle: 'menu.languageSubtitle'.tr(),
-      onTap: onOpenLanguage,
-    ),
-    if (includeDebugItem)
-      AppMenuItem(
-        id: 'debug',
-        icon: Icons.bug_report,
-        label: 'menu.debugPanel'.tr(),
-        subtitle: 'menu.debugPanelSubtitle'.tr(),
-        onTap: onOpenDebugPanel,
-      ),
-  ];
-}
+}) => [
+  ...items,
+  if (includeDebugItem && debugItem != null) debugItem,
+];
