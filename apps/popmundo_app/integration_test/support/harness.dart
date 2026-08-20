@@ -56,6 +56,20 @@ Future<void> grantNotificationsIfAsked(PatrolIntegrationTester $) async {
   }
 }
 
+/// Denies the notification permission only if the OS actually asked.
+///
+/// Mirror of [grantNotificationsIfAsked] for tests that need to prove the
+/// denial path on the real OS dialog (e.g. NOTIF-05) rather than skip it.
+/// Same visibility guard: a device that already resolved the permission (in
+/// either direction) shows no dialog, and an unguarded await would hang.
+Future<void> denyNotificationsIfAsked(PatrolIntegrationTester $) async {
+  if (await $.platform.mobile.isPermissionDialogVisible(
+    timeout: const Duration(seconds: 5),
+  )) {
+    await $.platform.mobile.denyPermission();
+  }
+}
+
 /// Answers the battery-optimisation exemption dialog if Android raised one.
 ///
 /// This is NOT a runtime permission, so `grantPermissionWhenInUse()` does not
