@@ -93,7 +93,6 @@ class _PopmundoHomeState extends State<PopmundoHome>
   var _previouslyEnabledIds = <String>{};
   BackgroundStatus? _backgroundStatus;
 
-  late final storage = StorageService(widget.store);
   late final catalog = UserScriptCatalog(widget.store);
   late final gmValueStore = GmValueStore(widget.store);
   late final gmResourceStore = GmResourceStore(widget.store);
@@ -328,75 +327,48 @@ class _PopmundoHomeState extends State<PopmundoHome>
 
   @override
   Widget build(BuildContext context) {
-    return PopmundoScope(
-      runtime: widget.runtime,
-      storage: storage,
-      child: AppShell(
-        items: buildAppMenuItems(
-          onOpenDebugPanel: () => setState(() => _debugPanelVisible = true),
-          onOpenUserScripts: _openUserScripts,
-          onOpenAutoLogin: _openAutoLogin,
-          onOpenLanguage: _openLanguage,
-        ),
-        gmMenuCommands: _gmMenuItems,
-        onGmMenuCommand: (cmd) {
-          unawaited(gmHostHandler.onMenuCommandTapped(
+    return AppShell(
+      items: buildAppMenuItems(
+        onOpenDebugPanel: () => setState(() => _debugPanelVisible = true),
+        onOpenUserScripts: _openUserScripts,
+        onOpenAutoLogin: _openAutoLogin,
+        onOpenLanguage: _openLanguage,
+      ),
+      gmMenuCommands: _gmMenuItems,
+      onGmMenuCommand: (cmd) {
+        unawaited(
+          gmHostHandler.onMenuCommandTapped(
             GmMenuCommand(
               scriptId: cmd.scriptId,
               commandId: cmd.commandId,
               caption: cmd.caption,
             ),
-          ));
-        },
-        body: SafeArea(
-          child: !_bootstrapReady
-              ? const Center(child: CircularProgressIndicator())
-              : GmNotificationOverlay(
-                  controller: gmNotificationController,
-                  onTap: (n) => unawaited(gmHostHandler.onNotificationTapped(n)),
-                  child: DebugOverlay(
-                    host: widget.runtime.host,
-                    events: widget.runtime.events,
-                    evaluate: widget.runtime.evaluate,
-                    cookies: _cookies,
-                    backgroundStatus: _backgroundStatus,
-                    notificationService: widget.notificationService,
-                    visible: _debugPanelVisible,
-                    onClose: () => setState(() => _debugPanelVisible = false),
-                    child: PopmundoWebView(
-                      runtime: widget.runtime,
-                      gmValueStore: gmValueStore,
-                      enabledUserScripts: _enabledUserScripts,
-                    ),
+          ),
+        );
+      },
+      body: SafeArea(
+        child: !_bootstrapReady
+            ? const Center(child: CircularProgressIndicator())
+            : GmNotificationOverlay(
+                controller: gmNotificationController,
+                onTap: (n) => unawaited(gmHostHandler.onNotificationTapped(n)),
+                child: DebugOverlay(
+                  host: widget.runtime.host,
+                  events: widget.runtime.events,
+                  evaluate: widget.runtime.evaluate,
+                  cookies: _cookies,
+                  backgroundStatus: _backgroundStatus,
+                  notificationService: widget.notificationService,
+                  visible: _debugPanelVisible,
+                  onClose: () => setState(() => _debugPanelVisible = false),
+                  child: PopmundoWebView(
+                    runtime: widget.runtime,
+                    gmValueStore: gmValueStore,
+                    enabledUserScripts: _enabledUserScripts,
                   ),
                 ),
-        ),
+              ),
       ),
     );
-  }
-}
-
-class PopmundoScope extends InheritedWidget {
-  const PopmundoScope({
-    super.key,
-    required this.runtime,
-    required this.storage,
-    required super.child,
-  });
-
-  final InAppPopmundoRuntime runtime;
-  final StorageService storage;
-
-  static PopmundoScope of(BuildContext context) {
-    final scope = context.dependOnInheritedWidgetOfExactType<PopmundoScope>();
-    if (scope == null) {
-      throw StateError('PopmundoScope not found');
-    }
-    return scope;
-  }
-
-  @override
-  bool updateShouldNotify(PopmundoScope oldWidget) {
-    return runtime != oldWidget.runtime || storage != oldWidget.storage;
   }
 }
