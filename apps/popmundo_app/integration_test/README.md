@@ -14,8 +14,9 @@ Exercitar APIs de plataforma que fakes não alcançam: Foreground Service, Keyst
 
 | Arquivo | Função |
 | ------- | ------ |
-| `support/harness.dart` | `initForegroundComms()`, `pumpHarness` (`MaterialApp` mínimo), diálogos de permissão/bateria |
-| `keepalive_test.dart` | FGS / notificação / `stopWithTask` |
+| `support/harness.dart` | `initForegroundComms()`, `pumpHarness` (`MaterialApp` mínimo), diálogos de permissão/bateria; bootstrap limitado a 30s após prompts |
+| keepalive_test.dart | FGS, notificação e stopWithTask; dois ticks novos enquanto Home |
+| session_background_test.dart | BSR-05: HTTP loopback, troca de host e cookies Android, relogin e resultado no sistema com JS suspenso; asserts antes de reabrir |
 | `storage_test.dart` | prefs reais |
 | `userscripts_test.dart` | superfície mobile do catálogo sem WebView de jogo |
 | `smoke_test.dart` | fumaça do harness |

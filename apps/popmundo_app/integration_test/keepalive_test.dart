@@ -21,12 +21,10 @@
 // all six criteria live in a single sequential test below, which also happens
 // to mirror a real app session more closely than six isolated ones would.
 //
-// Battery optimisation note: bootstrap() may call
-// requestIgnoreBatteryOptimization(), which fires an Intent and returns
-// without waiting — it does NOT block the test (verified on device). It can
-// still raise a settings screen that steals focus. If that ever destabilises
-// the shade assertions, waive it after install with:
-//   adb -s <device> shell dumpsys deviceidle whitelist +com.popmundo.popmundo_app
+// Battery exemption uses startActivityForResult: the plugin Future completes
+// only after Android returns the permission activity result. Grant it with
+// the harness, or waive it for the isolated test package before execution.
+// waitForKeepaliveBootstrap bounds a missing callback and reports OS state.
 //
 // See .specs/features/mobile-e2e-tests/spec.md (P1: Keepalive real em device).
 import 'package:flutter/material.dart';
@@ -57,7 +55,7 @@ void main() {
     // a separate system dialog that is NOT a runtime permission — unanswered,
     // it covers the app and breaks the shade assertions below.
     await grantBackgroundExemptionIfAsked($);
-    await bootstrapping;
+    await waitForKeepaliveBootstrap(bootstrapping, keepalive.status);
     await $.pumpAndSettle();
 
     // KA-01: the facade observed the service come up.
@@ -78,7 +76,7 @@ void main() {
     // service rather than starting a second one.
     final second = BackgroundKeepalive(platform: platform);
     addTearDown(second.dispose);
-    await second.bootstrap();
+    await waitForKeepaliveBootstrap(second.bootstrap(), second.status);
     await $.pumpAndSettle();
 
     expect(
@@ -106,6 +104,20 @@ void main() {
     final lastBeforeBackground = before.last;
 
     await $.platform.mobile.pressHome();
+
+    // BSR-05: prove two NEW ticks while still Home, before reopening.
+    // Waiting only after openApp could hide a service that resumed on return.
+    final whileBackgrounded = await waitForTicks(keepalive.status, count: 3);
+    expect(
+      whileBackgrounded[1].isAfter(lastBeforeBackground),
+      isTrue,
+      reason: "BSR-05: first new keepalive tick must arrive while Home",
+    );
+    expect(
+      whileBackgrounded[2].isAfter(whileBackgrounded[1]),
+      isTrue,
+      reason: "BSR-05: two distinct new ticks must arrive before reopen",
+    );
 
     // KA-05: the persistent notification must still be in the shade. This is
     // exactly what AD-013 broke: stopWithTask="true" tore the service down the

@@ -38,9 +38,7 @@ void initForegroundComms() {
 /// which navigates to popmundo.com. The device tier never loads the live game
 /// (CLAUDE.md hard constraint), and this is where that is enforced.
 Future<void> pumpHarness(PatrolIntegrationTester $, Widget child) {
-  return $.pumpWidgetAndSettle(
-    MaterialApp(home: Scaffold(body: child)),
-  );
+  return $.pumpWidgetAndSettle(MaterialApp(home: Scaffold(body: child)));
 }
 
 /// Grants the notification permission only if the OS actually asked.
@@ -49,8 +47,11 @@ Future<void> pumpHarness(PatrolIntegrationTester $, Widget child) {
 /// may auto-grant or present nothing. Guarding on visibility keeps the test
 /// from hanging on a dialog that never appears.
 Future<void> grantNotificationsIfAsked(PatrolIntegrationTester $) async {
+  final permission = await FlutterForegroundTask.checkNotificationPermission()
+      .timeout(const Duration(seconds: 5));
+  if (permission == NotificationPermission.granted) return;
   if (await $.platform.mobile.isPermissionDialogVisible(
-    timeout: const Duration(seconds: 5),
+    timeout: const Duration(seconds: 15),
   )) {
     await $.platform.mobile.grantPermissionWhenInUse();
   }
@@ -81,8 +82,11 @@ Future<void> denyNotificationsIfAsked(PatrolIntegrationTester $) async {
 ///
 /// Tries each known affirmative label in turn; a miss throws, which just means
 /// "not this label, or no dialog at all", so it is swallowed. Fully absent
-/// dialog (device already exempt) is the normal path and costs one timeout.
+/// dialog (device already exempt) is skipped after checking actual OS state.
 Future<void> grantBackgroundExemptionIfAsked(PatrolIntegrationTester $) async {
+  final exempt = await FlutterForegroundTask.isIgnoringBatteryOptimizations
+      .timeout(const Duration(seconds: 5));
+  if (exempt) return;
   const labels = ['Allow', 'ALLOW', 'Permitir', 'PERMITIR'];
   for (final label in labels) {
     try {
@@ -177,5 +181,28 @@ Future<void> waitUntil(
   }
   throw TimeoutException(
     'Timed out after ${timeout.inSeconds}s waiting for: $description',
+  );
+}
+
+/// Bounds bootstrap after answering system prompts, with state diagnostics.
+/// A frozen Android permission activity/SystemUI must fail instead of leaving
+/// the instrumentation runner waiting indefinitely for its native callback.
+Future<void> waitForKeepaliveBootstrap(
+  Future<void> bootstrap,
+  ValueNotifier<BackgroundStatus> status, {
+  Duration timeout = const Duration(seconds: 30),
+}) {
+  return bootstrap.timeout(
+    timeout,
+    onTimeout: () {
+      final state = status.value;
+      throw TimeoutException(
+        "Keepalive bootstrap stalled; notification=${state.notifLabel}, "
+        "battery=${state.batteryLabel}, service=${state.bgLabel}, "
+        "lifecycle=${state.lifecycleLabel}. "
+        "Check Android permission dialog or SystemUI ANR.",
+        timeout,
+      );
+    },
   );
 }
