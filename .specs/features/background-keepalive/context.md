@@ -48,7 +48,7 @@ O app solicita permissões na primeira abertura, mantém keepalive de sessão no
 ### Declined / Undiscussed Gray Areas → Assumptions
 
 - Sem botão no debug para reabrir Ajustes / re-pedir (usuário escolheu launch + status + heartbeat, não re-prompt).
-- Tipo FGS `dataSync` (README do plugin / MVP sideload); limite Android 15 documentado como risco.
+- Tipo FGS specialUse com subtype de manutenção contínua de sessão (AD-020; usuário confirmou uso durante a noite em 2026-10-04).
 
 ---
 
@@ -63,4 +63,3 @@ O app solicita permissões na primeira abertura, mantém keepalive de sessão no
 
 - Envio de notificações push / remote messaging.
 - Autostart pós-boot / fabricante.
-- `specialUse` FGS para Play Store longa duração.

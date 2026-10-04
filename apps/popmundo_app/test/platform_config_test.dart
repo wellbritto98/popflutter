@@ -18,7 +18,7 @@ void main() {
     ]);
     expect(manifest.contains('android.permission.FOREGROUND_SERVICE'), isTrue);
     expect(
-      manifest.contains('android.permission.FOREGROUND_SERVICE_DATA_SYNC'),
+      manifest.contains('android.permission.FOREGROUND_SERVICE_SPECIAL_USE'),
       isTrue,
     );
     expect(manifest.contains('android.permission.POST_NOTIFICATIONS'), isTrue);
@@ -35,7 +35,18 @@ void main() {
       ),
       isTrue,
     );
-    expect(manifest.contains('android:foregroundServiceType="dataSync"'), isTrue);
+    expect(
+      manifest.contains('android:foregroundServiceType="specialUse"'),
+      isTrue,
+    );
+    expect(
+      manifest.contains('android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE'),
+      isTrue,
+    );
+    expect(
+      manifest.contains('Maintain the user-enabled Popmundo session'),
+      isTrue,
+    );
     // stopWithTask="true" kills the FGS the moment the app leaves Recents,
     // defeating the whole point of background keepalive — must stay false.
     expect(manifest.contains('android:stopWithTask="false"'), isTrue);
@@ -47,6 +58,8 @@ void main() {
       'lib/background/flutter_foreground_task_platform.dart',
       'apps/popmundo_app/lib/background/flutter_foreground_task_platform.dart',
     ]);
+    expect(source.contains('ForegroundServiceTypes.specialUse'), isTrue);
+    expect(source.contains('ForegroundServiceTypes.dataSync'), isFalse);
     expect(source.contains('stopWithTask: false'), isTrue);
     expect(source.contains('stopWithTask: true'), isFalse);
   });

@@ -49,7 +49,7 @@ sequenceDiagram
 
 | System | Integration Method |
 | ------ | ------------------ |
-| AndroidManifest | Declare FGS perms + plugin service `dataSync` |
+| AndroidManifest | Declare FGS perms + plugin service `specialUse` |
 | Info.plist | `UIBackgroundModes` fetch + BGTaskScheduler id |
 | DebugOverlay | Optional `BackgroundStatus?` prop |
 | AppLifecycle | `WidgetsBindingObserver` on home or facade |
@@ -163,7 +163,7 @@ class BackgroundStatus {
 
 | Concern | Location | Impact | Mitigation |
 | ------- | -------- | ------ | ---------- |
-| Android 15+ `dataSync` ~6h/24h cap | FGS type | Service may stop after long background | Document; return to foreground resets; Play `specialUse` deferred |
+| Android 15+ service duration | FGS specialUse | Continuous session maintenance; no dataSync six-hour cap | Declare subtype; Play distribution requires use-case review |
 | iOS does not keep WebView JS alive | Platform | False expectation of live page | Honest debug (lifecycle + frozen heartbeat); cookies AD-004 |
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` Play policy | Manifest | Review before Play publish | OK for sideload MVP |
 | Plugin API drift (`initCommunicationPort`) | main.dart | Build break | Confirm against pinned README at implement |
@@ -177,7 +177,7 @@ class BackgroundStatus {
 | -------- | ------ | --------- |
 | Plugin | `flutter_foreground_task` only | Covers notif + battery + FGS + heartbeat |
 | Layer | App shell only | AD-002; utils stays Flutter-free |
-| FGS type | `dataSync` | Plugin default / MVP |
+| FGS type | `specialUse` | User-requested continuous session maintenance (AD-020) |
 | Boot autostart | Off | Policy / out of scope |
 | Heartbeat interval | 5000 ms | Balance visibility vs battery |
 | Project-level | **AD-012** | Keepalive shell-owned; isolate heartbeat-only |

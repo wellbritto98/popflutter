@@ -73,7 +73,7 @@ class FlutterForegroundTaskPlatform implements BackgroundPlatform {
     required String notificationText,
   }) async {
     final result = await FlutterForegroundTask.startService(
-      serviceTypes: const [ForegroundServiceTypes.dataSync],
+      serviceTypes: const [ForegroundServiceTypes.specialUse],
       notificationTitle: notificationTitle,
       notificationText: notificationText,
       callback: keepaliveStartCallback,

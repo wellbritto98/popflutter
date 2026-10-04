@@ -30,7 +30,7 @@ Quando o jogador coloca o Popflutter em segundo plano (home, outro app, tela blo
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
-| Objetivo Android | FGS (`dataSync`) + notificação persistente + isenção de bateria | Pedido explícito do usuário | y |
+| Objetivo Android | FGS (`specialUse`) + notificação persistente + isenção de bateria | Pedido explícito do usuário | y |
 | Objetivo iOS | Pedir notificação na abertura; JS da página para ao suspender; sessão via cookies (AD-004) | Limite da plataforma; pedido explícito | y |
 | Plugin | Só `flutter_foreground_task` (sem `permission_handler` paralelo) | Cobre notif + bateria + FGS + heartbeat | y |
 | Momento do prompt | Pós-primeiro-frame em `PopmundoHome`; não bloqueia o WebView | Pedido: pedido inicial ao abrir | y |
@@ -70,10 +70,10 @@ Quando o jogador coloca o Popflutter em segundo plano (home, outro app, tela blo
 
 **Acceptance Criteria**:
 
-1. WHEN bootstrap completes on Android and the service is not already running THEN the system SHALL start a foreground service of type `dataSync` with a persistent notification titled such that it communicates the app is running (e.g. “Popmundo is running”).
+1. WHEN bootstrap completes on Android and the service is not already running THEN the system SHALL start a foreground service of type `specialUse` with a persistent notification titled such that it communicates the app is running (e.g. “Popmundo is running”).
 2. WHEN the foreground service is running THEN `serviceRunning` in the keepalive status SHALL be true and the debug panel SHALL show `bg: running`.
 3. WHEN the service is already running THEN bootstrap SHALL NOT start a second instance (idempotent).
-4. WHEN the Android manifest is inspected THEN it SHALL declare `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_DATA_SYNC`, `POST_NOTIFICATIONS`, `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, `WAKE_LOCK`, and the plugin `ForegroundService` with `foregroundServiceType="dataSync"`.
+4. WHEN the Android manifest is inspected THEN it SHALL declare `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_SPECIAL_USE`, `POST_NOTIFICATIONS`, `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, `WAKE_LOCK`, and the plugin `ForegroundService` with `foregroundServiceType="specialUse"`.
 
 **Independent Test**: Facade unit test asserts `startService` only when `!isRunning`; `platform_config_test` asserts manifest strings.
 
@@ -152,3 +152,7 @@ Quando o jogador coloca o Popflutter em segundo plano (home, outro app, tela blo
 - [ ] Debug panel shows accurate permission, lifecycle, and heartbeat status
 - [ ] iOS asks for notifications; plist has required keys; debug remains honest when suspended
 - [ ] `flutter test` in `apps/popmundo_app` is green; no live popmundo.com e2e required
+
+## Continuous session amendment (2026-10-04, AD-020)
+
+Usuário confirmou funcionamento durante a noite. Serviço specialUse declara subtype de manutenção contínua de sessão; o limite de seis horas de dataSync não corresponde a essa finalidade. Isso não garante sobrevivência a force-stop, reboot ou encerramento do processo. Isolate FGS permanece heartbeat-only; probes nativos vivem no controller principal. Critérios e evidências: .specs/features/background-session-reliability/.

@@ -24,7 +24,7 @@ Permissões, start/stop do FGS, heartbeat para a UI de debug, textos da notifica
 
 ## Dependências
 
-`flutter_foreground_task`. Manifest: `FOREGROUND_SERVICE_DATA_SYNC`, `POST_NOTIFICATIONS`, battery, `android:stopWithTask="false"`. iOS: `UIBackgroundModes: fetch`.
+`flutter_foreground_task`. Manifest: `FOREGROUND_SERVICE_SPECIAL_USE`, `POST_NOTIFICATIONS`, battery, `android:stopWithTask="false"`. iOS: `UIBackgroundModes: fetch`.
 
 ## Relacionados
 
@@ -37,5 +37,5 @@ Permissões, start/stop do FGS, heartbeat para a UI de debug, textos da notifica
 ## Observações e débitos
 
 - iOS não oferece JS contínuo em background (spec honesto).
-- Teto `dataSync` no Android 15+.
+- Android pode encerrar o processo por force-stop, reboot ou políticas do fabricante. O serviço specialUse declara manutenção contínua de sessão; distribuição Play exige revisão do caso de uso.
 - Título da notificação de teste Patrol está hardcoded no harness (`Popmundo is running`) para bater KA-05 — produção usa `.tr()`.
