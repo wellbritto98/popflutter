@@ -48,7 +48,7 @@ Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testáv
 
 - **Host sticky:** `onNavigation` só para URI Popmundo http(s); leitores sempre usam `currentOrigin` no momento da chamada.
 - **TimedFetch:** enfileira, espera `delay` desde `_lastCall`, `waitUntilReady`, `fetchInPage`. Relativos resolvem no host atual.
-- **Auto Login:** ver submódulo; transporte injetável (`AuthHttpSend`) nos testes.
+- **Auto Login:** ver submódulo; transporte injetável (`AuthHttpSend`), UA nativo opcional (`userAgentProvider`) com cache e timeout 2 s. Probes não dependem do renderer; `done` sucede sync de cookies, e a confirmação de navegação tem espera limitada.
 - **GM values:** eventos `gmValue` aplicados em `GmValueStore` (o app assina o bus).
 - **Menu notifications:** `MenuNotificationsWatcher.start()` assina `events.network`; ao ver uma contagem diferente da persistida, chama `MenuNotificationsService.fetch()` (`TimedFetch`, `useCache: false`), difere `UID`s contra `MenuNotificationState.notifiedUids` e emite só os novos em `newNotifications`; persiste `{lastCount, notifiedUids}` só em caso de sucesso (falha não corrompe o estado — a próxima contagem diferente tenta de novo).
 

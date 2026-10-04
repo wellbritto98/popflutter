@@ -515,6 +515,218 @@ void main() {
       });
     }
 
+    Future<_PausedRuntime> restartWithPausedRuntime({
+      Future<String> Function()? userAgentProvider,
+    }) async {
+      await controller.dispose();
+      final paused = _PausedRuntime();
+      runtime = paused;
+      controller = AutoLoginController(
+        runtime: runtime,
+        settingsStore: settingsStore,
+        secretStore: secrets,
+        cookieSink: cookies,
+        cookieSource: cookies,
+        trace: trace.add,
+        sleep: (_) async {},
+        authSend: server.call,
+        userAgentProvider: userAgentProvider,
+        heartbeatInterval: const Duration(days: 1),
+      );
+      statuses = [];
+      controller.status.listen(statuses.add);
+      return paused;
+    }
+
+    test('native UA provider probes without an attached or active WebView',
+        () async {
+      var providerCalls = 0;
+      final paused = await restartWithPausedRuntime(
+        userAgentProvider: () async {
+          providerCalls++;
+          return userAgent;
+        },
+      );
+      paused.jsPaused = true;
+      paused.ready = false;
+      onGameHost();
+      server.routes['GET $characterUrl'] =
+          const AuthHttpResponse(status: 200, body: worldHomeHtml);
+      controller.start();
+      await controller.checkSession().timeout(const Duration(seconds: 3));
+      await controller.checkSession();
+
+      expect(server.seen.length, 2);
+      expect(server.seen.every((r) => r.headers['User-Agent'] == userAgent),
+          isTrue);
+      expect(providerCalls, 1, reason: 'native UA is cached across probes');
+      expect(paused.evaluateCalls, isEmpty,
+          reason: 'production never needs a page JS lookup');
+    });
+
+    test('native UA provider failure uses cached fallback without JS', () async {
+      var providerCalls = 0;
+      final paused = await restartWithPausedRuntime(
+        userAgentProvider: () async {
+          providerCalls++;
+          throw StateError('UA platform unavailable');
+        },
+      );
+      paused.ready = false;
+      onGameHost();
+      server.routes['GET $characterUrl'] =
+          const AuthHttpResponse(status: 200, body: worldHomeHtml);
+      controller.start();
+      await controller.checkSession();
+      await controller.checkSession();
+
+      expect(server.seen.length, 2);
+      expect(server.seen.first.headers['User-Agent'], startsWith('Mozilla/5.0'));
+      expect(providerCalls, 1);
+      expect(paused.evaluateCalls, isEmpty);
+      expect(controller.inFlight, isFalse);
+    });
+
+    test('navigation platform failure does not undo native relog success',
+        () async {
+      final paused = await restartWithPausedRuntime();
+      controller.start();
+      for (var i = 0; i < 10; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      onGameHost();
+      paused.navigationError = true;
+      wireLogoutOn75();
+
+      await controller.checkSession();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(statuses.last.phase, AutoLoginPhase.done);
+      expect(cookies.written.singleWhere((c) => c.name == 'popmundo.com').value,
+          'AUTHVALUE');
+      expect(traceText(), contains('world navigation unavailable'));
+      expect(controller.inFlight, isFalse);
+    });
+
+    test('startup captures WebView UA after the initial bridge becomes ready',
+        () async {
+      final paused = await restartWithPausedRuntime();
+      paused.requireReadyBeforeEvaluation = true;
+      paused.readyDelay = const Duration(milliseconds: 20);
+      onGameHost();
+      server.routes['GET $characterUrl'] =
+          const AuthHttpResponse(status: 200, body: worldHomeHtml);
+      controller.start();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      expect(server.seen.single.headers['User-Agent'], userAgent,
+          reason:
+              'start runs before WebView attaches; do not cache a default early');
+    });
+
+    test('background probe uses cached UA with the JS bridge paused', () async {
+      final paused = await restartWithPausedRuntime();
+      controller.start();
+      for (var i = 0; i < 10; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      onGameHost();
+      paused.jsPaused = true;
+      paused.ready = false;
+      server.routes['GET $characterUrl'] = const AuthHttpResponse(
+        status: 200,
+        body: worldHomeHtml,
+      );
+
+      await controller.checkSession().timeout(const Duration(seconds: 3));
+
+      expect(
+        server.seen.single.url.toString(),
+        characterUrl,
+        reason: 'BSR-01: native heartbeat must survive a paused renderer',
+      );
+      expect(server.seen.single.headers['User-Agent'], userAgent);
+      expect(server.seen.single.headers['Cookie'], contains('OLDSESSION'));
+      expect(
+        paused.evaluateCalls.length,
+        1,
+        reason: 'UA is warmed once before the renderer is paused',
+      );
+      expect(statuses, isEmpty);
+      expect(controller.inFlight, isFalse);
+    });
+
+    test(
+      'background relog completes while JS and navigation remain paused',
+      () async {
+        final paused = await restartWithPausedRuntime();
+        controller.start();
+        for (var i = 0; i < 10; i++) {
+          await Future<void>.delayed(Duration.zero);
+        }
+        onGameHost();
+        paused.jsPaused = true;
+        paused.navigationPaused = true;
+        wireLogoutOn75();
+
+        await controller.checkSession().timeout(const Duration(seconds: 3));
+        await Future<void>.delayed(Duration.zero);
+
+        expect(statuses.last.phase, AutoLoginPhase.done);
+        expect(statuses.last.characterName, 'Deon Drinkwater');
+        expect(
+          cookies.written.singleWhere((c) => c.name == 'popmundo.com').value,
+          'AUTHVALUE',
+        );
+        expect(
+          paused.loadUrlCalls.single.toString(),
+          'https://75.popmundo.com/World/Popmundo.aspx',
+        );
+        expect(
+          server.seen.every((r) => r.headers['User-Agent'] == userAgent),
+          isTrue,
+          reason: 'BSR-06: the whole handshake preserves cached UA',
+        );
+        expect(paused.evaluateCalls.length, 1);
+        expect(
+          controller.inFlight,
+          isFalse,
+          reason: 'BSR-02: pending navigation cannot hold the probe lock',
+        );
+        server.routes['GET $characterUrl'] = const AuthHttpResponse(
+          status: 200,
+          body: worldHomeHtml,
+        );
+        await controller.checkSession().timeout(const Duration(seconds: 3));
+        expect(
+          server.seen.last.url.toString(),
+          characterUrl,
+          reason: 'next heartbeat still runs before the renderer resumes',
+        );
+      },
+    );
+
+    test('startup UA timeout still allows native background probing', () async {
+      final paused = await restartWithPausedRuntime();
+      paused.jsPaused = true;
+      onGameHost();
+      server.routes['GET $characterUrl'] = const AuthHttpResponse(
+        status: 200,
+        body: worldHomeHtml,
+      );
+      controller.start();
+      await controller.checkSession().timeout(const Duration(seconds: 3));
+      await Future<void>.delayed(Duration.zero);
+
+      expect(server.seen.single.url.toString(), characterUrl);
+      expect(
+        server.seen.single.headers['User-Agent'],
+        startsWith('Mozilla/5.0'),
+      );
+      expect(traceText(), contains('user agent'));
+      expect(controller.inFlight, isFalse);
+    });
+
     test('302 to Default.aspx renews the session on the sticky host', () async {
       onGameHost();
       wireLogoutOn75();
@@ -737,6 +949,41 @@ void main() {
       await first;
     });
   });
+}
+
+class _PausedRuntime extends FakePopmundoRuntime {
+  var jsPaused = false;
+  var navigationPaused = false;
+  var navigationError = false;
+  var requireReadyBeforeEvaluation = false;
+  var wasReady = false;
+
+  @override
+  Future<void> waitUntilReady({
+    Duration timeout = const Duration(seconds: 30),
+  }) async {
+    await super.waitUntilReady(timeout: timeout);
+    wasReady = true;
+  }
+
+  @override
+  Future<String?> evaluate(String source) {
+    evaluateCalls.add(source);
+    if (requireReadyBeforeEvaluation && !wasReady) {
+      throw PopmundoRuntimeException('WebView not attached');
+    }
+    return jsPaused ? Completer<String?>().future : Future.value(userAgent);
+  }
+
+  @override
+  Future<void> loadUrl(Uri url) {
+    if (navigationError) {
+      return Future.error(StateError('navigation channel unavailable'));
+    }
+    if (!navigationPaused) return super.loadUrl(url);
+    loadUrlCalls.add(url);
+    return Completer<void>().future;
+  }
 }
 
 class _ThrowingCookies implements CookieSource {

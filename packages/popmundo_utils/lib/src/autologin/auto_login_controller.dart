@@ -44,7 +44,9 @@ class AutoLoginController {
     Future<void> Function(Duration)? sleep,
     ClockNow? now,
     this.authSend,
+    this.userAgentProvider,
     this.heartbeatInterval = const Duration(seconds: 60),
+    this.webViewTimeout = const Duration(seconds: 2),
   })  : _trace = trace ?? defaultAutoLoginTrace,
         _sleep = sleep ?? Future<void>.delayed,
         _now = now ?? DateTime.now;
@@ -67,13 +69,21 @@ class AutoLoginController {
   /// Native transport. Injected so tests drive the handshake without sockets.
   final AuthHttpSend? authSend;
 
-  /// How often [checkSession] runs after the first ready probe.
+  /// Optional native UA lookup, independent of WebView attachment/rendering.
+  /// Without it, the first lookup uses the page bridge with a bounded wait.
+  final Future<String> Function()? userAgentProvider;
+
+  /// How often [checkSession] runs after the initial bounded UA lookup.
   final Duration heartbeatInterval;
+
+  /// Bounds the initial UA lookup and final navigation acknowledgement.
+  final Duration webViewTimeout;
 
   final AutoLoginTrace _trace;
   final Future<void> Function(Duration) _sleep;
   final ClockNow _now;
   IoAuthHttpSender? _ioSender;
+  Future<String>? _userAgent;
 
   AuthHttpSend get _send {
     final injected = authSend;
@@ -102,18 +112,15 @@ class AutoLoginController {
   }
 
   Future<void> _armHeartbeat() async {
-    try {
-      await runtime.waitUntilReady();
-    } on PopmundoRuntimeException catch (e) {
-      _trace('heartbeat: runtime not ready yet ($e)');
-    }
-    if (!_running) return;
-    await checkSession();
+    // Capture the real UA while the page is active. A paused renderer must not
+    // gate native HTTP forever, including when the app starts in background.
+    await _readUserAgent();
     if (!_running) return;
     _heartbeatTimer?.cancel();
     _heartbeatTimer = Timer.periodic(heartbeatInterval, (_) {
       unawaited(checkSession());
     });
+    await checkSession();
   }
 
   Future<void> dispose() async {
@@ -185,59 +192,59 @@ class AutoLoginController {
   /// / `www` are no-ops. Safe to call from tests; the timer also calls this.
   Future<void> checkSession() async {
     if (!_running || _inFlight) return;
-    try {
-      await runtime.waitUntilReady();
-    } on PopmundoRuntimeException {
-      _trace('heartbeat skip: runtime not ready');
-      return;
-    }
-    if (!_running || _inFlight) return;
 
-    final host = runtime.host.currentOrigin.host.toLowerCase();
+    final origin = runtime.host.currentOrigin;
+    final host = origin.host.toLowerCase();
     if (!HostTracker.isPopmundoHost(host) || host == 'www.popmundo.com') {
       _trace('heartbeat skip: host=$host');
       return;
     }
-
     final source = cookieSource;
     if (source == null) {
       _trace('heartbeat skip: no CookieSource');
       return;
     }
 
-    final settings = await settingsStore.load();
-    final password =
-        await secretStore.read(AutoLoginSettingsStore.passwordSecretKey);
-    if (!settings.enabled ||
-        settings.username.trim().isEmpty ||
-        settings.characterName.trim().isEmpty ||
-        password == null ||
-        password.isEmpty) {
-      _trace('heartbeat skip: auto-login not armed');
-      return;
-    }
-
-    List<GameCookie> jar;
-    try {
-      jar = await source.read(runtime.host.currentOrigin);
-    } catch (e) {
-      _trace('heartbeat skip: cookie read failed ($e)');
-      return;
-    }
-
-    final url = runtime.host.currentOrigin.replace(path: characterPath);
-    _trace('heartbeat GET $url');
+    // Lock before settings/cookie reads: navigation and timer ticks share this
+    // native operation even when the renderer is suspended.
     _inFlight = true;
     try {
+      final settings = await settingsStore.load();
+      final password = await secretStore.read(
+        AutoLoginSettingsStore.passwordSecretKey,
+      );
+      if (!settings.enabled ||
+          settings.username.trim().isEmpty ||
+          settings.characterName.trim().isEmpty ||
+          password == null ||
+          password.isEmpty) {
+        _trace('heartbeat skip: auto-login not armed');
+        return;
+      }
+
+      List<GameCookie> jar;
+      try {
+        jar = await source.read(origin);
+      } catch (e) {
+        _trace('heartbeat skip: cookie read failed ($e)');
+        return;
+      }
+      if (!_running) return;
+
+      final url = origin.replace(path: characterPath);
+      _trace('heartbeat GET $url');
       final session = AuthSession(
         send: _send,
         userAgent: await _readUserAgent(),
         sleep: _sleep,
         now: _now,
       );
+      if (!_running) return;
       session.seed(jar);
       final response = await session.probe(url);
-      _trace('heartbeat ${response.status} location=${response.location}');
+      _trace(
+        'heartbeat ${response.status} location=${response.location}',
+      );
       if (response.status == 200) return;
       if (!_isLogoutRedirect(url, response)) return;
       _trace('heartbeat: logged out — starting cycle');
@@ -309,7 +316,7 @@ class AutoLoginController {
     AuthSession? session,
   }) async {
     final loginUrl = runtime.host.currentOrigin.replace(path: loginPath);
-    final userAgent = await _readUserAgent();
+    final userAgent = session?.userAgent ?? await _readUserAgent();
     _trace('native handshake from $loginUrl (ua=$userAgent)');
 
     session ??= AuthSession(
@@ -392,28 +399,50 @@ class AutoLoginController {
       await sink.write(jar);
     }
 
-    _inFlight = false;
     _emit(AutoLoginStatus(
       AutoLoginPhase.done,
       characterName: plan.choice.fullName,
     ));
     final home = gameOrigin.replace(path: worldHomePath);
     _trace('DONE — navigating to $home');
-    await runtime.loadUrl(home);
+    try {
+      await runtime.loadUrl(home).timeout(webViewTimeout);
+    } on TimeoutException {
+      _trace('world navigation pending: WebView paused; session renewed');
+    } catch (e) {
+      _trace(
+        'world navigation unavailable after session renewal ($e)',
+      );
+    }
   }
 
   /// Reads the WebView's user agent so the native client is the same client to
   /// the game, not a second one.
-  Future<String> _readUserAgent() async {
+  Future<String> _readUserAgent() => _userAgent ??= _readWebViewUserAgent();
+
+  Future<String?> _captureUserAgent() async {
+    final provider = userAgentProvider;
+    if (provider != null) return provider();
+    // start() precedes WebView attachment in the app shell. Only this initial
+    // lookup waits for the bridge; all later probes use the cached result.
+    await runtime.waitUntilReady(timeout: webViewTimeout);
+    return runtime.evaluate('navigator.userAgent');
+  }
+
+  Future<String> _readWebViewUserAgent() async {
     try {
-      final raw = await runtime.evaluate('navigator.userAgent');
+      final raw = await _captureUserAgent().timeout(webViewTimeout);
       final text = (raw ?? '').trim();
       final unquoted =
           text.length >= 2 && text.startsWith('"') && text.endsWith('"')
               ? text.substring(1, text.length - 1)
               : text;
       if (unquoted.isNotEmpty) return unquoted;
-    } on PopmundoRuntimeException catch (e) {
+    } on TimeoutException {
+      _trace(
+        'could not read the WebView user agent (renderer paused) — using a default',
+      );
+    } catch (e) {
       _trace('could not read the WebView user agent ($e) — using a default');
     }
     return 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 '

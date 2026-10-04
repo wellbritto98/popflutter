@@ -1,6 +1,6 @@
 # autologin (`popmundo_utils`)
 
-Lógica de Auto Login **sem UI**. Spec: `.specs/features/auto-login/`. Decisão vigente: **AD-018**, **AD-019**.
+Lógica de Auto Login **sem UI**. Specs: `.specs/features/auto-login/` e `.specs/features/background-session-reliability/`. Decisões vigentes: **AD-018**, **AD-019**.
 
 ## Objetivo
 
@@ -14,7 +14,7 @@ Orquestrar GET/POST ASP.NET, match de personagem por nome completo, throttle 750
 
 | Arquivo | Função |
 | ------- | ------ |
-| `auto_login_controller.dart` | Escuta navegação; `checkSession` 60 s; ciclo `_runNativeHandshake`; `inFlight` |
+| `auto_login_controller.dart` | Escuta navegação; `checkSession` 60 s; HTTP sem renderer; UA nativo/cache; `inFlight` cobre leitura de cookies e ciclo |
 | `auth_http.dart` | `AuthSession`: `probe`/`seed`/redirects manuais, jar `GameCookie`, cooldown |
 | `auth_http_io.dart` | `IoAuthHttpSender` (`dart:io`, `followRedirects = false`) |
 | `aspnet_form.dart` | Paths de login; parse `div.box` / `<h2>`; match exact case-insensitive |
@@ -28,19 +28,24 @@ Orquestrar GET/POST ASP.NET, match de personagem por nome completo, throttle 750
 
 ## Dependências
 
-- Internas: `PopmundoRuntime` (`loadUrl`, `evaluate` UA, `events.navigation`, `host`, `waitUntilReady`), `SecretStore`, `KeyValueStore`, `html`.
+- Internas: `PopmundoRuntime` (`loadUrl`, `events.navigation`, `host`; `evaluate`/`waitUntilReady` apenas no fallback inicial de UA), `SecretStore`, `KeyValueStore`, `html`.
 - Externas: `dart:io` só no sender real.
 - Relacionados: `InAppCookieSink` (webview); telas em `apps/popmundo_app/lib/autologin/`.
 
 ## Pontos de entrada
 
-`AutoLoginController.start()` / `dispose()` / `checkSession()`. App injeta o mesmo `InAppCookieSink()` como `cookieSink` e `cookieSource`.
+`AutoLoginController.start()` / `dispose()` / `checkSession()`. App injeta o mesmo `InAppCookieSink()` como `cookieSink` e `cookieSource`, e `userAgentProvider: InAppWebViewController.getDefaultUserAgent` para ler o UA nativo sem renderer. `webViewTimeout` limita lookup inicial e confirmação de navegação a 2 s por padrão.
 
 ## Fluxos
 
 Login path `/` ou `/Default.aspx` **ou** heartbeat 302 em `{hostSticky}/World/Popmundo.aspx/Character` → settings enabled + user + character + password → GET form no origin atual → POST form inteiro → se ainda login: `invalidCredentials` → senão origin = host final → parse ChooseCharacter → POST escolha → se ainda ChooseCharacter: `serverRejected` → `cookieSink.write` → `loadUrl(.../World/Popmundo.aspx)`.
 
 Heartbeat: skip `www`; 200/rede/5xx ≠ logout; não segue o 302 do Character. Timer no isolate do controller (não no FGS).
+O UA é capturado uma vez e reutilizado pelo probe e por todos os hops do login. Com `userAgentProvider`, não há leitura de JS. Sem provider, a primeira captura espera o bridge e lê `navigator.userAgent` dentro do mesmo limite de 2 s. Timeout/erro usa o fallback existente, também cacheado; não enfileira leituras de JS a cada tick.
+
+`checkSession` não espera `waitUntilReady`: settings, cookies e HTTP usam portas nativas. O lock começa antes das leituras assíncronas. O timer é armado antes do primeiro probe; um renderer suspenso não impede o próximo tick. Após `cookieSink.write`, `done` é emitido antes da navegação; `loadUrl` permanece solicitado, mas uma resposta pendente libera o ciclo após 2 s. Erros de navegação são registrados em trace e não desfazem a sessão já renovada.
+
+
 
 Nome duplicado → `characterAmbiguous` (não chuta). Sem `LastUrlStore`.
 
