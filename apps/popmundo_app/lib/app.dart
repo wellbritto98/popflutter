@@ -8,6 +8,7 @@ import 'package:popmundo_webview/popmundo_webview.dart';
 
 import 'app_shell.dart';
 import 'autologin/auto_login_messages.dart';
+import 'autologin/auto_login_notifications.dart';
 import 'autologin/auto_login_screen.dart';
 import 'autologin/secure_secret_store.dart';
 import 'background/background_keepalive.dart';
@@ -124,6 +125,7 @@ class _PopmundoHomeState extends State<PopmundoHome>
     // WebView's own jar never learns about it and stays logged out.
     cookieSink: cookieJar,
     cookieSource: cookieJar,
+    userAgentProvider: InAppWebViewController.getDefaultUserAgent,
   );
   late final menuNotificationsService = MenuNotificationsService(
     widget.runtime,
@@ -305,6 +307,12 @@ class _PopmundoHomeState extends State<PopmundoHome>
   }
 
   void _onAutoLoginStatus(AutoLoginStatus status) {
+    unawaited(notifyAutoLoginResult(
+      status: status,
+      lifecycle:
+          WidgetsBinding.instance.lifecycleState ?? AppLifecycleState.resumed,
+      notificationService: widget.notificationService,
+    ));
     final messenger = PopmundoApp.scaffoldMessengerKey.currentState;
     if (messenger == null) return;
     final message = autoLoginStatusMessage(status);

@@ -4,7 +4,7 @@ UI e cofre da feature Auto Login. Lógica: `packages/popmundo_utils/lib/src/auto
 
 ## Objetivo
 
-Configurar enabled/usuário/senha/personagem/status e traduzir `AutoLoginStatus` em snackbars EN/PT.
+Configurar enabled/usuário/senha/personagem/status e traduzir `AutoLoginStatus` em snackbars EN/PT e notificações locais de sucesso/falha em segundo plano.
 
 ## Responsabilidade principal
 
@@ -17,8 +17,10 @@ Persistir settings não-secretos no `KeyValueStore` e a senha no `SecretStore`. 
 | `auto_login_screen.dart` | Form: toggle, username, password (obscure), character full name, ddlStatus, Save |
 | `secure_secret_store.dart` | `FlutterSecureStorage` (iOS `first_unlock`) |
 | `auto_login_messages.dart` | `autoLoginStatusMessage` → chaves `autologin.cycle.*` |
+| `auto_login_notifications.dart` | Notifica done/failed em background; id fixo 2, texto EN/PT, falha do plugin contida |
 
 Wiring: `PopmundoHome` cria um `InAppCookieSink()` compartilhado como `cookieSink` e `cookieSource`, `start()`, escuta `status`.
+O User-Agent vem de `InAppWebViewController.getDefaultUserAgent`, via plataforma nativa; não exige renderer ativo nem depende de captura anterior à criação da WebView.
 
 ## Dependências
 
