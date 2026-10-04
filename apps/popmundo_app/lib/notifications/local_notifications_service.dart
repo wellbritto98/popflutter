@@ -4,6 +4,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'notification_service.dart';
 
+import 'package:popmundo_utils/popmundo_utils.dart';
+
 /// Fixed notification id. Reused on every `show()` call so a repeat tap of
 /// the debug button replaces the prior notification instead of stacking one
 /// (NOTIF-07).
@@ -30,6 +32,52 @@ const kGameNotificationChannelDescription =
 class LocalNotificationsService implements NotificationService {
   final _plugin = FlutterLocalNotificationsPlugin();
   bool _initialized = false;
+  bool _scheduledInitialized = false;
+
+  /// Strict path for durable scheduled actions. Existing consumers retain their
+  /// initialize/no-op behavior; scheduler results must never claim silent success.
+  Future<void> showScheduledNotification({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    if (!_scheduledInitialized) {
+      try {
+        final initialized = await _plugin.initialize(
+          settings: const InitializationSettings(
+            android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+          ),
+        );
+        if (initialized != true) {
+          throw const SchedulerException('notificationInitializationFailed');
+        }
+        _scheduledInitialized = true;
+      } catch (_) {
+        throw const SchedulerException('notificationInitializationFailed');
+      }
+    }
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (android == null || await android.areNotificationsEnabled() != true) {
+      throw const SchedulerException('permissionDenied');
+    }
+    await _plugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'popflutter_schedules',
+          'Schedules',
+          channelDescription: 'User-created recurring local reminders.',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+    );
+  }
 
   @override
   Future<void> initialize() async {
