@@ -5,14 +5,12 @@ import 'package:flutter/material.dart';
 import 'app_menu_item.dart';
 
 /// Single source of truth for the sidebar's item list.
-///
-/// Adding a new entry here is the only change required to surface it in
-/// `AppSidebar` — no existing widget or menu item needs to change.
 List<AppMenuItem> buildAppMenuItems({
   required VoidCallback onOpenDebugPanel,
   required VoidCallback onOpenUserScripts,
   required VoidCallback onOpenAutoLogin,
   required VoidCallback onOpenLanguage,
+  required VoidCallback onOpenSchedules,
   bool includeDebugItem = kDebugMode,
 }) {
   return [
@@ -29,6 +27,13 @@ List<AppMenuItem> buildAppMenuItems({
       label: 'menu.userscripts'.tr(),
       subtitle: 'menu.userscriptsSubtitle'.tr(),
       onTap: onOpenUserScripts,
+    ),
+    AppMenuItem(
+      id: 'schedules',
+      icon: Icons.schedule,
+      label: 'menu.schedules'.tr(),
+      subtitle: 'menu.schedulesSubtitle'.tr(),
+      onTap: onOpenSchedules,
     ),
     AppMenuItem(
       id: 'language',

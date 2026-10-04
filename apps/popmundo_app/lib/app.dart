@@ -13,6 +13,9 @@ import 'autologin/auto_login_screen.dart';
 import 'autologin/secure_secret_store.dart';
 import 'background/background_keepalive.dart';
 import 'background/background_status.dart';
+import 'background/flutter_foreground_task_platform.dart';
+import 'scheduler/scheduler_client.dart';
+import 'scheduler/scheduler_screen.dart';
 import 'debug_overlay.dart';
 import 'gm/gm_host_handler.dart';
 import 'gm/gm_menu_registry.dart';
@@ -33,6 +36,7 @@ class PopmundoApp extends StatelessWidget {
     this.secretStore,
     this.keepalive,
     this.notificationService,
+    this.schedulerApi,
   });
 
   final InAppPopmundoRuntime runtime;
@@ -40,6 +44,7 @@ class PopmundoApp extends StatelessWidget {
   final SecretStore? secretStore;
   final BackgroundKeepalive? keepalive;
   final NotificationService? notificationService;
+  final SchedulerApi? schedulerApi;
 
   /// Lets the auto-login listener show snackbars from above the [Scaffold].
   static final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -59,6 +64,7 @@ class PopmundoApp extends StatelessWidget {
         secretStore: secretStore ?? FlutterSecureSecretStore(),
         keepalive: keepalive,
         notificationService: notificationService,
+        schedulerApi: schedulerApi,
       ),
     );
   }
@@ -72,6 +78,7 @@ class PopmundoHome extends StatefulWidget {
     required this.secretStore,
     this.keepalive,
     this.notificationService,
+    this.schedulerApi,
   });
 
   final InAppPopmundoRuntime runtime;
@@ -79,6 +86,7 @@ class PopmundoHome extends StatefulWidget {
   final SecretStore secretStore;
   final BackgroundKeepalive? keepalive;
   final NotificationService? notificationService;
+  final SchedulerApi? schedulerApi;
 
   @override
   State<PopmundoHome> createState() => _PopmundoHomeState();
@@ -307,12 +315,14 @@ class _PopmundoHomeState extends State<PopmundoHome>
   }
 
   void _onAutoLoginStatus(AutoLoginStatus status) {
-    unawaited(notifyAutoLoginResult(
-      status: status,
-      lifecycle:
-          WidgetsBinding.instance.lifecycleState ?? AppLifecycleState.resumed,
-      notificationService: widget.notificationService,
-    ));
+    unawaited(
+      notifyAutoLoginResult(
+        status: status,
+        lifecycle:
+            WidgetsBinding.instance.lifecycleState ?? AppLifecycleState.resumed,
+        notificationService: widget.notificationService,
+      ),
+    );
     final messenger = PopmundoApp.scaffoldMessengerKey.currentState;
     if (messenger == null) return;
     final message = autoLoginStatusMessage(status);
@@ -330,6 +340,18 @@ class _PopmundoHomeState extends State<PopmundoHome>
       );
   }
 
+  // Sidebar entry for the Android scheduler and iOS availability explanation.
+  void _openSchedules() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => SchedulerScreen(
+          api: widget.schedulerApi,
+          platform: FlutterForegroundTaskPlatform(),
+        ),
+      ),
+    );
+  }
+
   void _openLanguage() {
     unawaited(showLanguageDialog(context));
   }
@@ -345,23 +367,27 @@ class _PopmundoHomeState extends State<PopmundoHome>
           onOpenUserScripts: _openUserScripts,
           onOpenAutoLogin: _openAutoLogin,
           onOpenLanguage: _openLanguage,
+          onOpenSchedules: _openSchedules,
         ),
         gmMenuCommands: _gmMenuItems,
         onGmMenuCommand: (cmd) {
-          unawaited(gmHostHandler.onMenuCommandTapped(
-            GmMenuCommand(
-              scriptId: cmd.scriptId,
-              commandId: cmd.commandId,
-              caption: cmd.caption,
+          unawaited(
+            gmHostHandler.onMenuCommandTapped(
+              GmMenuCommand(
+                scriptId: cmd.scriptId,
+                commandId: cmd.commandId,
+                caption: cmd.caption,
+              ),
             ),
-          ));
+          );
         },
         body: SafeArea(
           child: !_bootstrapReady
               ? const Center(child: CircularProgressIndicator())
               : GmNotificationOverlay(
                   controller: gmNotificationController,
-                  onTap: (n) => unawaited(gmHostHandler.onNotificationTapped(n)),
+                  onTap: (n) =>
+                      unawaited(gmHostHandler.onNotificationTapped(n)),
                   child: DebugOverlay(
                     host: widget.runtime.host,
                     events: widget.runtime.events,

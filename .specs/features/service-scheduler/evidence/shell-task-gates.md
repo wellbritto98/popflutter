@@ -26,3 +26,53 @@ Green: 15 focused scheduler tests pass. Complete app gate flutter test --no-pub:
 Adequacy: each test maps to SCHED-03/04/05/07/08/09/10; payload-bearing assertions compare actual fields, not calls alone. No test deleted/skipped/weakened. Existing LocalNotificationsService initialize/no-op behavior retained; only scheduled actions use strict checks. Notification initialization uses installed FLN named arguments and signed IDs. flutter_timezone 5.1.1 installed source confirms getLocalTimezone()->TimezoneInfo.identifier; bounded lookup caches last valid IANA zone. Public package source: https://pub.dev/packages/flutter_timezone .
 
 Review boundaries: true Home/Recents/boot/platform tray delivery remains T6 evidence; no overnight observation or device success claimed here.
+
+## T5 — Native sidebar and authoritative editor
+
+Assumptions: approved existing Material theme, local notifications only, Android continuous service and localized iOS explanation. Files: native scheduler screen/editor/recurrence/permission/label/connection helpers, composition root, menu registry, EN/PT catalogs, fake API and widget tests. The UI issues RPCs and never writes scheduler preferences.
+
+Red: initial scheduler editor/screen widget tests failed compilation while the new page/editor APIs were absent; registry callback expectation failed before the approved item was added. Later exact runtime-result assertions exposed the need for separate execution-failure labels. Form validation uses a finite mounted form so offscreen fields still participate. The readiness test initially hung because its fake timer and real clock disagreed; an injectable clock now preserves the exact bounded-unavailable assertion, without skipping it or leaving a polling loop after expiry.
+
+Green: flutter test --no-pub completed with 132 passed, zero failures, exit 0 (116 previous + 16 new). flutter analyze --no-pub: No issues found, exit 0. jq empty accepted both localization catalogs; scoped git diff --check found no whitespace errors. Native build/device evidence remains T6.
+
+Check A — sufficient coverage (all paths below are relative to apps/popmundo_app/test):
+
+| Requirement / done-when | Exact assertion evidence | Spec-defined outcome | Covered |
+| --- | --- | --- | --- |
+| SCHED-01 release sidebar / localization | app_menu_registry_test.dart:23 — expect(schedules.label,'Schedules'); :24 — expect(schedules.subtitle,'Recurring local reminders'); :26 — expect(calls,1); :27 — expect(items.any(id debug),false); :42 — expect(PT schedules.label,'Agendamentos') | Approved release item routes once; both catalogs resolve; existing debug gate retained | Yes |
+| SCHED-01 empty/iOS state | scheduler_screen_test.dart:129 — expect(find.text('No schedules yet'),findsOneWidget); :141 — expect(find.text('Agendamentos'),findsOneWidget); :142 — expect(find.text('Os agendamentos contínuos estão disponíveis apenas no Android.'),findsOneWidget); :148 — expect(find.byKey(Key('schedule-add')),findsNothing) | Empty Android catalog; truthful localized unavailable iOS state | Yes |
+| SCHED-02 fields/default interval/action | scheduler_editor_test.dart:112 — expect(rule.name,'Reminder'); :113 — expect(rule.action.title,'Saved title'); :114 — expect(rule.action.body,'Saved body'); :115 — expect(interval.quantity,1); :116 — expect(interval.unit,IntervalUnit.minutes); :120 — expect(decodedPersisted.rules.single.id,rule.id) | Trimmed saved values and default one-minute recurrence match durable returned rule | Yes |
+| SCHED-02 invalid text/number/overlong | scheduler_editor_test.dart:138 — expect(find.text('Use a whole number from 1 to 9999'),findsOneWidget) for 0/10000/1.5; :146/:147/:148 — expect(exact 1–80/120/1000 field errors,findsOneWidget); :149 — expect(api.store.raw,isNull); :42/:43/:44 PT exact validators | Invalid pasted decimal and all overlong values produce field errors, no truncation or mutation | Yes |
+| SCHED-02 day interval / 24h / weekly | scheduler_editor_test.dart:65 — expect(interval.unit,IntervalUnit.days); :66 — expect(interval.quantity,2); :67 — expect(rule.nextDueUtc,DateTime.utc(2026,10,6,12)); :76 — expect(MediaQuery.of(TimePickerDialog).alwaysUse24HourFormat,true); :165 — expect(find.text('Choose at least one weekday'),findsOneWidget); :174/:175/:176 — expect(weekly.weekdays,{1,4}); expect(hour,9); expect(minute,0) | Elapsed 24h days; explicit 24h picker; nonempty ISO weekdays and saved intended time | Yes |
+| SCHED-03 no optimistic ACK / pending | scheduler_editor_test.dart:102 — expect(saveButton.onPressed,isNull); :108 — expect(saved,isNull); :120 — expect(decodedPersisted.rules.single.id,rule.id) after completion | Save remains pending until authoritative persistence reply | Yes |
+| SCHED-03 cancel/edit cadence | scheduler_editor_test.dart:277 — expect(after.notificationId,before.notificationId); :278 — expect(after.interval.anchorUtc,before.interval.anchorUtc); :282 — expect(after.nextDueUtc,before.nextDueUtc); :288 — expect(api.store.raw,raw) after cancel | Text edit keeps card/cadence; cancel leaves persisted rule unchanged | Yes |
+| SCHED-03 authoritative pause/delete | scheduler_screen_test.dart:186 — expect((await api.list()).rules.single.enabled,false); :187 — expect(find.text('Paused'),findsOneWidget); :192 — expect(rules,hasLength(1)) after cancel; :197 — expect(rules,isEmpty) after confirm; :198 — expect(find.text('No schedules yet'),findsOneWidget) | Pause follows durable reply; delete requires confirmation; visible catalog matches | Yes |
+| SCHED-08 current permission/background status | scheduler_screen_test.dart:210/:211/:212 — expect(exact Notifications denied / Background battery optimized / Service running texts,findsOneWidget); :217 — expect(find.text('Notifications: allowed'),findsOneWidget) after action | Permission/battery/service statuses and actionable permission flow visible | Yes |
+| SCHED-09 lookup failure / readable catalog | scheduler_screen_test.dart:232 — expect(find.text('Readable'),findsOneWidget); :233 — expect(find.text('Could not read permission or background status. Try again.'),findsOneWidget) | Permission lookup failure is visible without hiding readable rules | Yes |
+| SCHED-09 denied/failed saves retain values | scheduler_editor_test.dart:190 — expect(api.creates,0); :191 — expect(nameController.text,' Reminder '); :198 — expect(find.text('Allow notifications to enable this schedule.'),findsOneWidget); :205 — expect(exact saveFailed text,findsOneWidget); :211 — expect(titleController.text,' Saved title '); :218 — expect(api.store.raw,isNull) | Denial prevents activation; error preserves draft and catalog | Yes |
+| SCHED-03/09 lost save reply / adoption | scheduler_editor_test.dart:234 — expect(saveButton.onPressed,isNull) after failed refresh; :240 — expect(editor,findsOneWidget); :246/:247 — expect(api.creates,1); expect(api.updates,1); :248 — expect(rules.single.id,id); :249 — expect(nextSequence,2) | Failed reread blocks blind resubmit; recovered stable ID is adopted with no duplicate | Yes |
+| SCHED-08 bounded first RPC readiness | scheduler_connection_test.dart:21 — expectLater(pending,throwsA(SchedulerException code serviceUnavailable)) after deadline; :53 — expect(sent,isEmpty) before heartbeat; :56 — expect(sent,hasLength(1)) after heartbeat; :62 — expect((await pending).rules,isEmpty) | Native-running flag alone cannot drop first request; bounded typed unavailable error and authoritative ready reply | Yes |
+| SCHED-01/09 visible current next/result | scheduler_screen_test.dart:82 — expect(find.text('Submitted to Android'),findsOneWidget); :83 — expect(find.text(nextText(DateTime.utc(2026,10,4,12,0,20))),findsOneWidget); :87/:109 — expect(find.text(at.toLocal().toString().split('.').first),findsOneWidget); :105 — expect(find.text('Failed: Notification service could not initialize.'),findsOneWidget) | Visible list refreshes next due and truthful submission/failure with timestamp without manual action; oracle portable across host zones | Yes |
+| SCHED-01/10 visible-route refresh bounded | scheduler_screen_test.dart:33 — expect(api.lists,before+1) while read pending across 20s; :40 — expect(api.lists,paused); :43 — expect(api.lists,paused+1) on resume; :117 — expect(api.lists,reads) while editing | Coalesced reads; inactive/editor polling stops; disposal cancels timer | Yes |
+
+Check C — necessary reverse mapping:
+
+| Test group and assertion | Maps to | Keep |
+| --- | --- | --- |
+| registry :23/:42 label and :26 callback; old callback/debug assertions preserved | SCHED-01, existing sidebar compatibility | Yes |
+| editor :42 PT validation and :65/:76 days/24h | SCHED-01/02 | Yes |
+| editor :112 actual rule fields and :120 persisted identity | SCHED-02/03 | Yes |
+| editor :138/:149 invalid input and unchanged store | SCHED-02/09 | Yes |
+| editor :165/:174 weekdays/time | SCHED-02 | Yes |
+| editor :191/:211 retained inputs and :218 unchanged store | SCHED-09 | Yes |
+| editor :234/:248/:249 timeout adoption | SCHED-03/09 | Yes |
+| editor :277/:282/:288 cadence/cancel | SCHED-03 | Yes |
+| screen :33/:40/:82/:105/:117 coalesced live feedback | SCHED-01/09/10 | Yes |
+| screen :129/:142 empty/iOS | SCHED-01/08 | Yes |
+| screen :186/:192/:197 pause/delete | SCHED-03 | Yes |
+| screen :210/:217/:232/:233 status/action/error | SCHED-08/09 | Yes |
+| connection :21/:53/:62 deadline/readiness | SCHED-08/09/10 | Yes |
+
+Adequacy verdict: every T5 criterion has concrete payload/state evidence; no skipped/deleted tests or weakened existing callback/debug assertions. Check B uses actual persisted values, submitted/result fields and error retention rather than call counts alone. Check D follows existing app widget/fake-platform/EasyLocalization conventions and the task coverage matrix. No SPEC_DEVIATION. Successful submission means Android accepted the native notification request, not guaranteed user visibility. Final native lifecycle and independent discrimination verification remain with T6/T7 owners.
+
+Final test inventory for T5 files: editor 8, screen 5, connection 2, menu registry 9 = 24 tests (8 existing registry cases + 16 new cases), all included in the successful 132-test full app gate.
