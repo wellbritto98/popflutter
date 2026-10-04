@@ -198,11 +198,13 @@ class ScheduledRule {
     required this.recurrence,
     required this.action,
     DateTime? nextDueUtc,
+    DateTime? lastAttemptUtc,
     this.zoneId,
     this.lastClaim,
     ScheduleResult? lastResult,
   }) : name = _text(name, 80),
        nextDueUtc = nextDueUtc?.toUtc(),
+       lastAttemptUtc = lastAttemptUtc?.toUtc(),
        lastResult =
            lastResult ??
            ScheduleResult(status: ScheduleResultStatus.neverExecuted) {
@@ -222,6 +224,7 @@ class ScheduledRule {
   final ScheduleRecurrence recurrence;
   final LocalNotificationAction action;
   final DateTime? nextDueUtc;
+  final DateTime? lastAttemptUtc;
   final String? zoneId;
   final ScheduleClaim? lastClaim;
   final ScheduleResult lastResult;
@@ -233,7 +236,9 @@ class ScheduledRule {
     ScheduleRecurrence? recurrence,
     LocalNotificationAction? action,
     DateTime? nextDueUtc,
+    DateTime? lastAttemptUtc,
     bool clearDue = false,
+    bool clearAttempt = false,
     String? zoneId,
     ScheduleClaim? lastClaim,
     bool clearClaim = false,
@@ -247,6 +252,7 @@ class ScheduledRule {
     recurrence: recurrence ?? this.recurrence,
     action: action ?? this.action,
     nextDueUtc: clearDue ? null : nextDueUtc ?? this.nextDueUtc,
+    lastAttemptUtc: clearAttempt ? null : lastAttemptUtc ?? this.lastAttemptUtc,
     zoneId: zoneId ?? this.zoneId,
     lastClaim: clearClaim ? null : lastClaim ?? this.lastClaim,
     lastResult: lastResult ?? this.lastResult,
@@ -265,6 +271,9 @@ class ScheduledRule {
       Map<String, dynamic>.from(json['action'] as Map),
     ),
     nextDueUtc: json['nextDueUtc'] == null ? null : _utc(json['nextDueUtc']),
+    lastAttemptUtc: json['lastAttemptUtc'] == null
+        ? null
+        : _utc(json['lastAttemptUtc']),
     zoneId: json['zoneId'] as String?,
     lastClaim: json['lastClaim'] == null
         ? null
@@ -284,6 +293,8 @@ class ScheduledRule {
     'recurrence': recurrence.toJson(),
     'action': action.toJson(),
     'nextDueUtc': nextDueUtc?.toIso8601String(),
+    if (lastAttemptUtc != null)
+      'lastAttemptUtc': lastAttemptUtc!.toIso8601String(),
     'zoneId': zoneId,
     'lastClaim': lastClaim?.toJson(),
     'lastResult': lastResult.toJson(),
