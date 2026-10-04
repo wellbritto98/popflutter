@@ -24,6 +24,7 @@ export 'src/observe_policy.dart';
 export 'src/popmundo_runtime.dart';
 export 'src/scoring.dart';
 export 'src/scheduler/scheduler_models.dart';
+export 'src/scheduler/recurrence_calculator.dart';
 export 'src/secret_store.dart';
 export 'src/storage.dart';
 export 'src/timed_fetch.dart';
