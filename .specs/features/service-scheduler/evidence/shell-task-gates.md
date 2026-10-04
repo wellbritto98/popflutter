@@ -98,3 +98,25 @@ Red: scheduler_task_handler_test failed compilation against the original handler
 | :164/:165/:169 late disposal/no-start/heartbeat | SCHED-08/09 cleanup | Yes |
 
 Adequacy: real SchedulerRunner/coordinator behind an injected factory, exact response payloads plus ownership/disposal assertions. No UTC fallback, game runtime, skipped tests or weaker existing assertions. Existing corrupt-catalog recovery test remains green. Guidelines: app fake-platform/channel/widget conventions; no device behavior claimed.
+
+## Follow-up fix — background permission check without Activity
+
+T6's first real Patrol run reached the authoritative paused-rule save, then enabled create failed with runtimeUnavailable (device log /tmp/popflutter-t6-first-real-patrol.log). Installed flutter_foreground_task 11.0.0 Android MethodCallHandlerImpl.kt:36 calls checkActivityNull before checkNotificationPermission; the secondary engine has no Activity. By contrast flutter_local_notifications 22.3.0 FlutterLocalNotificationsPlugin.java:2372 queries NotificationManagerCompat with applicationContext.
+
+The scheduler environment now injects LocalNotificationsService.isScheduledNotificationGranted, a read-only areNotificationsEnabled check safe in the service engine. Existing main/UI permission requests and strict scheduled action initialization/submission checks remain unchanged.
+
+Red: composition/channel regression mocked the FGT activity-dependent query throwing ActivityNotAttachedException. Actual runner.errorCode was runtimeUnavailable, violating expected null, test exit 1 before the fix. Green: regression plus three platform tests passed, then full flutter test --no-pub completed 137 passed, zero failures, exit 0; flutter analyze --no-pub: No issues found, exit 0. No SDK pub get or native build was run by this worker. True native retest remains T6.
+
+| AC / edge (Check A) | Exact assertion in apps/popmundo_app/test/scheduler_background_permission_test.dart | Spec-defined outcome / covered |
+| --- | --- | --- |
+| SCHED-03/09 enabled mutation from engine without Activity | :67 — expect(runner.errorCode,isNull); :71 — expect(saved.id,'stable'); :72 — expect(saved.notificationId,-1); :73 — expect(saved.enabled,true); :74 — expect(saved.action.title,'Exact title'); :75 — expect(saved.action.body,'Exact body') | Exact enabled durable rule/card/payload after background activation / Yes |
+| SCHED-08 background-safe read-only permission | :76 — expect(notificationCalls,['areNotificationsEnabled']); :77 — expect(foregroundCalls,isNot(contains('checkNotificationPermission'))); :78 — expect(foregroundCalls,isNot(contains('requestNotificationPermission'))) | No Activity-dependent check or permission dialog in secondary engine / Yes |
+| SCHED-09 truthful denied activation | :81 — expect(runner.errorCode,'permissionDenied'); :82 — expect(prefs.getString(SchedulerSnapshot.storageKey),raw) | Denial remains typed and leaves authoritative catalog unchanged / Yes |
+
+| Test assertion (Check C) | Maps to | Keep |
+| --- | --- | --- |
+| :67/:71–75 actual durable rule fields | SCHED-03/09 enabled-save outcome | Yes |
+| :76–78 channel method identity / absence | SCHED-08 secondary-engine permissions boundary | Yes |
+| :81/:82 exact denied code / unchanged blob | SCHED-09 no false activation | Yes |
+
+Adequacy: real createSchedulerRunner composition and real prefs adapter/coordinator behind native channels; persisted field values establish outcome independently of calls. The sole test covers the confirmed platform mismatch and permission denial, not hypothetical plugin behavior. No tests weakened/skipped; app channel/fake platform conventions retained.

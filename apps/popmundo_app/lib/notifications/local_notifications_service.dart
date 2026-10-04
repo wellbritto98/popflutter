@@ -34,6 +34,15 @@ class LocalNotificationsService implements NotificationService {
   bool _initialized = false;
   bool _scheduledInitialized = false;
 
+  /// Read-only Android check safe in the service engine without an Activity.
+  Future<bool> isScheduledNotificationGranted() async {
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    return android != null && await android.areNotificationsEnabled() == true;
+  }
+
   /// Strict path for durable scheduled actions. Existing consumers retain their
   /// initialize/no-op behavior; scheduler results must never claim silent success.
   Future<void> showScheduledNotification({

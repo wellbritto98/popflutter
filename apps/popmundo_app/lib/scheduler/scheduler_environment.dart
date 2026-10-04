@@ -38,7 +38,7 @@ Future<SchedulerRunner> createSchedulerRunner() async {
     ),
     refreshZone: zone.refresh,
     configureBoot: FlutterForegroundTaskPlatform.configureSchedulerBoot,
-    notificationGranted: FlutterForegroundTaskPlatform().isNotificationGranted,
+    notificationGranted: service.isScheduledNotificationGranted,
     send: FlutterForegroundTask.sendDataToMain,
   );
 }
