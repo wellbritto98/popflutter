@@ -76,3 +76,25 @@ Check C — necessary reverse mapping:
 Adequacy verdict: every T5 criterion has concrete payload/state evidence; no skipped/deleted tests or weakened existing callback/debug assertions. Check B uses actual persisted values, submitted/result fields and error retention rather than call counts alone. Check D follows existing app widget/fake-platform/EasyLocalization conventions and the task coverage matrix. No SPEC_DEVIATION. Successful submission means Android accepted the native notification request, not guaranteed user visibility. Final native lifecycle and independent discrimination verification remain with T6/T7 owners.
 
 Final test inventory for T5 files: editor 8, screen 5, connection 2, menu registry 9 = 24 tests (8 existing registry cases + 16 new cases), all included in the successful 132-test full app gate.
+
+## Follow-up fix — recover transient runner factory failure
+
+Problem: a failure before createSchedulerRunner returned left the handler permanently without a runner. Later heartbeat/RPC now retries a completed failed creation. _startupWork tracks the underlying factory/start Future independently of the five-second _starting deadline, retaining sole ownership when that deadline expires. A late factory result after destruction is disposed without start; existing-runner catalog errors still recover through reconcile.
+
+Red: scheduler_task_handler_test failed compilation against the original handler (missing injectable factory/send/Android seam), exit 1, before implementation. Four spec-derived channel/lifecycle tests then passed. Full flutter test --no-pub completed 136 passed, zero failed, exit 0. Analyzer reported one missing-braces info in the fixture; corrected with no outcome change, then flutter analyze --no-pub: No issues found, exit 0 and four focused tests reconfirmed. No native build/pub get ran for this fix.
+
+| AC / edge (Check A) | Exact assertion in apps/popmundo_app/test/scheduler_task_handler_test.dart | Expected outcome / covered |
+| --- | --- | --- |
+| SCHED-09 transient startup recovery + SCHED-10 authoritative read | :66 — expect(sent.single,{'heartbeat':at.toIso8601String()}); :70 — expect(attempts,2); :71 — expect(runner.starts,1); :72 — expect(sent.last,{type:'scheduler.response',requestId:'recovered',snapshot:SchedulerSnapshot().toJson()}) | Heartbeat retained; successful second factory owns runner; exact catalog reply / Yes |
+| SCHED-09 RPC recovery after completed failure | :97 — expect(attempts,2); :98 — expect(sent.single['snapshot'],SchedulerSnapshot().toJson()); :99 — expect(sent.single['requestId'],'rpc') | RPC can recover without another tick and returns authoritative matching response / Yes |
+| SCHED-09 bounded unavailable + SCHED-10 single writer | :126 — expect(attempts,1) after five-second deadline and three ticks; :127 — expect(heartbeatMessages,hasLength(3)); :128 — expect(sent.last,{type:'scheduler.response',requestId:'pending',error:'runtimeUnavailable'}); :137 — expect(attempts,1); :138 — expect(runner.starts,1); :139/:140 exact snapshot/ready requestId | Timeout cannot start overlapping factories; heartbeat/RPC bounded; eventual same runner accepted / Yes |
+| SCHED-08 service destruction cleanup | :164 — expect(runner.disposals,1); :165 — expect(runner.starts,0); :168 — expect(attempts,1); :169 — expect(sent.single,{'heartbeat':at.toIso8601String()}) | Late result disposed, no Timer armed or replacement writer created / Yes |
+
+| Test assertion (Check C) | Maps to | Keep |
+| --- | --- | --- |
+| :66/:72 recovery heartbeat and exact snapshot envelope | SCHED-09/10 startup recovery | Yes |
+| :98/:99 exact RPC snapshot/correlation | SCHED-09/10 recovery route | Yes |
+| :126/:128/:139 underlying-owner count plus bounded typed error and eventual state | SCHED-09/10 single writer / timeout | Yes |
+| :164/:165/:169 late disposal/no-start/heartbeat | SCHED-08/09 cleanup | Yes |
+
+Adequacy: real SchedulerRunner/coordinator behind an injected factory, exact response payloads plus ownership/disposal assertions. No UTC fallback, game runtime, skipped tests or weaker existing assertions. Existing corrupt-catalog recovery test remains green. Guidelines: app fake-platform/channel/widget conventions; no device behavior claimed.
