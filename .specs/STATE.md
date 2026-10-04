@@ -176,10 +176,11 @@
 
 ## Handoff
 
-- **Feature**: background-session-reliability / .specs/features/background-session-reliability — implementação e testes funcionais concluídos.
-- **Phase / Task**: Execute + Verifier; código revisado, fixture Android e keepalive passaram, APK de produção instalado preservando dados.
-- **Completed**: UA nativo cacheado com timeout; login e probes independentes de JS suspenso; host autenticado preservado até navegação real; notificação de resultado id 2 EN/PT; FGS specialUse. Utils 224 + app 101 testes; dois testes Patrol passaram no Android 16, com 8/8 mutações detectadas (uma na bandeja real). Commits df248e2, abd3d51, b2511e5, e172652, ea072ea, 0a234c1.
-- **In-progress**: none. Verifier PASS em validation.md.
-- **Next step**: nenhum bloqueio funcional; observação de uma noite inteira não foi realizada. Force-stop, reboot e morte do processo permanecem limites.
-- **Blockers**: none. Build Windows viabilizado por workaround Java process-scoped; configuração temporária de instrumentação totalmente restaurada.
+- **Feature**: service-scheduler / .specs/features/service-scheduler.
+- **Phase / Task**: Specify + provisional Design; written draft awaits user review. No feature code changed.
+- **Completed**: inspected core/shell/plugin lifecycle; captured sidebar, interval/weekday recurrence and local-notification MVP. User confirmed survival after app closure/reboot and skipping all missed occurrences. Spec/context/design drafted with explicit proposed defaults.
+- **In-progress**: design review. Recommended existing specialUse FGS with pure-Dart coordinator, single persistent writer and no game/WebView dependency. AD-021 is proposed in design, not active yet.
+- **Next step**: obtain review of the concrete design; then writing-plans + TLC Tasks/Execute with domain specialists, atomic commits, actual Android reboot/background evidence and fresh independent verifier.
+- **Blockers**: design approval required by brainstorming/TLC workflow; no technical blocker established.
+- **Prior feature**: background-session-reliability completed; Verifier PASS and production APK installed preserving data. Evidence remains in that feature's validation.md. Overnight coverage was not observed.
 - **Branch**: master
