@@ -120,3 +120,25 @@ Red: composition/channel regression mocked the FGT activity-dependent query thro
 | :81/:82 exact denied code / unchanged blob | SCHED-09 no false activation | Yes |
 
 Adequacy: real createSchedulerRunner composition and real prefs adapter/coordinator behind native channels; persisted field values establish outcome independently of calls. The sole test covers the confirmed platform mismatch and permission denial, not hypothetical plugin behavior. No tests weakened/skipped; app channel/fake platform conventions retained.
+
+## Follow-up fix — valid native GMT alias in complete IANA database
+
+Device evidence reported persist.sys.timezone=GMT while enabled interval rules persisted zoneId Unknown/Unavailable. Installed flutter_timezone 5.1.1 Android uses ZoneId.systemDefault().id (API26+) with a context-only channel. timezone 0.11.1 tool/get.dart:177 builds latest from commonLocations, which contains Etc/GMT/Etc/UTC but excludes literal GMT/UTC. Read-only binary inspection confirms latest_all.tzf contains a GMT location (header nameLength 3, name bytes 47 4d 54, zero offset) while latest lacks it. Package README distinguishes common/default from all IANA data.
+
+The sole production change imports timezone/data/latest_all.dart in scheduler_environment. DeviceZone still validates the literal native identifier; failed/unknown lookups retain the last valid zone without arbitrary UTC fallback. The database supports legitimate aliases rather than hardcoding an offset or modifying the device timezone.
+
+Red: real createSchedulerRunner composition with native-shaped map {identifier:'GMT',localizedName:'Greenwich Mean Time',locale:'en_US'} failed the valid activation assertion with actual zoneUnavailable versus expected null, exit 1 before the import change. Green: focused test passed, full flutter test --no-pub completed 138 passed, zero failures, exit 0. flutter analyze --no-pub app and flutter analyze --no-pub integration_test each reported No issues found, exit 0. No pub get/native build ran here. T6 owns subsequent actual Flutter/native GMT capture and device revalidation.
+
+| AC / edge (Check A) | Exact assertion in apps/popmundo_app/test/scheduler_background_zone_test.dart | Spec-defined outcome / covered |
+| --- | --- | --- |
+| SCHED-05 valid native alias reaches authoritative weekly activation | :65 — expect(runner.errorCode,isNull); :70 — expect(rule.zoneId,'GMT'); :72 — expect(rule.enabled,true) | No false zone-unavailable for an actual IANA alias; native literal saved / Yes |
+| SCHED-02/05 weekly intended local time | :71 — expect(rule.nextDueUtc,expected), where expected=DateTime.utc(now.year,now.month,now.day+1,9), weekday=expected.weekday | Device GMT tomorrow local09:00 equals exact UTC calendar date09:00 / Yes |
+| SCHED-09 no false execution failure | :73 — expect(rule.lastResult.status,ScheduleResultStatus.neverExecuted); :74 — expect(rule.lastResult.errorCode,isNull) | Valid new future rule is ready, never executed, no failure recorded / Yes |
+
+| Test assertion (Check C) | Maps to | Keep |
+| --- | --- | --- |
+| :65/:70/:72 valid GMT activation / persisted zone | SCHED-05 native timezone boundary | Yes |
+| :71 exact persisted weekly UTC date | SCHED-02/05 intended local calendar | Yes |
+| :73/:74 initial execution state | SCHED-09 truthful status | Yes |
+
+Adequacy: verifies the database actually selected by createSchedulerRunner, not a unit helper separately initialized with a different database; native map shape passes through installed parser. Expected UTC oracle follows the actual GMT offset, not host local timezone. Existing initial lookup failure/cache/real zone change and core DST tests remain green. No weakening/skipping; scoped app composition/channel conventions retained.

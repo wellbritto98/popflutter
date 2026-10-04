@@ -1,7 +1,7 @@
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/data/latest_all.dart' as tz;
 
 import '../background/flutter_foreground_task_platform.dart';
 import '../notifications/local_notifications_service.dart';
