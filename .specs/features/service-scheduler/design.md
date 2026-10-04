@@ -2,7 +2,7 @@
 
 Spec: spec.md
 Context: context.md
-Status: Draft; architecture and defaults await user review.
+Status: Approved by user on 2026-10-04.
 
 ## Approaches considered
 

@@ -1,7 +1,7 @@
 # Service Scheduler — Context
 
 Date: 2026-10-04
-Status: Draft for user review; implementation has not started.
+Status: Approved by user on 2026-10-04.
 
 ## Feature boundary
 
@@ -15,7 +15,7 @@ Native sidebar scheduling, inspired by MacroDroid. A rule repeats by interval or
 - Rules must continue with the app closed and after rebooting Android.
 - If the device or service was unavailable, skip missed occurrences and wait for the next one. Never replay a backlog.
 
-## Proposed defaults, awaiting design approval
+## Approved defaults
 
 - Android-only scheduler in this MVP. Existing iOS features continue normally; unsupported continuous scheduling is explained on iOS.
 - Interval units: seconds, minutes, hours, days; integer quantity 1–9999. Days mean elapsed periods of 24 hours.
@@ -26,7 +26,7 @@ Native sidebar scheduling, inspired by MacroDroid. A rule repeats by interval or
 - Minor runtime delays are tolerated, with the precise bound in SCHED-06. Startup never recovers an overdue slot.
 - No separate design exploration is needed for the screen: follow the existing native theme and form patterns.
 
-These are proposed defaults, not additional user confirmations. They are listed explicitly for review.
+These defaults were approved with the written design on 2026-10-04.
 
 ## Reference and deferred scope
 

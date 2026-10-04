@@ -174,13 +174,22 @@
 - **Date**: 2026-10-04
 - **Status**: active; supersedes AD-012 service type and amends AD-018/019 renderer dependency.
 
+### AD-021
+
+- **Decision**: Agendamentos de serviços locais executam no isolate do FGS specialUse existente; domínio/calendário/coordenador são Dart puro em popmundo_utils. Um escritor serializado no FGS persiste service_scheduler.v1; UI usa comandos/respostas, nunca grava o snapshot. Boot/package-replacement auto-start só habilitado enquanto existirem regras ativas. MVP executa apenas notificação local com ID negativo estável e descarta ocorrências perdidas.
+- **Reason**: Usuário aprovou agendamentos em segundos/intervalos/dias da semana, com execução ao fechar o app e após reboot, sem recuperação de perdidas.
+- **Trade-off**: Serviço contínuo e consumo de bateria; entrega em segundos é melhor esforço. At-most-once attempt permite perder uma ação se morrer após claim. Android force-stop continua exceção; iOS não ganha este scheduler contínuo.
+- **Scope**: popmundo_utils scheduler, app shell/background/notifications, sidebar/i18n, Android lifecycle/device tests.
+- **Date**: 2026-10-04
+- **Status**: active; amends heartbeat-only restriction of AD-012/019/020 and scheduler reboot restriction of AD-020. WebView, JS, auth and game HTTP remain outside FGS isolate.
+
 ## Handoff
 
 - **Feature**: service-scheduler / .specs/features/service-scheduler.
-- **Phase / Task**: Specify + provisional Design; written draft awaits user review. No feature code changed.
-- **Completed**: inspected core/shell/plugin lifecycle; captured sidebar, interval/weekday recurrence and local-notification MVP. User confirmed survival after app closure/reboot and skipping all missed occurrences. Spec/context/design drafted with explicit proposed defaults.
-- **In-progress**: design review. Recommended existing specialUse FGS with pure-Dart coordinator, single persistent writer and no game/WebView dependency. AD-021 is proposed in design, not active yet.
-- **Next step**: obtain review of the concrete design; then writing-plans + TLC Tasks/Execute with domain specialists, atomic commits, actual Android reboot/background evidence and fresh independent verifier.
-- **Blockers**: design approval required by brainstorming/TLC workflow; no technical blocker established.
-- **Prior feature**: background-session-reliability completed; Verifier PASS and production APK installed preserving data. Evidence remains in that feature's validation.md. Overnight coverage was not observed.
-- **Branch**: master
+- **Phase / Task**: Tasks -> Execute; design approved by user on 2026-10-04. Seven atomic tasks in tasks.md.
+- **Completed**: spec/context/design approved; recurrence, reboot survival and skip policy explicit; AD-021 adopted.
+- **In-progress**: T1 snapshot model, then T2 recurrence and T3 coordinator through pure-Dart specialist.
+- **Next step**: core gates/commits -> shell runtime/UI -> actual Android Home/Recents/reboot proof -> maintenance docs/release install -> fresh independent verifier.
+- **Blockers**: none. Keep test package/build changes temporary and preserve installed production data.
+- **Prior feature**: background-session-reliability Verifier PASS; overnight coverage was not observed.
+- **Branch**: codex/service-scheduler

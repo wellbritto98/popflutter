@@ -1,6 +1,6 @@
 # Service Scheduler — Specification
 
-Status: Draft for user review
+Status: Approved by user on 2026-10-04
 Scope: Large, multi-component Android feature
 Context: context.md
 
@@ -56,7 +56,7 @@ Independent test: real Android isolated test app verifies local notification del
 
 ## Assumptions and closure
 
-Confirmed decisions and proposed defaults are separated in context.md. All defaults above are explicit proposals awaiting approval, including Android-only scope, units/bounds, notification-card replacement, timing tolerance and daylight-saving behavior. No unresolved question is silently assigned a behavior.
+Confirmed decisions and proposed defaults are separated in context.md. All defaults above were approved by the user on 2026-10-04, including Android-only scope, units/bounds, notification-card replacement, timing tolerance and daylight-saving behavior. No unresolved question is silently assigned a behavior.
 
 | Implicit requirement dimension | Resolution |
 | --- | --- |
