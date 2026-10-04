@@ -41,11 +41,12 @@ Orquestrar GET/POST ASP.NET, match de personagem por nome completo, throttle 750
 Login path `/` ou `/Default.aspx` **ou** heartbeat 302 em `{hostSticky}/World/Popmundo.aspx/Character` → settings enabled + user + character + password → GET form no origin atual → POST form inteiro → se ainda login: `invalidCredentials` → senão origin = host final → parse ChooseCharacter → POST escolha → se ainda ChooseCharacter: `serverRejected` → `cookieSink.write` → `loadUrl(.../World/Popmundo.aspx)`.
 
 Heartbeat: skip `www`; 200/rede/5xx ≠ logout; não segue o 302 do Character. Timer no isolate do controller (não no FGS).
+
 O UA é capturado uma vez e reutilizado pelo probe e por todos os hops do login. Com `userAgentProvider`, não há leitura de JS. Sem provider, a primeira captura espera o bridge e lê `navigator.userAgent` dentro do mesmo limite de 2 s. Timeout/erro usa o fallback existente, também cacheado; não enfileira leituras de JS a cada tick.
 
+Se o handshake atribuir outro host numerado enquanto a navegação estiver pausada, o controller guarda esse origin privado após sincronizar cookies. Probes e novas tentativas de login usam o host autenticado e leem os cookies desse host. `HostTracker` continua refletindo apenas navegação nativa real (AD-007). Callback atrasado de login no host antigo é ignorado; quando navegação real estabelece o host autenticado ou outra página do jogo, o origin privado é descartado e o tracker volta a definir o roteamento.
+
 `checkSession` não espera `waitUntilReady`: settings, cookies e HTTP usam portas nativas. O lock começa antes das leituras assíncronas. O timer é armado antes do primeiro probe; um renderer suspenso não impede o próximo tick. Após `cookieSink.write`, `done` é emitido antes da navegação; `loadUrl` permanece solicitado, mas uma resposta pendente libera o ciclo após 2 s. Erros de navegação são registrados em trace e não desfazem a sessão já renovada.
-
-
 
 Nome duplicado → `characterAmbiguous` (não chuta). Sem `LastUrlStore`.
 

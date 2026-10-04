@@ -706,6 +706,118 @@ void main() {
       },
     );
 
+    test('paused host handover probes synced cookies until native navigation',
+        () async {
+      final recordingCookies = _RecordingCookies();
+      cookies = recordingCookies;
+      final paused = await restartWithPausedRuntime();
+      controller.start();
+      for (var i = 0; i < 10; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      onGameHost();
+      paused.jsPaused = true;
+      paused.navigationPaused = true;
+      wireLogoutOn75();
+      server.routes.addAll({
+        'POST https://75.popmundo.com/Default.aspx': const AuthHttpResponse(
+          status: 302,
+          body: '',
+          location: 'https://76.popmundo.com//Login.aspx?t=TOKEN76',
+        ),
+        'GET https://76.popmundo.com//Login.aspx?t=TOKEN76':
+            const AuthHttpResponse(
+          status: 302,
+          body: '',
+          location: '/World/Popmundo.aspx/ChooseCharacter',
+          setCookieHeaders: [
+            'popmundo.com=AUTH76; path=/; Secure; HttpOnly',
+          ],
+        ),
+        'GET https://76.popmundo.com/World/Popmundo.aspx/ChooseCharacter':
+            const AuthHttpResponse(status: 200, body: chooseHtml),
+        'POST https://76.popmundo.com/World/Popmundo.aspx/ChooseCharacter':
+            const AuthHttpResponse(
+          status: 302,
+          body: '',
+          location: '/World/Popmundo.aspx',
+        ),
+        'GET https://76.popmundo.com/World/Popmundo.aspx':
+            const AuthHttpResponse(status: 200, body: worldHomeHtml),
+        'GET https://76.popmundo.com/World/Popmundo.aspx/Character':
+            const AuthHttpResponse(status: 200, body: worldHomeHtml),
+      });
+
+      await controller.checkSession();
+      await Future<void>.delayed(Duration.zero);
+      expect(statuses.last.phase, AutoLoginPhase.done);
+      expect(runtime.host.currentOrigin.host, '75.popmundo.com',
+          reason: 'AD-007: only actual native navigation updates HostTracker');
+      expect(paused.loadUrlCalls.single.host, '76.popmundo.com');
+      final auth76 = cookies.written.singleWhere((c) => c.value == 'AUTH76');
+      expect(auth76.host, '76.popmundo.com');
+      expect(auth76.isHostOnly, isTrue);
+      final completedCount = server.seen.length;
+      await controller.checkSession();
+      await controller.checkSession();
+      final nextProbes = server.seen.skip(completedCount).toList();
+      expect(nextProbes.map((r) => r.url.host),
+          ['76.popmundo.com', '76.popmundo.com']);
+      expect(nextProbes.every((r) => r.headers['Cookie'] == 'popmundo.com=AUTH76'),
+          isTrue, reason: 'BSR-06: new host-only session, no old-host cookies');
+      expect(recordingCookies.readOrigins.skip(1).map((u) => u.host),
+          ['76.popmundo.com', '76.popmundo.com']);
+      expect(runtime.host.currentOrigin.host, '75.popmundo.com');
+
+      // A delayed callback from the old login page must not abandon the
+      // newly authenticated host or start another cycle there.
+      runtime.events.emitNavigation(NavigationEvent(
+        url: 'https://75.popmundo.com/Default.aspx',
+      ));
+      await Future<void>.delayed(Duration.zero);
+      await controller.checkSession();
+      expect(server.seen.last.url.host, '76.popmundo.com');
+      expect(server.seen.where((r) => r.method == 'POST').length, 2);
+
+      // Expiry before the renderer resumes must also authenticate on the
+      // reassigned native host, rather than returning to the old login host.
+      server.routes.addAll({
+        'GET https://76.popmundo.com/World/Popmundo.aspx/Character':
+            const AuthHttpResponse(status: 302, body: '',
+                location: '/Default.aspx'),
+        'GET https://76.popmundo.com/Default.aspx':
+            const AuthHttpResponse(status: 200, body: loginHtml),
+        'POST https://76.popmundo.com/Default.aspx':
+            const AuthHttpResponse(status: 302, body: '',
+                location: '/World/Popmundo.aspx/ChooseCharacter'),
+      });
+      await controller.checkSession();
+      expect(server.postTo('76.popmundo.com/Default.aspx'), isNotNull,
+          reason: 'native retry login follows pending authenticated origin');
+      expect(server.seen.where((r) => r.method == 'POST' &&
+          r.url.host == '75.popmundo.com').length, 1,
+          reason: 'no repeated credentials POST to the obsolete host');
+      expect(runtime.host.currentOrigin.host, '75.popmundo.com');
+
+      // Once real navigation establishes a game host, it owns routing again.
+      final nextOrigin = Uri.parse('https://77.popmundo.com');
+      runtime.host.onNavigation(nextOrigin.replace(path: '/World/Popmundo.aspx'));
+      runtime.events.emitNavigation(NavigationEvent(
+        url: nextOrigin.replace(path: '/World/Popmundo.aspx').toString(),
+      ));
+      await Future<void>.delayed(Duration.zero);
+      cookies.seed([
+        const GameCookie(name: 'popmundo.com', value: 'AUTH77',
+            host: '77.popmundo.com', secure: true, httpOnly: true),
+      ]);
+      server.routes['GET https://77.popmundo.com/World/Popmundo.aspx/Character'] =
+          const AuthHttpResponse(status: 200, body: worldHomeHtml);
+      await controller.checkSession();
+      expect(server.seen.last.url.host, '77.popmundo.com');
+      expect(server.seen.last.headers['Cookie'], 'popmundo.com=AUTH77');
+      expect(recordingCookies.readOrigins.last.host, '77.popmundo.com');
+    });
+
     test('startup UA timeout still allows native background probing', () async {
       final paused = await restartWithPausedRuntime();
       paused.jsPaused = true;
@@ -983,6 +1095,16 @@ class _PausedRuntime extends FakePopmundoRuntime {
     if (!navigationPaused) return super.loadUrl(url);
     loadUrlCalls.add(url);
     return Completer<void>().future;
+  }
+}
+
+class _RecordingCookies extends MemoryCookieSink {
+  final readOrigins = <Uri>[];
+
+  @override
+  Future<List<GameCookie>> read(Uri url) {
+    readOrigins.add(url);
+    return super.read(url);
   }
 }
 

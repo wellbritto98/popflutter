@@ -84,6 +84,9 @@ class AutoLoginController {
   final ClockNow _now;
   IoAuthHttpSender? _ioSender;
   Future<String>? _userAgent;
+  Uri? _pendingSessionOrigin;
+
+  Uri get _sessionOrigin => _pendingSessionOrigin ?? runtime.host.currentOrigin;
 
   AuthHttpSend get _send {
     final injected = authSend;
@@ -163,6 +166,20 @@ class AutoLoginController {
     }
 
     final path = uri.path.isEmpty ? '/' : uri.path;
+    final observedOrigin = Uri.parse(uri.origin);
+    final pending = _pendingSessionOrigin;
+    if (pending != null) {
+      // A paused page may report its old login URL after the native handshake
+      // has moved the session to another host. That callback is obsolete.
+      if (AspNetForm.isLoginPath(path) && observedOrigin != pending) {
+        _trace('nav ignored: old login host while authenticated navigation is pending');
+        return;
+      }
+      if (observedOrigin == runtime.host.currentOrigin &&
+          (observedOrigin == pending || !AspNetForm.isLoginPath(path))) {
+        _pendingSessionOrigin = null;
+      }
+    }
     _trace('nav ${event.url} (path=$path, inFlight=$_inFlight, '
         'host=${runtime.host.currentOrigin})');
 
@@ -193,7 +210,7 @@ class AutoLoginController {
   Future<void> checkSession() async {
     if (!_running || _inFlight) return;
 
-    final origin = runtime.host.currentOrigin;
+    final origin = _sessionOrigin;
     final host = origin.host.toLowerCase();
     if (!HostTracker.isPopmundoHost(host) || host == 'www.popmundo.com') {
       _trace('heartbeat skip: host=$host');
@@ -315,7 +332,7 @@ class AutoLoginController {
     required String password,
     AuthSession? session,
   }) async {
-    final loginUrl = runtime.host.currentOrigin.replace(path: loginPath);
+    final loginUrl = _sessionOrigin.replace(path: loginPath);
     final userAgent = session?.userAgent ?? await _readUserAgent();
     _trace('native handshake from $loginUrl (ua=$userAgent)');
 
@@ -397,6 +414,9 @@ class AutoLoginController {
       _trace('no CookieSink wired — the WebView will NOT be logged in');
     } else {
       await sink.write(jar);
+      // Preserve native session routing until actual WebView navigation
+      // establishes the new sticky host. Do not mutate HostTracker (AD-007).
+      _pendingSessionOrigin = gameOrigin;
     }
 
     _emit(AutoLoginStatus(
