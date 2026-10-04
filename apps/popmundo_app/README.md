@@ -23,7 +23,7 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 | UserScripts UI | `lib/userscripts/` | [README](lib/userscripts/README.md) |
 | GM host | `lib/gm/` | [README](lib/gm/README.md) |
 | Keepalive | `lib/background/` | [README](lib/background/README.md) |
-| Notificações | `lib/notifications/` | `NotificationService`/`LocalNotificationsService`/`FakeNotificationService` (`showNotification` genérico); botão manual `debug-send-notification` no overlay; `MenuNotificationsBridge` traduz `MenuNotificationsWatcher.newNotifications` (popmundo_utils) em notificações reais, uma por item novo do jogo, canal `popflutter_game_notifications_channel` |
+| Notificações | `lib/notifications/` | `NotificationService`/`LocalNotificationsService`/`FakeNotificationService` (`showNotification` genérico); botão manual `debug-send-notification` no overlay; `MenuNotificationsBridge` traduz `MenuNotificationsWatcher.newNotifications` (popmundo_utils) em notificações reais, uma por item novo do jogo, canal `popflutter_game_notifications_channel`; Auto Login em background usa notificação de resultado id 2 |
 | Idioma | `lib/language/`, `lib/l10n.dart` | [README](lib/language/README.md) |
 | i18n assets | `assets/translations/{en,pt}.json` | Strings de release |
 | Patrol | `integration_test/` | [README](integration_test/README.md) |
@@ -42,7 +42,7 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 ## Pontos de entrada
 
 - `lib/main.dart` — binário Flutter.
-- `android/app/src/main/AndroidManifest.xml` — INTERNET, FGS `dataSync`, `POST_NOTIFICATIONS`, battery, `stopWithTask="false"`.
+- `android/app/src/main/AndroidManifest.xml` — INTERNET, FGS `specialUse`, `POST_NOTIFICATIONS`, battery, `stopWithTask="false"`.
 - `ios/Runner/Info.plist` — ATS `popmundo.com` + subdomains; `UIBackgroundModes: fetch`; localizações `en`/`pt`.
 
 ## Fluxos importantes
@@ -75,3 +75,6 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 cd apps/popmundo_app && flutter test
 flutter analyze apps/popmundo_app integration_test
 ```
+
+
+Manutenção contínua de sessão Android usa FGS specialUse com subtype declarado (AD-020). Force-stop, reboot e morte do processo encerram manutenção; distribuição Play exige revisão do caso de uso.

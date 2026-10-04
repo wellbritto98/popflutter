@@ -28,7 +28,7 @@ O propósito central é:
 | Sessão cai na tela de login ASP.NET | Auto Login (se enabled) autentica em `dart:io`, copia cookies para a WebView e abre a home do mundo |
 | Senha em SharedPreferences é inaceitável | `SecretStore` → `flutter_secure_storage` (Keystore/Keychain) |
 | Extensão Chrome não roda no app | Catálogo de UserScripts + polyfill `GM_*`/`GM.*` (Core + Host) |
-| Android mata o processo em background | Foreground Service `dataSync` + notificação persistente (`stopWithTask=false`) |
+| Android mata o processo em background | Foreground Service `specialUse` + notificação persistente (`stopWithTask=false`) |
 | Back do sistema fecha o app | Histórico do WebView é consumido primeiro (`WebViewBackHandler`) |
 | `chrome.storage` / `chrome.runtime` não existem | `KeyValueStore` + `StorageService` + `GmValueStore` |
 | Depurar WebView sem USB | Overlay de debug (menu, só em `kDebugMode`) |
@@ -42,7 +42,7 @@ O propósito central é:
 1. **Jogar:** abre o app → bootstrap do catálogo de UserScripts → WebView carrega `https://www.popmundo.com` → cookies persistem (não incógnito) → redirecionamentos de subdomínio atualizam o host sticky.
 2. **Sair do domínio:** link fora de `*.popmundo.com` abre no navegador do sistema (`ObservePolicy.openExternal` + `url_launcher`).
 3. **Voltar no jogo:** botão/gesto de system-back anda no histórico da WebView; com histórico vazio, o app sai.
-4. **Reautenticar (Auto Login):** se enabled e (a) a navegação cai em `/` ou `/Default.aspx`, ou (b) o heartbeat 60 s em `{hostSticky}/World/Popmundo.aspx/Character` recebe 302 para `/Default.aspx`, o handshake nativo corre fora da tela; o jogador só vê `{host}/World/Popmundo.aspx`. Personagem pelo **nome completo** (`div.box > h2`). Snackbars EN/PT por fase. Sem restore da última URL.
+4. **Reautenticar (Auto Login):** se enabled e (a) a navegação cai em `/` ou `/Default.aspx`, ou (b) o heartbeat 60 s em `{hostSticky}/World/Popmundo.aspx/Character` recebe 302 para `/Default.aspx`, o handshake nativo corre fora da tela; o jogador só vê `{host}/World/Popmundo.aspx`. Personagem pelo **nome completo** (`div.box > h2`). Snackbars EN/PT por fase; sucesso/falha em segundo plano também geram notificação local. Sem restore da última URL.
 5. **UserScripts:** item sempre visível no sidebar → import por URL, toggle, delete → injector recarrega a página. `@require`/`@resource` via HTTP do app. Scripts com `@grant` GM recebem shim.
 6. **GM host:** `GM.xmlHttpRequest` (TimedFetch no jogo / HttpClient fora), `GM.openInTab` (browser do SO), menu commands no sidebar (limpos a cada navegação), notificação in-app, clipboard, `getResourceUrl`.
 7. **Keepalive:** FGS sobe no boot; isolate só heartbeat; overlay de debug mostra se o serviço está rodando / bateria / ciclo de vida.

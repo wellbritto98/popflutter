@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuites tests="1" failures="0" errors="0" skipped="0" time="31.146" timestamp="2026-10-04T17:50:59" hostname="localhost">
+  <testsuite name="com.popmundo.popmundo_app.MainActivityTest" tests="1" failures="0" errors="0" skipped="0" time="30.649" timestamp="2026-10-04T17:50:59" hostname="localhost">
+    <properties>
+      <property name="device" value="Medium_Phone_API_36.1(AVD) - 16" />
+      <property name="flavor" value="" />
+      <property name="project" value=":app" />
+    </properties>
+    <testcase name="runDartTest[integration_test.keepalive_test keepalive: real FGS starts once, ticks, and survives background]" classname="com.popmundo.popmundo_app.MainActivityTest" time="30.649" />
+  </testsuite>
+</testsuites>

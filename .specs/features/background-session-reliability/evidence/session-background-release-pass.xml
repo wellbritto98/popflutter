@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuites tests="1" failures="0" errors="0" skipped="0" time="34.386" timestamp="2026-10-04T17:48:50" hostname="localhost">
+  <testsuite name="com.popmundo.popmundo_app.MainActivityTest" tests="1" failures="0" errors="0" skipped="0" time="33.874" timestamp="2026-10-04T17:48:50" hostname="localhost">
+    <properties>
+      <property name="device" value="Medium_Phone_API_36.1(AVD) - 16" />
+      <property name="flavor" value="" />
+      <property name="project" value=":app" />
+    </properties>
+    <testcase name="runDartTest[integration_test.session_background_test session: native login and notification finish while JS is paused]" classname="com.popmundo.popmundo_app.MainActivityTest" time="33.874" />
+  </testsuite>
+</testsuites>

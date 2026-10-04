@@ -165,12 +165,21 @@
 - **Date**: 2026-08-19
 - **Status**: active
 
+### AD-020
+
+- **Decision**: Manutenção contínua de sessão Android usa FGS specialUse, permissão FOREGROUND_SERVICE_SPECIAL_USE e PROPERTY_SPECIAL_USE_FGS_SUBTYPE explicando o uso; substitui o tipo dataSync do AD-012. Isolate FGS continua heartbeat-only. Auto Login cacheia User-Agent nativo com espera limitada; probes HTTP nativos não dependem de JS pronto e navegação final não bloqueia conclusão. Origin autenticado pendente guia HTTP e cookies até navegação nativa confirmar o host, sem mutar HostTracker. Resultados done/failed fora de resumed geram notificação local EN/PT com id fixo 2; foreground conserva Snackbar.
+- **Reason**: Usuário exige funcionamento contínuo, inclusive noite inteira. dataSync limita-se a seis horas no Android 15+; o código esperava JS suspenso sem timeout e só mostrava feedback dentro da tela.
+- **Trade-off**: Google Play revisa o caso de uso specialUse. Processo morto, force-stop e reboot continuam limites; sem auto-boot. UA padrão existente é fallback se primeira leitura não responder em 2 s. iOS não ganha execução contínua.
+- **Scope**: AutoLoginController, shell/autologin, adapter FGS, Android manifest e testes device-real.
+- **Date**: 2026-10-04
+- **Status**: active; supersedes AD-012 service type and amends AD-018/019 renderer dependency.
+
 ## Handoff
 
-- **Feature**: local-notifications (debug-panel test-notification button) / `.specs/features/local-notifications` — **DONE**
-- **Phase / Task**: Execute + Verifier complete, device-real proof + mutation-proof complete. `.specs/features/local-notifications/validation.md` has the full record.
-- **Completed**: T1-T9 committed, plus 3 follow-up fixes surfaced only by an actual on-device run: `a938592` (Android core library desugaring, required by `flutter_local_notifications`), `f9cb868`+`d57eba4` (fixed a hanging `notifications_test.dart` teardown). User ran `patrol test` from their own terminal (agent sandboxes on this machine cannot complete any Gradle build — confirmed independently 3 times, including a plain `flutter build apk --debug`) and it passed end-to-end. Mutation-proof done: `showTestNotification()` mutated to no-op, test failed at the exact NOTIF-01/04 assertion, reverted (`git checkout --`, tree clean). NOTIF-01/02/03/04/05/06/07 all `Verified` in `spec.md`. NOTIF-08 has one accepted low-risk gap: `LocalNotificationsService.initialize()`'s own failure branch is untested in either tier (Verifier-judged not worth a fix task, matches the existing `FlutterForegroundTaskPlatform` zero-unit-test precedent).
-- **In-progress**: none
-- **Next step**: none — feature closed. If `LocalNotificationsService.initialize()`'s catch branch ever becomes a real concern, it would need the plugin made injectable (out of this MVP's scope).
-- **Blockers**: none.
+- **Feature**: background-session-reliability / .specs/features/background-session-reliability — implementação e testes funcionais concluídos.
+- **Phase / Task**: Execute + Verifier; código revisado, fixture Android e keepalive passaram, APK de produção instalado preservando dados.
+- **Completed**: UA nativo cacheado com timeout; login e probes independentes de JS suspenso; host autenticado preservado até navegação real; notificação de resultado id 2 EN/PT; FGS specialUse. Utils 224 + app 101 testes; dois testes Patrol passaram no Android 16, com 8/8 mutações detectadas (uma na bandeja real). Commits df248e2, abd3d51, b2511e5, e172652, ea072ea, 0a234c1.
+- **In-progress**: none. Verifier PASS em validation.md.
+- **Next step**: nenhum bloqueio funcional; observação de uma noite inteira não foi realizada. Force-stop, reboot e morte do processo permanecem limites.
+- **Blockers**: none. Build Windows viabilizado por workaround Java process-scoped; configuração temporária de instrumentação totalmente restaurada.
 - **Branch**: master

@@ -174,11 +174,11 @@ gatilho B: a cada 60 s, GET nativo {hostSticky}/World/Popmundo.aspx/Character
       hop www → N.popmundo.com (Set-Cookie no último hop)
       POST ChooseCharacter (match por <h2> nome completo)
   → CookieSink.write(jar) → CookieManager da WebView
-  → runtime.loadUrl(https://{host_final}/World/Popmundo.aspx)
-  → Stream AutoLoginStatus → snackbars EN/PT
+  → AutoLoginStatus(done) → snackbar EN/PT ou notificação local id 2 em background
+  → runtime.loadUrl(https://{host_final}/World/Popmundo.aspx), espera limitada a 2 s
 ```
 
-O User-Agent do cliente nativo é lido de `navigator.userAgent` na WebView (fallback Android Chrome string se o evaluate falhar). O isolate do FGS **não** faz o GET de Character (AD-012).
+O User-Agent é resolvido pela API nativa Android no app e cacheado com timeout de 2 s; clientes sem provider usam captura inicial de navigator.userAgent com o mesmo limite. Probes seguintes não aguardam JS. O isolate FGS continua heartbeat-only (AD-020).
 
 ### 6.4 UserScripts + GM
 
@@ -219,8 +219,8 @@ DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
 | `html: ^0.15.6` | pub.dev | `popmundo_utils` | Alta para Auto Login — parse de `#aspnetForm` / `div.box` |
 | `shared_preferences: ^2.5.3` | pub.dev | app | Média — `KeyValueStore` de produção |
 | `flutter_secure_storage: ^9.2.4` | pub.dev | app | Alta para Auto Login — senha |
-| `flutter_foreground_task: ^11.0.0` | pub.dev | app | Alta para keepalive Android (`dataSync`, `stopWithTask=false`) |
-| `flutter_local_notifications: ^22.3.0` | pub.dev | app | Média — botão de teste do debug overlay e as notificações reais de `MenuNotificationsBridge` (`LocalNotificationsService`); nenhum outro código importa o plugin |
+| `flutter_foreground_task: ^11.0.0` | pub.dev | app | Alta para keepalive Android (`specialUse`, `stopWithTask=false`) |
+| `flutter_local_notifications: ^22.3.0` | pub.dev | app | Média — botão de teste do debug overlay e as notificações reais de `MenuNotificationsBridge` (`LocalNotificationsService`), incluindo resultados finais de Auto Login |
 | `easy_localization: ^3.0.8` | pub.dev | app | Média — strings de release da shell |
 | `url_launcher: ^6.3.1` | pub.dev | webview + app | Média — links externos e `GM.openInTab` |
 | `patrol: ^4.9.0` + `patrol_cli` | pub.dev / global | app `dev_dependencies` | Média — só o tier device-real |
@@ -255,7 +255,7 @@ DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
 | `PopmundoScope` sem call sites | `app.dart` | InheritedWidget morto | Decisão de manter o menu agnóstico do runtime |
 | `packages/popmundo_utils/example/` | example | `main` só imprime `HostTracker.defaultOrigin` | Boilerplate; não é ponto de entrada do produto |
 | Cache TimedFetch só em memória | `timed_fetch.dart` | Perde ao matar o processo | AD-006, aceito |
-| Teto `dataSync` Android 15+ / iOS suspende JS | keepalive | Keepalive ≠ sessão eterna no iOS | Overlay mostra status; spec honesto |
+| Retenção do processo Android / iOS suspende JS | keepalive | Force-stop e reboot encerram manutenção; iOS suspende | specialUse com subtype declarado; overlay mostra status |
 
 ---
 
@@ -292,3 +292,9 @@ DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
 | `webview-back-navigation` | webview | — |
 
 Fonte de *porquê*: `.specs/STATE.md` Decisions. Fonte de *o quê* por feature: `spec.md` da pasta. Este documento descreve o sistema **como o código está hoje**.
+
+### Background reliability (AD-020)
+
+A shell fornece getDefaultUserAgent da API nativa; o controller cacheia essa leitura com timeout de 2 s e fallback existente. Clientes sem provider usam uma captura inicial do bridge. Probes nativos usam esse cache e cookies nativos, sem esperar JS pronto a cada tick. Após sync dos cookies, o resultado do login é emitido; navegação é solicitada com espera limitada de 2 s para não prender o ciclo ao renderer suspenso. A shell publica notificação local id 2 para done/failed quando lifecycle não é resumed, com as mensagens EN/PT existentes. FGS specialUse declara manutenção contínua de sessão no subtype; force-stop, reboot e morte do processo permanecem limites.
+
+Se o handshake atribui outro servidor enquanto a navegação final está pendente, o controller guarda apenas para HTTP/cookies o origin recém-autenticado. HostTracker continua acompanhando navegações reais; callback de login obsoleto no servidor anterior não dispara novo ciclo. Nova navegação real devolve a autoridade ao HostTracker. Isso evita probes repetidos no servidor expirado antes de reabrir o app.

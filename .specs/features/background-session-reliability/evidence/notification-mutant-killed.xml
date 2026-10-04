@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuites tests="1" failures="1" errors="0" skipped="0" time="42.027" timestamp="2026-10-04T14:17:28" hostname="localhost">
+  <testsuite name="com.popmundo.popmundo_app.MainActivityTest" tests="1" failures="1" errors="0" skipped="0" time="41.467" timestamp="2026-10-04T14:17:28" hostname="localhost">
+    <properties>
+      <property name="device" value="Medium_Phone_API_36.1(AVD) - 16" />
+      <property name="flavor" value="" />
+      <property name="project" value=":app" />
+    </properties>
+    <testcase name="runDartTest[integration_test.session_background_test session: native login and notification finish while JS is paused]" classname="com.popmundo.popmundo_app.MainActivityTest" time="41.467">
+      <failure>java.lang.AssertionError: Dart test failed: integration_test.session_background_test session: native login and notification finish while JS is paused
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞═════════════════
+The following TestFailure was thrown running a test:
+Expected: an object with length of &lt;1&gt;
+Actual: WhereIterable&lt;Notification&gt;:[]
+Which: has length of &lt;0&gt;
+BSR-03/05: background result appears in actual system tray
+
+When the exception was thrown, this was the stack:
+#4      main.&lt;anonymous closure&gt; (file:///C:/Users/Wellington/Documents/projetos/popflutter-bsr-verifier/apps/popmundo_app/integration_test/session_background_test.dart:338:7)
+&lt;asynchronous suspension&gt;
+#5      patrolTest.&lt;anonymous closure&gt; (package:patrol/src/common.dart:194:9)
+&lt;asynchronous suspension&gt;
+#6      testWidgets.&lt;anonymous closure&gt;.&lt;anonymous closure&gt; (package:flutter_test/src/widget_tester.dart:192:15)
+&lt;asynchronous suspension&gt;
+#7      PatrolBinding._wrapTestBodyWithExceptionGatherer (package:patrol/src/binding.dart:246:5)
+&lt;asynchronous suspension&gt;
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+&lt;asynchronous suspension&gt;
+#9      TestWidgetsFlutterBinding._createTestCompletionHandler.&lt;anonymous closure&gt; (package:flutter_test/src/binding.dart:1707:12)
+&lt;asynchronous suspension&gt;
+
+This was caught by the test expectation on the following line:
+file:///C:/Users/Wellington/Documents/projetos/popflutter-bsr-verifier/apps/popmundo_app/integration_test/session_background_test.dart line 338
+The test description was:
+session: native login and notification finish while JS is
+paused
+═════════════════════════════════════════════════════════════════
+
+at pl.leancode.patrol.PatrolJUnitRunner.runDartTest(PatrolJUnitRunner.java:187)
+at pl.leancode.patrol.PatrolJUnitRunner.runDartTest(PatrolJUnitRunner.java:161)
+at com.popmundo.popmundo_app.MainActivityTest.runDartTest(MainActivityTest.java:29)
+</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

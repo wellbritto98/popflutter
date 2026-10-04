@@ -39,6 +39,8 @@ URL inicial: `https://www.popmundo.com`. Redirecionamentos `N.popmundo.com` atua
 
 Fila serial, delay **750 ms**, cache in-memory `METHOD:URL`. Fetch auxiliar do jogo roda **no contexto da página**. O handshake de Auto Login é a exceção: HTTP nativo `dart:io` com o mesmo cooldown, depois sync de cookies na WebView. Heartbeat de sessão: GET nativo a cada 60 s em `{N.popmundo.com}/World/Popmundo.aspx/Character`.
 
+Android mantém a sessão por FGS specialUse e auto login HTTP nativo, com notificação local de sucesso/falha em segundo plano. Veja [critérios e limites](.specs/features/background-session-reliability/spec.md) e AD-020.
+
 ## Overlay e menu
 
 Um FAB (`menu-toggle`) abre o sidebar. Itens fixos vêm de `buildAppMenuItems` (Auto Login, Userscripts, Language; Debug só em debug). Cookies no overlay: **nome@domínio**, nunca o valor.

@@ -4,7 +4,7 @@
 
 Quando a sessão do Popmundo expira, o jogador volta ao formulário ASP.NET em `/` ou `/Default.aspx`. Isso pode acontecer **sem a WebView navegar** — em especial com o app em segundo plano (keepalive). Detectar só a URL de login deixa a sessão morta até o jogador tocar na página.
 
-O ciclo de Auto Login continua **silencioso e fora da WebView**: handshake em HTTP nativo `dart:io`, cookies copiados para o jar da WebView, uma navegação para `{host}/World/Popmundo.aspx`. Além da detecção por navegação, um **heartbeat** a cada 60 s faz GET em `{hostSticky}/World/Popmundo.aspx/Character` com os cookies da WebView; um 302 para `/Default.aspx` significa deslogado e dispara o mesmo ciclo de renovação. Personagem pelo **nome completo**. Feedback por snackbars. Sem fallback visível (AD-018).
+O ciclo de Auto Login continua **silencioso e fora da WebView**: handshake em HTTP nativo `dart:io`, cookies copiados para o jar da WebView, uma navegação para `{host}/World/Popmundo.aspx`. Além da detecção por navegação, um **heartbeat** a cada 60 s faz GET em `{hostSticky}/World/Popmundo.aspx/Character` com os cookies da WebView; um 302 para `/Default.aspx` significa deslogado e dispara o mesmo ciclo de renovação. Personagem pelo **nome completo**. Feedback por snackbars; resultado final em segundo plano por notificação local (AD-020). Sem fallback visível (AD-018).
 
 ## Goals
 
@@ -50,7 +50,7 @@ O ciclo de Auto Login continua **silencioso e fora da WebView**: handshake em HT
 | `ddlStatus` | Default `0` (Normal); editável na UI | Captura de request | y (agent) |
 | Destino final | Sempre `{origin}/World/Popmundo.aspx`; `LastUrlStore` removido | Pedido explícito | y |
 | UI nativa | Localizada EN/PT via `easy_localization` (AD-014); item sempre visível | Padrão sidebar | y |
-| Feedback | Stream `AutoLoginStatus` no controller → snackbars na shell | Pedido explícito | y |
+| Feedback | Stream AutoLoginStatus → snackbars na shell; done/failed em background → notificação local | Pedido explícito | y |
 | Concurrency | Um auto-login por vez (`inFlight`); falha 200+form = parar | Evita loop / throttle abuse | y (agent) |
 | Heartbeat intervalo | 60 s, um GET por tick | Pedido explícito ("a cada minuto"); saudável vs throttle do jogo | y |
 | Heartbeat URL | `{HostTracker.currentOrigin}/World/Popmundo.aspx/Character` — host numerado (`74.`, `75.`, …), **nunca** `www` hardcoded e **nunca** `HostTracker.resolve` (trailing slash) | Sessão e cookies são host-only no `N.` atribuído no login (AD-007); captura do usuário | y |
@@ -247,3 +247,9 @@ O ciclo de Auto Login continua **silencioso e fora da WebView**: handshake em HT
 - [x] Logout on `75.popmundo.com` (302 from `/World/Popmundo.aspx/Character` to `/Default.aspx`) renews the session without the WebView having navigated
 - [x] Probe never hits `www.popmundo.com/.../Character` after the sticky host is a numbered `N.`
 - [x] One Character GET per minute, never per FGS 5 s tick; the 302 is not followed
+
+## Background reliability amendment (2026-10-04, AD-020)
+
+User-Agent resolvido por API nativa no app, ou captura inicial de bridge para clientes sem provider, com timeout de 2 s/cache; probe nativo não depende de renderer pronto. Sync de cookie conclui antes de done; resposta de navegação suspensa não bloqueia novos probes. done/failed em lifecycle não-resumed gera notificação local EN/PT id 2. Critérios e evidências: .specs/features/background-session-reliability/.
+
+Handover em background: origin autenticado pendente guia probes, cookie reads e nova renovação até navegação nativa confirmar host; HostTracker não é mutado pelo HTTP. Navegação real retoma autoridade do tracker.
