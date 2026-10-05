@@ -1,0 +1,13 @@
+diff --git a/packages/popmundo_utils/lib/src/scheduler/recurrence_calculator.dart b/packages/popmundo_utils/lib/src/scheduler/recurrence_calculator.dart
+index 1114384..72db071 100644
+--- a/packages/popmundo_utils/lib/src/scheduler/recurrence_calculator.dart
++++ b/packages/popmundo_utils/lib/src/scheduler/recurrence_calculator.dart
+@@ -109,7 +109,7 @@ class RecurrenceCalculator {
+     }
+     if (valid.isNotEmpty) {
+       valid.sort();
+-      return valid.first;
++      return valid.last;
+     }
+     if (gapCandidate != null) return gapCandidate;
+     throw const SchedulerException('zoneUnavailable');

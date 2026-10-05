@@ -1,0 +1,87 @@
+Resolving dependencies in `C:\Users\Wellington\.codex\worktrees\scheduler-final-verifier\popflutter`...
+Downloading packages...
+  _fe_analyzer_shared 103.0.0 (108.0.0 available)
+  analyzer 13.3.0 (14.4.0 available)
+  clock 1.1.2 (1.1.3 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cupertino_icons 1.0.9 (2.0.0 available)
+  dbus 0.7.13 (0.8.0 available)
+  equatable 2.1.0 (3.0.0 available)
+  flutter_foreground_task 11.0.0 (11.0.3 available)
+  flutter_local_notifications 22.3.0 (22.3.1 available)
+  flutter_secure_storage 9.2.4 (11.2.0 available)
+  flutter_secure_storage_linux 1.2.3 (3.0.3 available)
+  flutter_secure_storage_macos 3.1.3 (4.0.0 available)
+  flutter_secure_storage_platform_interface 1.1.2 (2.1.1 available)
+  flutter_secure_storage_web 1.2.1 (2.1.1 available)
+  flutter_secure_storage_windows 3.1.2 (4.2.2 available)
+  frontend_server_client 4.0.0 (4.1.0 available)
+  glob 2.1.3 (2.2.0 available)
+  html 0.15.6 (0.15.7 available)
+  io 1.0.5 (1.1.0 available)
+  jni 1.0.3 (1.1.0 available)
+  jni_flutter 1.0.2 (1.0.3 available)
+  js 0.6.7 (0.7.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  mime 2.0.0 (2.1.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  package_config 2.2.0 (3.0.0 available)
+  patrol 4.9.0 (4.10.0 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  pool 1.5.2 (1.5.3 available)
+  pub_semver 2.2.0 (2.2.1 available)
+  shared_preferences_android 2.4.27 (2.4.28 available)
+  shared_preferences_foundation 2.5.6 (2.5.7 available)
+  source_maps 0.10.13 (0.10.14 available)
+  stack_trace 1.12.1 (1.12.2 available)
+  test 1.31.1 (1.32.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  test_core 0.6.18 (0.6.20 available)
+  url_launcher 6.3.2 (6.3.3 available)
+  url_launcher_android 6.3.32 (6.3.33 available)
+  url_launcher_ios 6.4.1 (6.4.2 available)
+  url_launcher_linux 3.2.2 (3.2.3 available)
+  url_launcher_macos 3.2.5 (3.2.6 available)
+  url_launcher_windows 3.1.5 (3.1.6 available)
+  vector_math 2.4.2 (2.4.3 available)
+  vm_service 15.2.0 (15.3.0 available)
+  win32 5.15.0 (6.4.0 available)
+  xml 7.0.1 (7.1.0 available)
+  yaml 3.1.3 (3.1.4 available)
+Got dependencies in `C:\Users\Wellington\.codex\worktrees\scheduler-final-verifier\popflutter`!
+49 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/in_app_cookie_sink_test.dart
+00:00 +0: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/in_app_cookie_sink_test.dart: sameSitePolicyFor maps what the game actually sends
+00:00 +1: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/in_app_cookie_sink_test.dart: sameSitePolicyFor maps the other two policies
+00:00 +2: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/in_app_cookie_sink_test.dart: sameSitePolicyFor an absent or unknown attribute leaves the browser default
+00:00 +3: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/in_app_cookie_sink_test.dart: gameCookieFromInApp null domain is host-only on the request host
+00:00 +4: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/in_app_cookie_sink_test.dart: gameCookieFromInApp domain equal to the host stays host-only
+00:00 +5: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/in_app_cookie_sink_test.dart: gameCookieFromInApp a broader domain cookie keeps domainAttribute
+00:00 +6: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/popmundo_webview_test.dart: settings are non-incognito and enable intercept listeners
+00:00 +7: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/popmundo_webview_test.dart: observe-only resource intercept returns null
+00:00 +8: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/popmundo_webview_test.dart: JS hooks wrap fetch/xhr/console and helpers do not auto-run scoring
+00:00 +9: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/popmundo_webview_test.dart: JS __popmundo.fetch passes options and exposes Location header
+00:00 +10: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/popmundo_webview_test.dart: inPageFetchResultFromJsMap normalizes headers and url
+00:00 +11: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/popmundo_webview_test.dart: loadUrl throws when WebView is not attached
+00:00 +12: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/popmundo_webview_test.dart: JS bridge emits network and console events
+00:00 +13: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/popmundo_webview_test.dart: JS bridge emits gmValue events for set and delete
+00:00 +14: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/popmundo_webview_test.dart: JS bridge emits gm host call events
+00:00 +15: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/popmundo_webview_test.dart: initial URL default is www.popmundo.com
+00:00 +16: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/userscript_injector_test.dart: toUserScript maps runAt, forMainFrameOnly, groupName, PAGE world
+00:00 +17: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/userscript_injector_test.dart: toUserScript maps documentEnd injection time
+00:00 +18: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/userscript_injector_test.dart: mergeInitial appends only enabled catalog scripts after builtins
+00:00 +19: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/userscript_injector_test.dart: sync adds new enabled scripts and reloads
+00:00 +20: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/userscript_injector_test.dart: sync removes disabled/deleted by groupName and reloads
+00:00 +21: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/userscript_injector_test.dart: toUserScript wraps source with GM shim when a Core grant is present
+00:00 +22: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/userscript_injector_test.dart: toUserScript leaves grant-less script source untouched
+00:00 +23: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/userscript_injector_test.dart: refreshGmSnapshots re-registers only value-grant scripts with fresh values
+00:00 +24: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/userscript_injector_test.dart: refreshGmSnapshots is a no-op when nothing has a value grant
+00:00 +25: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/userscript_injector_test.dart: injector source never calls removeAllUserScripts
+00:00 +26: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/webview_back_navigation_test.dart: system back with history calls goBack once and does not allow exit
+00:00 +27: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/webview_back_navigation_test.dart: system back without history does not call goBack and allows exit
+00:00 +28: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/webview_back_navigation_test.dart: system back with no attached WebView allows exit
+00:00 +29: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/webview_back_navigation_test.dart: route may pop only when the WebView has no history
+00:00 +30: C:/Users/Wellington/.codex/worktrees/scheduler-final-verifier/popflutter/packages/popmundo_webview/test/webview_back_navigation_test.dart: PopmundoWebView intercepts system back with PopScope
+00:00 +31: All tests passed!

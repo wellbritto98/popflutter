@@ -1,0 +1,13 @@
+diff --git a/apps/popmundo_app/lib/scheduler/scheduler_editor.dart b/apps/popmundo_app/lib/scheduler/scheduler_editor.dart
+index 163434f..ed5753f 100644
+--- a/apps/popmundo_app/lib/scheduler/scheduler_editor.dart
++++ b/apps/popmundo_app/lib/scheduler/scheduler_editor.dart
+@@ -67,7 +67,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
+   }
+
+   String? _text(String? value, int max) {
+-    final length = (value ?? '').trim().length;
++    final length = (value ?? '').trim().runes.length;
+     return length < 1 || length > max
+         ? 'scheduler.textError'.tr(args: [max.toString()])
+         : null;

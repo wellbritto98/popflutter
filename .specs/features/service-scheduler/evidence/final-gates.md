@@ -11,7 +11,7 @@ Production core and WebView source remained unchanged while shell recovery and d
 | popmundo_webview | flutter.bat test --no-pub --reporter expanded | 31 passed, no failures | final-webview-tests.log |
 | popmundo_webview | flutter.bat analyze --no-pub | No issues found | final-webview-analysis.log |
 
-The recovery fix 3131a8f passed 136 app tests; c56844c fixed the native Activity-bound permission check and passed 137 app tests plus analyzer (shell-task-gates.md). Native GMT alias fix d83414f passed 138 app tests and clean app/integration analyzers. Home, screen-off, Recents, actual reboot/skip and native suppression sensor passed on the isolated Android fixture; native weekly GMT delivery passed on 2026-10-05 with exact planned/local slot, saved payload and next occurrence seven days later; restored production build configuration and release install are pending. This record does not claim final feature completion or overnight observation.
+The recovery fix 3131a8f passed 136 app tests; c56844c fixed the native Activity-bound permission check and passed 137 app tests plus analyzer (shell-task-gates.md). Native GMT alias fix d83414f passed 138 app tests and clean app/integration analyzers. Home, screen-off, Recents, actual reboot/skip and native suppression sensor passed on the isolated Android fixture; native weekly GMT delivery passed on 2026-10-05 with exact planned/local slot, saved payload and next occurrence seven days later; restored production build configuration and release install passed, as recorded below. This record does not claim final feature completion or overnight observation.
 
 ## Requirement mapping before independent validation
 
@@ -30,7 +30,7 @@ The table identifies the located assertion evidence reviewed by the orchestrator
 | SCHED-09 | core-task-gates.md T3 claim/result/command failures, corrupt retention, five-second action timeout; shell T4 strict initialization/permission/errors; T5 retained editor; recovery fix bounded startup/retry |
 | SCHED-10 | core-task-gates.md T3 serialized full catalog, revisions, pre-action durable claim and stale candidates; shell T4 correlation/coalescing; T5 coalesced visible reads; recovery fix retains sole ownership after timeout |
 
-Original game/session pathways remain outside the secondary scheduler engine. The full existing package suites include their regression checks. Actual OS lifecycle evidence and production installation will be added after T6; no overnight claim is made.
+Original game/session pathways remain outside the secondary scheduler engine. The full existing package suites include their regression checks. Actual OS lifecycle evidence and production installation are retained below and in device-task-gates.md; no overnight claim is made.
 
 ## Restored app and production release — 2026-10-05
 
@@ -43,3 +43,21 @@ adb install -r updated com.popmundo.popmundo_app on emulator-5554 successfully (
 Native evidence is in device-task-gates.md: exact real OS payload/card cardinality, Home/Asleep/Recents, actual system-start reboot across a missed slot, next anchored future delivery, and actual GMT weekly delivery with next occurrence seven days later. Native suppression mutant failed the OS-card assertion and restored green passed. This covers one Android16 emulator; no physical handset, PIN/keyguard authentication or overnight coverage is claimed. Seconds remain best effort; force-stop requires opening the app again.
 
 All author implementation/build/install gates are complete. Fresh independent validation is the closing gate and is recorded separately in validation.md.
+
+## Independent-review repairs — 2026-10-05
+
+The independent review found retained native CLI trailing whitespace (F1) and an experimentally surviving UTF-16 text-length mutant (F2). Production text validation already counted UTF-16 code units correctly. F1 log normalization committed as 74b9500. F2 adds only spec-derived supplementary-character tests: core 2aec530 and editor ac79b13. Exact author evidence is in unicode-core-gates.md and unicode-shell-gates.md.
+
+Fresh author package gates after F2: core277, app140, WebView31 unchanged, total448 passed; baseline356, delta+92. Focused model19 and editor10 passed, both analyzers clean. No prior assertion/test was deleted, skipped or weakened. Root reviewed the test diffs, exact payload/error/raw-storage assertions and logs. Full committed diff whitespace check 5ca0d99..ac79b13 passed with the repository's default whitespace rules.
+
+Production paths, dependencies and platform configuration are identical to d83414f; git diff excluding module README.md files is empty for app/core/WebView lib, Android/iOS, app pubspec.yaml and pubspec.lock. The normal release previously built and installed remains the final production implementation. No rebuild or reinstall is needed for these test/evidence-only changes. Independent re-verification of both core and UI-only UTF-16 mutants is recorded in validation.md.
+
+## Final independent acceptance
+
+Fresh independent verifier passed 10/10 requirements and 41/41 acceptance subcriteria over 5ca0d99..ac79b13. Fresh changed-package tests confirm core277 and app140, plus fresh unchanged WebView31, total448 with zero failures/skips and delta+92 over independently run baseline356. Core/app analyzers repeated clean after F2; initial clean WebView/integration analysis and normal release build apply to unchanged source.
+
+Five independently chosen semantic faults were detected: startup skip, durable claim, DST fold, core UTF-16 count and editor UTF-16 count. Both Unicode sensors failed the new exact oracle then restored green19/10. The original native OS-suppression fault is separately retained. All mutations were confined to managed scratch state, discarded and the scratch was archived. Root read the final report, new red/restored logs, independent full-package logs and analyzers before accepting PASS.
+
+SCHED-01 through SCHED-10 are verified within the emulator/UAT bounds stated above. No outstanding fix remains. CLI evidence trailing whitespace was normalized after all jobs, without changing assertions/counts. Closing metadata marks T7/F1/F2 complete and retains the complete independent report/evidence; no product code or installed release changes during closeout.
+
+Closing serialization check: three retained Unicode mutation patches had a single-space empty context line. Those empty context lines were normalized to bare newlines. Each patch independently passed git apply --check against the unchanged production source; no patch was applied. This preserves executable mutation evidence while satisfying the final staged full-range whitespace gate.

@@ -3,7 +3,7 @@
 Goal: Persistent Android sidebar rules for local notifications, with intervals/weekly recurrence and skip-on-restart behavior.
 Architecture: Pure-Dart recurrence and a serialized coordinator own the snapshot. Existing FGS runs that coordinator; native shell communicates by request/reply and displays the authoritative result.
 Tech stack: Dart/Flutter, timezone, flutter_timezone, flutter_foreground_task, SharedPreferences, flutter_local_notifications, Patrol.
-Status: Implementation and author gates complete; final independent validation pending. User approved the written design on 2026-10-04.
+Status: Complete; independent validation PASS on 2026-10-05. User approved the written design on 2026-10-04.
 
 ## Execution Protocol
 
@@ -127,7 +127,7 @@ Deliverable: consistent maintenance docs, exact coverage mapping, approved AD-02
 - [x] Map task/test assertion file:line to every SCHED requirement; record actual gate output/counts and bounded limitations.
 - [x] Update maintenance docs from final source; no hypothetical claims.
 - [x] Run Final build, install production APK with adb install -r, inspect service/menu without loading live-site test fixtures; commit docs(scheduler): document verified scheduling lifecycle.
-- [ ] Dispatch fresh independent verifier after final task commit; provide spec, commit range, tests, validate.md and scratch mutation rules. Route gaps to atomic fixes and reverify (maximum three iterations).
+- [x] Dispatch fresh independent verifier after final task commit; provide spec, commit range, tests, validate.md and scratch mutation rules. Route gaps to atomic fixes and reverify (maximum three iterations).
 Tests: none for docs; full implementation gates. Gate: Final build. Done when verifier PASS, production install succeeds and working tree contains no temporary device-test configuration.
 
 ## Granularity, diagram and test co-location checks
@@ -155,3 +155,20 @@ The domain specialist publishes actual immutable public signatures immediately a
 ## Execution evidence
 
 Per-task adequacy tables, commands, counts and commit IDs are recorded in evidence/core-task-gates.md and evidence/shell-task-gates.md (device and final gate reports added by their owners) by task owners/orchestrator. Independent final coverage and discrimination results belong to validation.md.
+
+## Independent review fixes
+
+### F1: Retained CLI log hygiene
+
+Independent full-range diff check found four native CLI trailing-space lines in retained gate evidence. Trim only those lines with sed; preserve assertions/counts. Done: commit 74b9500; git diff --check 5ca0d99 passed after normalization. No product source changed.
+
+### F2: Supplementary UTF-16 boundary discrimination
+
+SCHED-02 specifies UTF-16 code units after trim. The independent scratch mutation replacing core String.length with runes.length survived the existing ASCII-only model and editor tests. Production validation already uses the correct length calculation.
+
+- [x] Utils specialist: assert exact accepted emoji boundaries 40/60/500 and rejected 41/61/501 for name/title/body, trimming, exact retained payload and invalidText.
+- [x] Shell specialist: assert those accepted saved payloads; reject overlong supplementary text with exact field errors, retained inputs and unchanged authoritative catalog.
+- [x] Run scoped red discrimination and restored full package gates; commit each specialist test fix atomically.
+- [x] Independent verifier: repeat core and UI-only length mutants in scratch; both must fail the new spec oracle, restore green and update validation.md.
+
+This is a test-coverage fix; no production behavior or installed release change is needed. It is the second bounded fix/reverify iteration. Existing tests and assertions remain intact.

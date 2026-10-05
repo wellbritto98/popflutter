@@ -1,0 +1,17 @@
+00:00 +0: loading test/scheduler_models_test.dart
+00:00 +0: SCHED-02 trims valid text and default is one minute
+00:00 +1: SCHED-02 rejects count 0
+00:00 +2: SCHED-02 rejects count 10000
+00:00 +3: SCHED-02 accepts inclusive interval bounds
+00:00 +4: SCHED-02 rejects weekdays {}
+00:00 +5: SCHED-02 rejects weekdays {0}
+00:00 +6: SCHED-02 rejects weekdays {8}
+00:00 +7: SCHED-02 rejects time [-1, 0]
+00:00 +8: SCHED-02 rejects time [24, 0]
+00:00 +9: SCHED-02 rejects time [9, -1]
+00:00 +10: SCHED-02 rejects time [9, 60]
+00:00 +11: SCHED-02 rejects blank and overlong text, accepts exact maxima
+00:00 +12: T1 exact immutable snapshot roundtrip includes every cursor field
+00:00 +13: SCHED-07 negative int32 identity and sequence exhaustion/no recycling
+00:00 +14: SCHED-09 corrupt/unknown schemas and duplicate identities fail closed
+00:00 +15: All tests passed!

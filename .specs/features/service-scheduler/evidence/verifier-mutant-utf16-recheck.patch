@@ -1,0 +1,13 @@
+diff --git a/packages/popmundo_utils/lib/src/scheduler/scheduler_models.dart b/packages/popmundo_utils/lib/src/scheduler/scheduler_models.dart
+index 58b8d6f..686a926 100644
+--- a/packages/popmundo_utils/lib/src/scheduler/scheduler_models.dart
++++ b/packages/popmundo_utils/lib/src/scheduler/scheduler_models.dart
+@@ -9,7 +9,7 @@ class SchedulerException implements Exception {
+
+ String _text(String value, int max) {
+   final trimmed = value.trim();
+-  if (trimmed.isEmpty || trimmed.length > max) {
++  if (trimmed.isEmpty || trimmed.runes.length > max) {
+     throw const SchedulerException('invalidText');
+   }
+   return trimmed;
