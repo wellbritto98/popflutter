@@ -186,10 +186,10 @@
 ## Handoff
 
 - **Feature**: service-scheduler / .specs/features/service-scheduler.
-- **Phase / Task**: Tasks -> Execute; design approved by user on 2026-10-04. Seven atomic tasks in tasks.md.
-- **Completed**: spec/context/design approved; recurrence, reboot survival and skip policy explicit; AD-021 adopted.
-- **In-progress**: T1 snapshot model, then T2 recurrence and T3 coordinator through pure-Dart specialist.
-- **Next step**: core gates/commits -> shell runtime/UI -> actual Android Home/Recents/reboot proof -> maintenance docs/release install -> fresh independent verifier.
+- **Phase / Task**: Execute T7; user approved design on 2026-10-04.
+- **Completed**: approved plan and AD-021; T1 dcd7781 (239 core tests), T2 c5e2782 (248), T3 77288a2 (273), analyzers clean; root spec/quality review passed for core and T4 runtime; T4 9467250 (116 app tests), T5 4f1c2e1 (132 app tests); native screen spec/quality review passed; startup recovery fix 3131a8f (136 app tests); background permission fix c56844c (137 app tests), native GMT alias fix d83414f (138 app tests), analyzers clean. T6 fac723d: all native lifecycle, reboot skip, weekly GMT and native suppression evidence passed; temporary configuration restored.
+- **In-progress**: T7 maintenance/release evidence ready; core273, WebView31 and app138 tests pass, analyzers clean, production release installed preserving firstInstallTime/data inodes, foreground service and scheduler callback confirmed. Fresh independent verifier is pending.
+- **Next step**: Commit T7 maintenance/release evidence, dispatch fresh independent verifier, route any gaps and record final verdict.
 - **Blockers**: none. Keep test package/build changes temporary and preserve installed production data.
 - **Prior feature**: background-session-reliability Verifier PASS; overnight coverage was not observed.
 - **Branch**: codex/service-scheduler

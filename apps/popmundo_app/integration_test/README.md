@@ -20,6 +20,8 @@ Exercitar APIs de plataforma que fakes não alcançam: Foreground Service, Keyst
 | `storage_test.dart` | prefs reais |
 | `userscripts_test.dart` | superfície mobile do catálogo sem WebView de jogo |
 | `smoke_test.dart` | fumaça do harness |
+| [scheduler_test.dart](scheduler_test.dart) | Um Patrol test: formulário/prefs reais, FGS após Home, IDs/payload e substituição de cartões Android, pausa sem parar keepalive |
+| [support/scheduler_reboot_harness.dart](support/scheduler_reboot_harness.dart) | Entrypoint standalone sem jogo: prepara reboot real e regra semanal GMT para inspeção ADB de prefs, serviço e notificações |
 
 **Exatamente um `patrolTest` por arquivo** (bug upstream Patrol 2005/2380). Agrupe asserts num teste sequencial com `reason`.
 
@@ -44,3 +46,34 @@ patrol test --target integration_test/keepalive_test.dart -d <device-id>
 - Tudo que `main()` inicializa (ex.: `initCommunicationPort`) deve ser repetido no harness.
 - Título de notificação assertado no harness está em inglês fixo para KA-05.
 - `flutter test` não executa esta pasta.
+
+## Scheduler: fixtures e evidência Android
+
+O [scheduler_test.dart](scheduler_test.dart) contém exatamente um `patrolTest`. Usa uma página nativa mínima, o FGS real e uma nova leitura do snapshot persistido para verificar o formulário, duas ocorrências distintas após Home, IDs negativos distintos, título/mensagem exatos no Android, substituição do mesmo cartão após editar texto e ausência de novos claims/cartões após pausar. A pausa preserva o keepalive. O fixture cancela explicitamente seus cartões antes da espera de ausência; remover um cartão antigo não é comportamento atribuído à pausa de produção.
+
+O [support/scheduler_reboot_harness.dart](support/scheduler_reboot_harness.dart) é um entrypoint standalone sem jogo e sem instrumentação Patrol. Ele existe porque um reboot real encerra a instrumentação. O botão `Preparar reboot` salva uma regra durável de 180 segundos; a sequência ADB reinicia o emulador e inspeciona o início do serviço pelo sistema, SharedPreferences, Activities e NotificationManager antes e depois do próximo horário futuro. O primeiro poll anterior ao início do serviço não conta como prova de descarte de ocorrências.
+
+O botão `Preparar semanal GMT` usa o identificador retornado pelo plugin `flutter_timezone`, exige GMT nativo e compara o próximo horário salvo com um UTC independente calculado dois minutos à frente. Pausa as regras anteriores, cancela seus cartões apenas para isolar a prova e cria a regra semanal com o dia ISO e HH:mm correspondentes. Após Home, a evidência exige claim/slot local exatos, próxima ocorrência sete dias depois e exatamente um cartão agendado com o ID e payload salvos. Essa prova posterior à correção do banco de aliases é separada da prova anterior de intervalos.
+
+### Execução e preservação de dados
+
+- Execute `flutter analyze integration_test` antes de qualquer execução no dispositivo. O agente executa o build, Patrol, ADB e diagnóstico; comandos documentados não substituem a execução.
+- Use apenas o pacote sintético isolado `com.popmundo.popmundo_app.backgrounddebug`. Nunca limpe, desinstale ou force-stop o app de produção `com.popmundo.popmundo_app`; registre e confira seu primeiro horário de instalação e os inodes de dados. Preserve o AVD e seu userdata, sem wipe nem alteração do relógio/fuso para mascarar falhas.
+- Para a corrida registrada, Patrol usou `--profile --package-name com.popmundo.popmundo_app.backgrounddebug --no-uninstall --no-check-compatibility`; a fonte de verdade é o XML de instrumentação e o logcat, não apenas o resumo do CLI. Cada arquivo continua com um único teste Patrol.
+- A build standalone registrada usou `flutter build apk --profile --target integration_test/support/scheduler_reboot_harness.dart --target-platform android-x64`, com aplicação isolada configurada antes da instalação. Ela nunca usa `lib/main.dart`, `PopmundoApp` ou WebView do jogo.
+- O emulador exigiu configuração temporária de profile AOT com inspeção de prefs, minificação desligada, assinatura debug, ABI x64 e promoção da dependência nativa Patrol. Restaure `android/app/build.gradle.kts`, `android/gradle.properties`, `pubspec.yaml` do app e `pubspec.lock` antes de concluir. Essas alterações não pertencem aos commits. Execute `flutter pub get` normal e reconstrua o release sem `--no-pub` para atualizar o registro de plugins.
+- Mantenha um único job Flutter/Gradle por vez. Use esperas limitadas e o UTC do dispositivo para comparar horários. Depois de reter a evidência, a limpeza pode atingir somente os dados do pacote sintético que o fixture criou.
+
+### Prova de discriminação e limites
+
+Um teste novo precisa ficar vermelho com o bug correspondente reintroduzido em scratch, seguido de restauração e verde. A mutação que suprimia a submissão das notificações negativas deixou o estado persistido como `submitted`, mas o teste nativo falhou com total esperado 2 e total Android 0. O XML seguinte passou 1/1 após descartar a mutação. Assim, o status persistido não substitui a prova do cartão real.
+
+A evidência observada cobre um AVD Android 16/API 36/x86_64: Home, tela apagada em `Asleep`, remoção efetiva das próprias tarefas de Recents, reboot ADB e semana em GMT. Não comprova handset físico, políticas de outros fabricantes, lock com autenticação/PIN, force-stop bypass ou execução overnight. A entrega é controlada pelo Android.
+
+Referências e oráculos reproduzíveis:
+
+- [Spec service-scheduler](../../../.specs/features/service-scheduler/spec.md), [design](../../../.specs/features/service-scheduler/design.md) e AD-021 em [STATE](../../../.specs/STATE.md).
+- [Relatório T6 e asserções file:line / jq](../../../.specs/features/service-scheduler/evidence/device-task-gates.md).
+- [Patrol verde](../../../.specs/features/service-scheduler/evidence/patrol-final-green.xml), [mutante vermelho](../../../.specs/features/service-scheduler/evidence/patrol-native-mutant.xml) e [patch scratch descartado](../../../.specs/features/service-scheduler/evidence/native-suppression-mutant.patch).
+- [Snapshot após reboot](../../../.specs/features/service-scheduler/evidence/android-reboot-future.json) e [cartões Android](../../../.specs/features/service-scheduler/evidence/android-reboot-future-cards.txt).
+- [Snapshot semanal GMT](../../../.specs/features/service-scheduler/evidence/android-weekly-delivered.json), [cartão semanal](../../../.specs/features/service-scheduler/evidence/android-weekly-delivered-cards.txt) e [atribuição de fonte/APK](../../../.specs/features/service-scheduler/evidence/weekly-source-attribution.txt).

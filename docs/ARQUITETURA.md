@@ -2,7 +2,7 @@
 
 > Documento gerado por análise estática do código-fonte real (imports, chamadas, configs) e dos artefatos em `.specs/STATE.md` e `.specs/features/`. Onde a análise exigiu inferência sem confirmação direta no código, o trecho está marcado como **Hipótese**.
 >
-> Última atualização: 2026-08-19.
+> Última atualização: 2026-10-04.
 
 ---
 
@@ -23,7 +23,8 @@ A UI principal do produto **é a própria página web do Popmundo**, renderizada
 3. persiste cookies da sessão (não incógnito) e, se configurado, reautentica em silêncio (Auto Login via HTTP nativo + sync de cookies);
 4. injeta UserScripts do jogador e um polyfill `GM_*`/`GM.*`;
 5. mantém um keepalive de processo em segundo plano (Foreground Service no Android);
-6. expõe, em Dart, uma fundação equivalente ao `common/` do [Popmundo-Utils](https://github.com/ilpersi/Popmundo-Utils) (GPL-3).
+6. agenda notificações locais Android por intervalos ou dias da semana, inclusive com o app fora da tela e após reboot enquanto existirem regras ativas (AD-021);
+7. expõe, em Dart, uma fundação equivalente ao `common/` do [Popmundo-Utils](https://github.com/ilpersi/Popmundo-Utils) (GPL-3).
 
 A camada `popmundo_utils` é isolada do Flutter/WebView pelo contrato `PopmundoRuntime`. Lógica de negócio é testável com `FakePopmundoRuntime`, sem dispositivo.
 
@@ -54,6 +55,14 @@ graph TD
   GmHost --> TimedFetch
   TimedFetch --> Runtime
   Keepalive[BackgroundKeepalive] --> FGS[flutter_foreground_task]
+  Sidebar --> ScheduleUI[SchedulerScreen / editor]
+  ScheduleUI --> Client[SchedulerClient request / response]
+  Client --> FGS
+  FGS --> Runner[SchedulerRunner]
+  Runner --> Coordinator[SchedulerCoordinator Dart]
+  Coordinator --> Store[PreferencesSchedulerStore]
+  Coordinator --> Action[ScheduledNotificationExecutor]
+  Action --> LocalNotif
   Overlay --> NotifSvc[NotificationService]
   NotifSvc --> LocalNotif[LocalNotificationsService]
   LocalNotif --> FLN[flutter_local_notifications]
@@ -80,9 +89,10 @@ graph TD
 
 ## 3. Regras arquiteturais
 
-Registradas em `.specs/STATE.md` (AD-001 a AD-018; AD-011 e AD-017 **superseded**):
+As regras do scheduler estão registradas no AD-021 e em .specs/features/service-scheduler/.
+Registradas em `.specs/STATE.md` (AD-001 a AD-021; AD-011 e AD-017 **superseded**):
 
-1. **`popmundo_utils` não depende de Flutter nem de `flutter_inappwebview`.** Pode usar Dart puro (`html`, `dart:io` só em `auth_http_io.dart`). Testes padrão: `dart test` (globa `test/`).
+1. **`popmundo_utils` não depende de Flutter nem de `flutter_inappwebview`.** Pode usar Dart puro (timezone, `html`, `dart:io` só em `auth_http_io.dart`). Testes padrão: `dart test` (globa `test/`).
 2. **Interceptação de rede é somente-observação (AD-003).** `shouldInterceptFetchRequest`/`shouldInterceptAjaxRequest` devolvem o request original; `shouldInterceptRequest` (Android) devolve `null` via `ObservePolicy.observeOnlyResourceResponse()`. Nenhum caminho constrói `WebResourceResponse` substituto.
 3. **Host sticky nunca é hardcoded após o primeiro load (AD-007).** `HostTracker` é a fonte da origem; `TimedFetch` e `Utils.getServerLink` resolvem contra `currentOrigin`. Auto Login, depois do handshake, resolve contra o host em que o POST realmente aterrissou (`landed.finalUrl.host`), não contra um origin guardado (AD-018).
 4. **Sessão nunca é incógnita (AD-004).** `PopmundoWebSettings.defaults()` fixa `incognito: false`.
@@ -93,7 +103,7 @@ Registradas em `.specs/STATE.md` (AD-001 a AD-018; AD-011 e AD-017 **superseded*
 9. **Nenhum gesto nativo sobre a área do WebView (AD-009).** `AppShell` fixa `drawerEnableOpenDragGesture: false`.
 10. **UserScripts do jogador nunca chamam `removeAllUserScripts` (AD-010).** Grupos `userscript:<id>`; builtins `hooks.js`/`helpers.js` permanecem.
 11. **Download de `.user.js` / `@require` / `@resource` não usa TimedFetch (AD-010).** Fetcher HTTP do app (`userscript_http.dart`).
-12. **Keepalive não toca WebView nem TimedFetch (AD-012).** Isolate do FGS só emite heartbeat. `stopWithTask` é `false` (AD-013).
+12. **FGS não toca WebView, JS, autenticação ou HTTP do jogo (AD-021).** Além do heartbeat, executa o scheduler de serviços locais. stopWithTask permanece false; boot e atualização do pacote retomam o serviço somente enquanto houver regras ativas.
 13. **i18n da shell (AD-014).** `easy_localization`, catálogos `en`/`pt`. `popmundo_utils`/`popmundo_webview` e o DebugOverlay permanecem em inglês — inclui o título/corpo fixos da notificação de teste do debug (`LocalNotificationsService`, `kTestNotificationTitle`/`kTestNotificationBody`), que reusa a mesma exceção por só ser alcançável pelo botão debug-only.
 14. **Dois tiers de teste no app (AD-015).** `flutter test` (fakes) vs. Patrol em `integration_test/` (device-real, **nunca** carrega popmundo.com). Exatamente um `patrolTest` por arquivo.
 15. **Auto Login autentica fora da WebView (AD-018).** `AuthSession` em `dart:io`, redirects manuais, cookies copiados via `CookieSink`. Sem fallback de `form.submit()`. Observe-only (AD-003) permanece.
@@ -113,6 +123,7 @@ Registradas em `.specs/STATE.md` (AD-001 a AD-018; AD-011 e AD-017 **superseded*
 - **Erros tipados:** `PopmundoRuntimeException`, `TimedFetchException`, `AuthHttpException`, `UserScriptParseException`, `UserScriptImportException`, `UserScriptCatalogException`.
 - **Workspace:** `resolution: workspace` em todos os `pubspec.yaml`. `melos.yaml` só lista globs — **não há scripts Melos**.
 - **Chaves de storage (produção, via `KeyValueStore`):** `userscripts.v1`, `autologin.v1`, `userscript:<id>:gmvalues`, `userscript:<id>:gmresources`. Senha: `autologin.password` no `SecretStore`.
+- **Scheduler:** service_scheduler.v1 é um snapshot JSON único, com um escritor no engine FGS. A UI não grava esse blob.
 - **UserScripts nativos:** `groupName: 'userscript:<id>'`, `ContentWorld.PAGE`.
 
 ---
@@ -121,9 +132,9 @@ Registradas em `.specs/STATE.md` (AD-001 a AD-018; AD-011 e AD-017 **superseded*
 
 | Módulo | Responsabilidade | Não faz |
 | ------ | ----------------- | ------- |
-| `packages/popmundo_utils` | Contrato `PopmundoRuntime`; host sticky; TimedFetch; parsing ASP.NET; Auto Login (orquestração + HTTP abstrato); catálogo/parser/shim GM; storage lógico; eventos | Não renderiza UI; não importa Flutter; persistência de disco é injetada (`KeyValueStore`/`SecretStore`); `CookieManager` fica atrás de `CookieSink` |
+| packages/popmundo_utils | Contrato PopmundoRuntime; host, fetch, Auto Login, UserScripts/GM, eventos e scheduler com modelos/calendário/coordenador | Sem Flutter, UI ou plugins; persistência, ação nativa e fuso são portas injetadas |
 | `packages/popmundo_webview` | `InAppPopmundoRuntime`; widget `PopmundoWebView`; JS bridge; UserScripts builtins + injector; `InAppCookieSink`; back navigation; settings do WebView | Não decide throttle, parsing de login, catálogo persistido, i18n, FGS |
-| `apps/popmundo_app` | Composition root; shell (`AppShell`/sidebar); telas Auto Login / UserScripts / idioma; `GmHostHandler`; keepalive; notificação de teste local (debug-only, `lib/notifications/`); i18n; `SharedPreferencesStore` / `FlutterSecureSecretStore` | Não implementa parsing de form ASP.NET nem política de host; **ainda** importa `flutter_inappwebview` em `app.dart` para ler nomes de cookies; não dispara notificações a partir de eventos de jogo (fora de escopo, MVP é só o botão manual) |
+| apps/popmundo_app | Composition root; sidebar; telas Auto Login, UserScripts, Agendamentos e idioma; GM host; keepalive; adapters de persistência, fuso e notificações; i18n | Parsing e calendário pertencem ao core; WebView e HTTP do jogo não rodam no engine FGS |
 | `packages/popmundo_webview/assets/js` | Hooks de `fetch`/`XHR`/`console` e helpers DOM **na página** | Não decide política — só captura e `callHandler` |
 | `apps/popmundo_app/integration_test` | Tier device-real (Patrol): FGS, Keystore, prefs, sockets loopback | Não constrói `PopmundoApp` / `InAppPopmundoRuntime`; não carrega o jogo |
 | `packages/popmundo_utils/test_live` | Suite **opt-in** contra o site real (credenciais em env); `dart test` **não** a executa | Não substitui o tier fake; não é CI |
@@ -178,7 +189,7 @@ gatilho B: a cada 60 s, GET nativo {hostSticky}/World/Popmundo.aspx/Character
   → runtime.loadUrl(https://{host_final}/World/Popmundo.aspx), espera limitada a 2 s
 ```
 
-O User-Agent é resolvido pela API nativa Android no app e cacheado com timeout de 2 s; clientes sem provider usam captura inicial de navigator.userAgent com o mesmo limite. Probes seguintes não aguardam JS. O isolate FGS continua heartbeat-only (AD-020).
+O User-Agent é resolvido pela API nativa Android no app e cacheado com timeout de 2 s; clientes sem provider usam captura inicial de navigator.userAgent com o mesmo limite. Probes seguintes não aguardam JS. O isolate FGS executa heartbeat e serviços locais (AD-021); o Auto Login permanece no isolate do app.
 
 ### 6.4 UserScripts + GM
 
@@ -194,7 +205,7 @@ GM.registerMenuCommand → GmMenuRegistry → seção extra no AppSidebar (limpa
 
 ### 6.5 Keepalive
 
-`main()` chama `FlutterForegroundTask.initCommunicationPort()`. `BackgroundKeepalive.bootstrap()` pede notificação + isenção de bateria (Android) e sobe o FGS. O isolate só manda heartbeat; o WebView não é tocado. Lifecycle do app (`WidgetsBindingObserver`) atualiza o status visível no overlay de debug.
+main() inicializa a porta de comunicação. BackgroundKeepalive.bootstrap() pede notificação e isenção de bateria no Android e sobe o FGS specialUse. KeepaliveTaskHandler mantém o heartbeat e cria SchedulerRunner no engine do serviço; WebView, autenticação e HTTP do jogo ficam fora desse engine. Os flags de boot e atualização do pacote derivam das regras ativas, sem parar o keepalive ao pausar ou excluir a última regra.
 
 ### 6.6 Notificação de teste local (debug)
 
@@ -220,7 +231,8 @@ DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
 | `shared_preferences: ^2.5.3` | pub.dev | app | Média — `KeyValueStore` de produção |
 | `flutter_secure_storage: ^9.2.4` | pub.dev | app | Alta para Auto Login — senha |
 | `flutter_foreground_task: ^11.0.0` | pub.dev | app | Alta para keepalive Android (`specialUse`, `stopWithTask=false`) |
-| `flutter_local_notifications: ^22.3.0` | pub.dev | app | Média — botão de teste do debug overlay e as notificações reais de `MenuNotificationsBridge` (`LocalNotificationsService`), incluindo resultados finais de Auto Login |
+| `flutter_local_notifications: ^22.3.0` | pub.dev | app | Alta — ações do scheduler, botão de teste do debug overlay e as notificações reais de `MenuNotificationsBridge` (`LocalNotificationsService`), incluindo resultados finais de Auto Login |
+| timezone: ^0.11.1 / flutter_timezone | pub.dev | utils / app | Alta para recorrência semanal — banco IANA e identificador do fuso do dispositivo |
 | `easy_localization: ^3.0.8` | pub.dev | app | Média — strings de release da shell |
 | `url_launcher: ^6.3.1` | pub.dev | webview + app | Média — links externos e `GM.openInTab` |
 | `patrol: ^4.9.0` + `patrol_cli` | pub.dev / global | app `dev_dependencies` | Média — só o tier device-real |
@@ -255,7 +267,7 @@ DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
 | `PopmundoScope` sem call sites | `app.dart` | InheritedWidget morto | Decisão de manter o menu agnóstico do runtime |
 | `packages/popmundo_utils/example/` | example | `main` só imprime `HostTracker.defaultOrigin` | Boilerplate; não é ponto de entrada do produto |
 | Cache TimedFetch só em memória | `timed_fetch.dart` | Perde ao matar o processo | AD-006, aceito |
-| Retenção do processo Android / iOS suspende JS | keepalive | Force-stop e reboot encerram manutenção; iOS suspende | specialUse com subtype declarado; overlay mostra status |
+| Retenção do processo Android / iOS suspende JS | keepalive / scheduler | Force-stop impede retomada automática; reboot restaura apenas regras locais ativas, sem restaurar Auto Login no novo engine | specialUse, flags condicionais e próximo horário estritamente futuro; segundos em melhor esforço |
 
 ---
 
@@ -285,16 +297,34 @@ DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
 | `app-sidebar-menu` | app | AD-009 |
 | `userscript-manager` | utils, webview, app | AD-010 |
 | `auto-login` | utils, webview, app | AD-018, AD-019 (AD-011/017 superseded) |
+| background-session-reliability | utils, webview, app | AD-020 |
 | `background-keepalive` | app | AD-012, AD-013 |
 | `app-i18n` | app | AD-014 |
 | `mobile-e2e-tests` | app `integration_test/` | AD-015 |
 | `gm-host-apis` | utils, webview, app | AD-016 |
 | `webview-back-navigation` | webview | — |
+| service-scheduler | utils, app | AD-021 |
 
 Fonte de *porquê*: `.specs/STATE.md` Decisions. Fonte de *o quê* por feature: `spec.md` da pasta. Este documento descreve o sistema **como o código está hoje**.
 
 ### Background reliability (AD-020)
 
-A shell fornece getDefaultUserAgent da API nativa; o controller cacheia essa leitura com timeout de 2 s e fallback existente. Clientes sem provider usam uma captura inicial do bridge. Probes nativos usam esse cache e cookies nativos, sem esperar JS pronto a cada tick. Após sync dos cookies, o resultado do login é emitido; navegação é solicitada com espera limitada de 2 s para não prender o ciclo ao renderer suspenso. A shell publica notificação local id 2 para done/failed quando lifecycle não é resumed, com as mensagens EN/PT existentes. FGS specialUse declara manutenção contínua de sessão no subtype; force-stop, reboot e morte do processo permanecem limites.
+A shell fornece getDefaultUserAgent da API nativa; o controller cacheia essa leitura com timeout de 2 s e fallback existente. Clientes sem provider usam uma captura inicial do bridge. Probes nativos usam esse cache e cookies nativos, sem esperar JS pronto a cada tick. Após sync dos cookies, o resultado do login é emitido; navegação é solicitada com espera limitada de 2 s para não prender o ciclo ao renderer suspenso. A shell publica notificação local id 2 para done/failed quando lifecycle não é resumed, com as mensagens EN/PT existentes. FGS specialUse declara manutenção contínua de sessão no subtype; force-stop e morte do processo permanecem limites da sessão; regras locais ativas podem restaurar o FGS após reboot (AD-021).
 
 Se o handshake atribui outro servidor enquanto a navegação final está pendente, o controller guarda apenas para HTTP/cookies o origin recém-autenticado. HostTracker continua acompanhando navegações reais; callback de login obsoleto no servidor anterior não dispara novo ciclo. Nova navegação real devolve a autoridade ao HostTracker. Isso evita probes repetidos no servidor expirado antes de reabrir o app.
+
+### Agendamentos locais (AD-021)
+
+Sidebar → SchedulerClient → mensagem scheduler.request com requestId → SchedulerRunner no engine FGS → SchedulerCoordinator → PreferencesSchedulerStore. A resposta scheduler.response contém snapshot autoritativo ou erro tipado. Somente esse coordenador grava o blob service_scheduler.v1; a UI envia comandos com revisão esperada. O store recarrega preferências antes de ler e verifica a confirmação da gravação.
+Enquanto visível e ativa, a lista consulta o catálogo a cada cinco segundos, agregando leituras em andamento e suspendendo-as durante edição ou lifecycle inativo. A primeira requisição espera um heartbeat do engine, pois serviço nativo iniciado ainda pode estar registrando o canal Dart. Essa espera é limitada e não repete comandos de mutação.
+
+RecurrenceCalculator usa intervalos ancorados em UTC (dia = 24 horas decorridas) e calendário semanal no fuso IANA atual do dispositivo, obtido por flutter_timezone. Na transição de horário de verão, horários inexistentes avançam pelo tamanho do salto; horários repetidos usam somente a primeira ocorrência. DeviceZone limita a leitura nativa e retém o último identificador válido, sem assumir UTC quando indisponível. Mudanças de fuso são reconciliadas nos heartbeats de cinco segundos.
+O engine carrega timezone/data/latest_all.dart, incluindo aliases IANA como GMT e UTC que podem ser retornados pelo Android; o banco reduzido não inclui todos esses identificadores.
+
+O runner arma um único Timer para o horário mais próximo e agrega ticks sobrepostos na mesma fila dos comandos. Antes da ação, o coordenador persiste claim, lastAttemptUtc e próximo horário. Depois grava o resultado: solicitação submetida ao SO, falha ou interrupção. A execução tem limite de cinco segundos. Uma queda após claim pode perder a notificação, mas não repete a tentativa; o cursor impede repetição se o relógio retroceder. Ao iniciar um novo engine, todas as ocorrências vencidas são descartadas, aguardando a próxima estritamente futura. Snapshot inválido permanece preservado e indisponível, sem reset silencioso.
+Falhas temporárias na criação do runner são tentadas novamente por heartbeat ou RPC. O prazo de cinco segundos limita a resposta, enquanto a inicialização subjacente mantém a posse exclusiva; um resultado tardio após destruição é descartado.
+
+ScheduledNotificationExecutor chama o caminho estrito showScheduledNotification de LocalNotificationsService: inicialização e permissão precisam ser confirmadas; falhas são registradas. Cada regra tem ID negativo int32 estável e monotônico, sem reciclagem. Repetir substitui seu cartão; regras diferentes e os consumidores existentes de IDs positivos permanecem separados. O canal nativo é popflutter_schedules. Submetida significa aceitação da chamada do SO, sem garantia de leitura pelo usuário.
+A ativação consulta areNotificationsEnabled do plugin de notificações pelo applicationContext; a consulta de permissões do ForegroundTask exige Activity e fica restrita ao isolate da tela. O engine secundário nunca abre pedidos de permissão.
+
+O MVP é Android e somente notificação local. Há restauração após reboot e atualização do pacote enquanto existir regra ativa, sem recuperar horários perdidos. Force-stop bloqueia a execução até o usuário abrir o app; intervalos de segundos são melhor esforço diante das políticas do Android. iOS mostra indisponibilidade do scheduler contínuo. Reboot do serviço local não restaura o AutoLoginController do isolate principal.

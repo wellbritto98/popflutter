@@ -20,32 +20,33 @@ The recommendation minimizes the new platform surface while satisfying the same 
 - AD-009/014: add the sidebar item through buildAppMenuItems; use existing native theme and EN/PT assets.
 - AD-013/020: preserve stopWithTask false, specialUse, wake lock, existing keepalive and result notifications.
 - AD-015: device fixtures never construct PopmundoApp or reach the live game.
-- This proposal requires AD-021 after approval: amend AD-012/019/020's heartbeat-only FGS restriction to permit generic local-service scheduling, while keeping game HTTP, WebView, login and JS outside that isolate. Enable boot restoration for enabled rules; session auto-login restoration after reboot is not part of this feature.
+- Approved AD-021 amends AD-012/019/020's heartbeat-only FGS restriction to permit generic local-service scheduling, while keeping game HTTP, WebView, login and JS outside that isolate. Enable boot restoration for enabled rules; session auto-login restoration after reboot is not part of this feature.
 
 Reuse KeepaliveTaskHandler, FlutterForegroundTaskPlatform and LocalNotificationsService through narrow adapters. SharedPreferencesStore's cached instance cannot be used independently by both isolates as writers.
 
 ## Components and contracts
 
-| Component | Proposed location | Responsibility and interface |
+| Component | Location | Responsibility and interface |
 | --- | --- | --- |
-| ScheduledService / Recurrence / SchedulerSnapshot | packages/popmundo_utils/lib/src/scheduler/ | Immutable validated data, versioned JSON; no plugins |
+| ScheduledRule / ScheduleRecurrence / SchedulerSnapshot | packages/popmundo_utils/lib/src/scheduler/ | Immutable validated data, versioned JSON; no plugins |
 | RecurrenceCalculator | Same pure-Dart module | nextAfter(now), current armed-slot eligibility, interval anchor and local calendar arithmetic |
 | SchedulerCoordinator | Same pure-Dart module | Serialized load/list/create/update/toggle/delete/reconcile; sole snapshot writer; claims before action execution |
 | ScheduledActionExecutor port | Same pure-Dart module | Execute a typed action with stable notification ID; first registered action is localNotification |
-| SchedulerStore adapter | apps/popmundo_app/lib/scheduler/ | Persist one JSON string through a reload-aware SharedPreferences/plugin adapter in the FGS engine |
-| Background scheduler runner | apps/popmundo_app/lib/background/ | Initialize timezone/plugins, load coordinator, arm one nearest-occurrence Timer, reconcile at existing heartbeat, cancel timer on destroy |
-| Scheduler client | apps/popmundo_app/lib/scheduler/ | Request/response IPC with request ID, revision and bounded UI waits; list refreshed from FGS authority |
+| PreferencesSchedulerStore adapter | apps/popmundo_app/lib/scheduler/ | Persist one JSON string through a reload-aware SharedPreferences/plugin adapter in the FGS engine |
+| SchedulerRunner | apps/popmundo_app/lib/scheduler/ | Initialize the complete IANA database and plugins, load coordinator, arm one nearest-occurrence Timer, reconcile at existing heartbeat, cancel timer on destroy |
+| Scheduler client | apps/popmundo_app/lib/scheduler/ | Request/response IPC with request ID, revision and bounded UI waits after a task-heartbeat readiness check; list refreshed from FGS authority |
 | Scheduler page/editor | apps/popmundo_app/lib/scheduler/ | Existing-themed list, FAB, form, enable switch, deletion dialog, permission/status presentation |
 
 TaskHandler remains the platform entrypoint and delegates scheduler work. No scheduler module imports the WebView adapter. The five-second native heartbeat remains intact. A single Dart Timer arms the nearest future due time, permitting seconds without adding permanent one-second native polling. Heartbeats reconcile clock/timezone changes and recover overdue timers. The real Android gate must prove this timer continues in the FGS engine with Home/task removal.
 
 ## Persisted model
 
-Storage key: service_scheduler.v1. Snapshot contains schemaVersion, nextSequence and the rule list with execution cursors. A rule contains stable id, revision, name, enabled, typed recurrence, localNotification title/body, notificationId, nextDueUtc, lastClaim and lastResult.
+Storage key: service_scheduler.v1. Snapshot contains schemaVersion, nextSequence and the rule list with execution cursors. A rule contains stable id, revision, name, enabled, typed recurrence, localNotification title/body, notificationId, nextDueUtc, lastClaim, lastAttemptUtc and lastResult.
 
 - Notification ID is the negative of a monotonically increasing sequence in 1..2147483648. Never recycle it; fail allocation explicitly if exhausted. Existing debug/login/GM/FGS IDs remain positive.
 - Interval recurrence stores quantity, unit and anchorUtc. Weekly recurrence stores ISO weekday set and local hour/minute; the active zone is read from the device.
 - Claim identifies rule/revision/planned UTC instant. Weekly execution also remembers the local date/time slot to distinguish the two copies of a DST repeated hour.
+- lastAttemptUtc is a durable planned-UTC watermark set before submission; startup retains it even when dropping an interrupted claim. Text edits keep it; recurrence edits and re-enabling clear it. Calendar search uses max(now, watermark), preventing duplicate slots after a clock rollback. Schema version 1 omits this optional field when absent and migrates older claims on load.
 - Latest result is never-executed, submitted, failed or skipped-interrupted, with timestamp and non-secret error category. submitted means the platform accepted the request, not that a person saw the notification.
 - Disabled rules persist without an armed due time. Deletion removes the rule/cursor, preserving the sequence counter.
 - An unknown/corrupt snapshot is preserved and fails closed. No silent reset or accidental execution of partially decoded rules.
@@ -63,13 +64,13 @@ A persistence write and an Android notification cannot form one transaction. The
 
 ## Calendar handling
 
-Declare timezone as a direct pure-Dart dependency and initialize its IANA database in the shell. Detect the current device IANA identifier with flutter_timezone; do not silently assume UTC. Failure to resolve the zone makes weekly scheduling visibly unavailable while interval rules can continue.
+Declare timezone as a direct pure-Dart dependency and initialize its complete IANA database (timezone/data/latest_all.dart) in the shell, including native aliases such as GMT and UTC. Detect the current device IANA identifier with flutter_timezone; do not silently assume UTC. The native lookup has a one-second bound and caches the last validated identifier. A transient lookup failure retains that known zone; if none has been resolved, weekly scheduling is visibly unavailable while interval rules can continue.
 
-Calendar search considers selected local dates, resolves each wall-clock time, then selects the earliest UTC candidate strictly after now. DST gap resolution shifts by the transition gap. Repeated-hour resolution selects the first UTC instant; a persisted local-slot claim prevents the second copy from firing. Unit tests specify New York spring 02:30 -> 03:30 and autumn 01:30 -> first 01:30, plus a non-DST zone and year boundaries. Device time-zone changes trigger future-slot recalculation at runtime reconciliation.
+Calendar search considers selected local dates, resolves each wall-clock time, then selects the earliest UTC candidate strictly after now. DST gap resolution shifts by the transition gap. Repeated-hour resolution selects the first UTC instant before future filtering, so an already-past first copy does not select the second copy. The durable planned-instant cursor also prevents replay after clock rollback. Unit tests specify New York spring 02:30 -> 03:30 and autumn 01:30 -> first 01:30, plus a non-DST zone and year boundaries. Device time-zone changes trigger future-slot recalculation at runtime reconciliation.
 
 ## UI and errors
 
-The list shows name, recurrence summary, next execution and latest result, plus enabled switch, edit and delete. The editor uses interval/day-of-week selection; weekday chips and a time picker; title/message fields; a visible Local notification action. Save is disabled while a command is pending. A timeout retains the editor and triggers a catalog refresh before a further submission; it never blindly creates a duplicate rule.
+The list shows name, recurrence summary, next execution and latest result, plus enabled switch, edit and delete. The editor uses interval/day-of-week selection; weekday chips and a time picker; title/message fields; a visible Local notification action. Save is disabled while a command is pending. The visible list refreshes authoritative state every five seconds with coalesced reads, suspending those reads while inactive or editing and canceling the timer on disposal. A timeout retains the editor and triggers a catalog refresh before a further submission; it never blindly creates a duplicate rule.
 
 Notification/background status is actionable through the existing permission flow. Permission denial during enable/save retains the form and does not activate the rule. Runtime failures remain visible in latest-result status. A failed boot-configuration update is not reported as successful restoration; show failure, refresh persisted state and reconcile on subsequent requests/startup. No destructive rollback is attempted after an uncertain write.
 
@@ -79,7 +80,7 @@ Notification/background status is actionable through the existing permission flo
 | --- | --- | --- | --- |
 | Cached prefs across engines | apps/popmundo_app/lib/prefs_store.dart | Lost catalog updates/stale reads | Reload-aware adapter and one FGS writer |
 | Silent notification init failure/no-op | apps/popmundo_app/lib/notifications/local_notifications_service.dart | False success status | Scheduler action adapter returns truthful initialization/permission/submission failure |
-| Heartbeat-only architectural contract | .specs/STATE.md AD-012/019/020 | Undocumented responsibility expansion | Proposed explicit AD-021, after approval; local services only |
+| Heartbeat-only architectural contract | .specs/STATE.md AD-012/019/020 | Undocumented responsibility expansion | Approved AD-021; local services only |
 | Secondary-engine plugin registration | apps/popmundo_app/lib/background/keepalive_task_handler.dart | MissingPluginException, service runs but no notification | Initialize plugins in entrypoint and prove actual background tray behavior |
 | Process death between persistence and OS action | New coordinator/executor boundary | Lost or duplicate notifications | Persist claim first; at-most-once attempt; skip interrupted slot |
 | Clock/DST changes and date arithmetic | New recurrence calculator | Wrong weekday, double firing | IANA local-date calculations and exact outcome tests |
@@ -89,7 +90,7 @@ Notification/background status is actionable through the existing permission flo
 
 ## Verification and documentation
 
-After approval, divide into atomic tasks for pure models/calendar; serialized coordinator; shell/background integration; UI/i18n; device evidence; documentation/independent verification. Each task derives tests from SCHED IDs and commits separately. Domain and shell specialists own their module changes; the e2e specialist runs the Android tier.
+Implementation uses approved atomic tasks for pure models/calendar; serialized coordinator; shell/background integration; UI/i18n; device evidence; documentation/independent verification. Each task derives tests from SCHED IDs and commits separately. Domain and shell specialists own their module changes; the e2e specialist runs the Android tier.
 
 The device gate uses a separate application ID and preserves the user's installed app/data. Validate background seconds, selected-weekday behavior through deterministic clocks, disable/delete, same-ID replacement, actual reboot restoration and no missed notifications. Include behavior mutations for replay-on-start and disabled-rule execution, and a real-platform mutation for suppressed notification delivery. Record supported-device evidence without claiming overnight coverage unless observed.
 
@@ -106,4 +107,4 @@ Installed FlutterForegroundTask and local-notification source was inspected befo
 - https://pub.dev/packages/timezone
 - https://pub.dev/packages/flutter_timezone
 
-Boot restoration with the chosen plugin/service type and continuous Dart timers remain hypotheses until the real-device tests pass; the design does not count source inspection as execution evidence.
+T6 observed Home, screen-off, Recents, actual system-start reboot with missed-slot skipping, and exact next-future delivery on Android 16/API 36. A fresh d83414f build also proved native GMT weekly delivery. Full source attribution, exact oracles and bounded limitations are in evidence/device-task-gates.md; no physical handset or overnight observation is inferred.

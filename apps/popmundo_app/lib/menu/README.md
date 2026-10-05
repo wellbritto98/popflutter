@@ -1,6 +1,6 @@
 # menu (`popmundo_app`)
 
-Sidebar nativo. Spec: `app-sidebar-menu`. AD-009 (amendment: Userscripts/Auto Login/Language sempre visíveis).
+Sidebar nativo. Spec: `app-sidebar-menu`. AD-009 (amendment: Userscripts/Auto Login/Agendamentos/Language sempre visíveis).
 
 ## Objetivo
 
@@ -15,7 +15,7 @@ Renderizar `AppMenuItem` e `GmMenuCommandItem`. Agnóstico de `PopmundoRuntime`.
 | Arquivo | Função |
 | ------- | ------ |
 | `app_menu_item.dart` | Value object `id`, `icon`, `label`, `subtitle?`, `onTap` |
-| `app_menu_registry.dart` | `buildAppMenuItems`: `auto-login`, `userscripts`, `language`, e `debug` se `includeDebugItem` (default `kDebugMode`) |
+| app_menu_registry.dart | buildAppMenuItems: auto-login, userscripts, schedules, language, e debug se includeDebugItem (default kDebugMode) |
 | `app_sidebar.dart` | `Drawer`; `menu-empty` se lista fixa vazia **e** sem comandos GM |
 | `gm_menu_command_item.dart` | Entrada dinâmica (scriptId, commandId, caption) |
 
@@ -27,7 +27,7 @@ Renderizar `AppMenuItem` e `GmMenuCommandItem`. Agnóstico de `PopmundoRuntime`.
 
 ## Relacionados
 
-Telas Auto Login / UserScripts / Language / DebugOverlay. `GmMenuRegistry`.
+Telas Auto Login / UserScripts / Scheduler / Language / DebugOverlay. `GmMenuRegistry`.
 
 ## Pontos de entrada
 
@@ -35,5 +35,7 @@ Novo item nativo = nova entrada em `buildAppMenuItems` **somente**. Não hardcod
 
 ## Observações e débitos
 
-- Em release o FAB permanece; os três itens QoL preenchem o drawer (não fica só “No options available” como no AD-009 original).
+- Em release o FAB permanece; os quatro itens QoL preenchem o drawer (não fica só “No options available” como no AD-009 original).
 - Keys: `app-sidebar`, `menu-toggle`, `menu-item-<id>`, `menu-empty`.
+
+O callback obrigatório onOpenSchedules abre SchedulerScreen por PopmundoHome; o registro só define o item schedules com ícone schedule e strings menu.schedules/menu.schedulesSubtitle EN/PT. A ordem em release é auto-login, userscripts, schedules, language. No iOS a mesma entrada abre a explicação de indisponibilidade; gating de debug e comandos GM permanecem independentes.
