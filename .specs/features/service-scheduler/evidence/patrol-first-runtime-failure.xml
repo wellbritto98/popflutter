@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuites tests="1" failures="1" errors="0" skipped="0" time="142.198" timestamp="2026-10-04T21:52:53" hostname="localhost">
+  <testsuite name="com.popmundo.popmundo_app.MainActivityTest" tests="1" failures="1" errors="0" skipped="0" time="141.373" timestamp="2026-10-04T21:52:53" hostname="localhost">
+    <properties>
+      <property name="device" value="Medium_Phone_API_36.1(AVD) - 16" />
+      <property name="flavor" value="" />
+      <property name="project" value=":app" />
+    </properties>
+    <testcase name="runDartTest[integration_test.scheduler_test scheduler: durable seconds, Home, real cards and pause]" classname="com.popmundo.popmundo_app.MainActivityTest" time="141.373">
+      <failure>java.lang.AssertionError: Dart test failed: integration_test.scheduler_test scheduler: durable seconds, Home, real cards and pause
+Instance of 'FlutterErrorDetails'
+at pl.leancode.patrol.PatrolJUnitRunner.runDartTest(PatrolJUnitRunner.java:294)
+at pl.leancode.patrol.PatrolJUnitRunner.runDartTest(PatrolJUnitRunner.java:268)
+at com.popmundo.popmundo_app.MainActivityTest.runDartTest(MainActivityTest.java:29)
+</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

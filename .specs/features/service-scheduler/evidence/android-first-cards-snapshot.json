@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "nextSequence": 4,
+  "rules": [
+    {
+      "id": "rule-1791152297236120-50601454",
+      "revision": 1,
+      "notificationId": -1,
+      "name": "Lembrete pela tela",
+      "enabled": false,
+      "recurrence": {
+        "type": "interval",
+        "quantity": 1,
+        "unit": "minutes",
+        "anchorUtc": "2026-10-04T22:18:17.236103Z"
+      },
+      "action": {
+        "type": "localNotification",
+        "title": "Título salvo pela tela",
+        "body": "Mensagem nativa persistida"
+      },
+      "nextDueUtc": null,
+      "zoneId": null,
+      "lastClaim": null,
+      "lastResult": {
+        "status": "neverExecuted",
+        "atUtc": null,
+        "errorCode": null
+      }
+    },
+    {
+      "id": "e2e-a",
+      "revision": 1,
+      "notificationId": -2,
+      "name": "Scheduler Home A",
+      "enabled": true,
+      "recurrence": {
+        "type": "interval",
+        "quantity": 10,
+        "unit": "seconds",
+        "anchorUtc": "2026-10-04T22:18:28.141630Z"
+      },
+      "action": {
+        "type": "localNotification",
+        "title": "Scheduler Home A",
+        "body": "Home first body"
+      },
+      "nextDueUtc": "2026-10-04T22:18:58.141630Z",
+      "lastAttemptUtc": "2026-10-04T22:18:48.141630Z",
+      "zoneId": "Unknown/Unavailable",
+      "lastClaim": {
+        "revision": 1,
+        "plannedUtc": "2026-10-04T22:18:48.141630Z",
+        "localSlot": null
+      },
+      "lastResult": {
+        "status": "submitted",
+        "atUtc": "2026-10-04T22:18:48.191407Z",
+        "errorCode": null
+      }
+    },
+    {
+      "id": "e2e-b",
+      "revision": 1,
+      "notificationId": -3,
+      "name": "Scheduler Home B",
+      "enabled": true,
+      "recurrence": {
+        "type": "interval",
+        "quantity": 13,
+        "unit": "seconds",
+        "anchorUtc": "2026-10-04T22:18:28.274298Z"
+      },
+      "action": {
+        "type": "localNotification",
+        "title": "Scheduler Home B",
+        "body": "Independent second body"
+      },
+      "nextDueUtc": "2026-10-04T22:18:54.274298Z",
+      "lastAttemptUtc": "2026-10-04T22:18:41.274298Z",
+      "zoneId": "Unknown/Unavailable",
+      "lastClaim": {
+        "revision": 1,
+        "plannedUtc": "2026-10-04T22:18:41.274298Z",
+        "localSlot": null
+      },
+      "lastResult": {
+        "status": "submitted",
+        "atUtc": "2026-10-04T22:18:41.297144Z",
+        "errorCode": null
+      }
+    }
+  ]
+}

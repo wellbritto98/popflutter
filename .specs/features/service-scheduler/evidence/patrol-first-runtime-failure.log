@@ -1,0 +1,6 @@
+10-04 21:52:01.884 14680 14680 I flutter : scheduler.start utc=2026-10-04T21:52:01.884400Z starter=developer
+10-04 21:52:11.273 14680 14680 I flutter : scheduler.e2e stage=screen-ready
+10-04 21:52:21.299 14680 14680 I flutter : runtimeUnavailable
+10-04 21:52:21.530 14680 14698 E TestRunner: failed: runDartTest[integration_test.scheduler_test scheduler: durable seconds, Home, real cards and pause](com.popmundo.popmundo_app.MainActivityTest)
+10-04 21:52:21.532 14680 14698 E TestRunner: Instance of 'FlutterErrorDetails'
+10-04 21:52:21.532 14680 14698 E TestRunner: 	at com.popmundo.popmundo_app.MainActivityTest.runDartTest(MainActivityTest.java:29)

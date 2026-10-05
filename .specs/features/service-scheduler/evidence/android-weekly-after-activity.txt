@@ -1,0 +1,16 @@
+      topResumedActivity=ActivityRecord{86888242 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}
+  * Task{19e0999 #44 type=standard I=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}
+    mLastPausedActivity: ActivityRecord{3269344 u0 com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity t44}
+    * Hist  #0: ActivityRecord{3269344 u0 com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity t44}
+      packageName=com.popmundo.popmundo_app.backgrounddebug processName=com.popmundo.popmundo_app.backgrounddebug
+      app=ProcessRecord{33effd6 4991:com.popmundo.popmundo_app.backgrounddebug/u0a264}
+      Intent { flg=0x10000000 xflg=0x5 cmp=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity }
+      rootOfTask=true task=Task{19e0999 #44 type=standard I=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}
+      mActivityComponent=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity
+      baseDir=/data/app/~~ytb1wn-T2fQNBaacpW8dbw==/com.popmundo.popmundo_app.backgrounddebug-LWXOJlqCGIz_bx8N_OAfdA==/base.apk
+      dataDir=/data/user/0/com.popmundo.popmundo_app.backgrounddebug
+      taskDescription: label="" icon=null iconResource=com.popmundo.popmundo_app.backgrounddebug/0 iconFilename=null primaryColor=ff2196f3
+      windows=[Window{61a37ce u0 com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}]
+      * Task{19e0999 #44 type=standard I=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}
+        * ActivityRecord{3269344 u0 com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity t44}
+        (fullscreen) Task{19e0999 #44 type=standard I=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}

@@ -1,0 +1,10 @@
+10-04 22:02:35.227 15492 15492 I flutter : Patrol (native): getNotifications() started
+10-04 22:02:35.228 15492 15492 I flutter : PATROL_LOG {"timestamp":"2026-10-04T22:02:35.227801","type":"step","action":"\u001b[94mgetNotifications\u001b[0m \u001b[90m(native)\u001b[0m","status":"start","data":null}
+10-04 22:02:35.265 15492 15520 I PatrolServer: POST /getNotifications started
+10-04 22:02:35.268 15492 15520 D PatrolServer: getNotifications()
+10-04 22:02:36.313 15492 15520 I PatrolServer: POST /getNotifications took 1048 ms
+10-04 22:02:36.330 15492 15492 I flutter : Patrol (native): getNotifications() succeeded
+10-04 22:02:36.330 15492 15492 I flutter : PATROL_LOG {"timestamp":"2026-10-04T22:02:36.330289","type":"step","action":"\u001b[94mgetNotifications\u001b[0m \u001b[90m(native)\u001b[0m","status":"success","data":null}
+10-04 22:02:36.031 15492 15520 I PatrolServer: Found 6 notification containers with resourceId "android:id/status_bar_latest_event_content"
+10-04 22:02:36.053 15492 15520 I PatrolServer: Found 5 notification containers with resourceId "com.android.systemui:id/expandableNotificationRow"
+10-04 22:02:36.053 15492 15520 D PatrolServer: Found 11 notifications
