@@ -26,6 +26,117 @@ Future<void> save(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets(
+    'supplementary Unicode at trimmed UTF-16 limits saves exact payload',
+    (tester) async {
+      final api = FakeSchedulerApi();
+      SchedulerSnapshot? saved;
+      final name = '😀' * 40;
+      final title = '😀' * 60;
+      final body = '😀' * 500;
+      await pumpLocalized(
+        tester,
+        SchedulerEditor(
+          api: api,
+          ensurePermission: () async => true,
+          onSaved: (snapshot) => saved = snapshot,
+        ),
+      );
+      await field(tester, 'schedule-name', ' \t$name\t ');
+      await field(tester, 'schedule-title', ' \t$title\t ');
+      await field(tester, 'schedule-body', ' \t$body\t ');
+      await save(tester);
+
+      expect(api.creates, 1);
+      expect(api.updates, 0);
+      expect(saved, isNotNull);
+      final authoritative = saved!.rules.single;
+      expect(authoritative.name, name);
+      expect(authoritative.name.length, 80);
+      expect(authoritative.action.title, title);
+      expect(authoritative.action.title.length, 120);
+      expect(authoritative.action.body, body);
+      expect(authoritative.action.body.length, 1000);
+      expect(api.store.raw, saved!.encode());
+      final persisted = SchedulerSnapshot.decode(api.store.raw!).rules.single;
+      expect(persisted.name, name);
+      expect(persisted.action.title, title);
+      expect(persisted.action.body, body);
+    },
+  );
+  testWidgets(
+    'supplementary Unicode beyond UTF-16 limits shows field errors without saving',
+    (tester) async {
+      final api = FakeSchedulerApi();
+      final original = (await api.create(
+        ScheduleDraft(
+          name: 'original',
+          recurrence: IntervalRecurrence(
+            quantity: 1,
+            unit: IntervalUnit.minutes,
+            anchorUtc: DateTime.utc(2026, 10, 4, 12),
+          ),
+          action: LocalNotificationAction(
+            title: 'original title',
+            body: 'body',
+          ),
+        ),
+        id: 'existing',
+      )).rules.single;
+      final raw = api.store.raw;
+      final creates = api.creates;
+      SchedulerSnapshot? saved;
+      await pumpLocalized(
+        tester,
+        SchedulerEditor(
+          api: api,
+          rule: original,
+          ensurePermission: () async => true,
+          onSaved: (snapshot) => saved = snapshot,
+        ),
+      );
+      final inputs = {
+        'schedule-name': ' \t${'😀' * 41}\t ',
+        'schedule-title': ' \t${'😀' * 61}\t ',
+        'schedule-body': ' \t${'😀' * 501}\t ',
+      };
+      for (final input in inputs.entries) {
+        await field(tester, input.key, input.value);
+      }
+      await save(tester);
+
+      final errors = {
+        'schedule-name': 'Required: 1–80 characters',
+        'schedule-title': 'Required: 1–120 characters',
+        'schedule-body': 'Required: 1–1000 characters',
+      };
+      for (final input in inputs.entries) {
+        final formField = find.byKey(Key(input.key));
+        await tester.ensureVisible(formField);
+        await tester.pumpAndSettle();
+        expect(
+          find
+              .descendant(
+                of: formField,
+                matching: find.text(errors[input.key]!),
+              )
+              .hitTestable(),
+          findsOneWidget,
+          reason: '${input.key} must display its UTF-16 length error',
+        );
+        expect(
+          tester.widget<TextFormField>(formField).controller!.text,
+          input.value,
+          reason: '${input.key} must retain the complete rejected input',
+        );
+      }
+      expect(saved, isNull);
+      expect(api.creates, creates);
+      expect(api.updates, 0);
+      expect(api.savedDraft!.name, 'original');
+      expect(api.store.raw, raw);
+    },
+  );
   testWidgets('Portuguese form labels and validation resolve catalog strings', (
     tester,
   ) async {
