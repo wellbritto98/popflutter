@@ -74,6 +74,62 @@ void main() {
     expect(draft(title: 'a' * 120).action.title.length, 120);
     expect(draft(body: 'a' * 1000).action.body.length, 1000);
   });
+  test('SCHED-02 trimmed UTF-16 maxima preserve exact snapshot payload', () {
+    final name = '\u{1f600}' * 40; // 80 UTF-16 code units.
+    final title = '\u{1f680}' * 60; // 120 UTF-16 code units.
+    final body = '\u{1f514}' * 500; // 1000 UTF-16 code units.
+    final accepted = draft(
+      name: ' \t$name\n ',
+      title: ' \t$title\n ',
+      body: ' \t$body\n ',
+    );
+    final rule = ScheduledRule(
+      id: 'schedule-1',
+      revision: 1,
+      notificationId: -1,
+      name: accepted.name,
+      enabled: false,
+      recurrence: accepted.recurrence,
+      action: accepted.action,
+    );
+    final expectedAction = {
+      'type': 'localNotification',
+      'title': title,
+      'body': body,
+    };
+    expect(accepted.name, name);
+    expect(accepted.action.toJson(), expectedAction);
+    expect(rule.toJson()['name'], name);
+    expect(rule.toJson()['action'], expectedAction);
+    final restored = SchedulerSnapshot.decode(
+      SchedulerSnapshot(nextSequence: 2, rules: [rule]).encode(),
+    ).rules.single;
+    expect(restored.name, name);
+    expect(restored.action.toJson(), expectedAction);
+  });
+  for (final (field, emojiCount) in [
+    ('name', 41),
+    ('title', 61),
+    ('body', 501),
+  ]) {
+    test('SCHED-02 rejects overlong UTF-16 $field without truncation', () {
+      final text = ' \t${'\u{1f600}' * emojiCount}\n ';
+      expect(
+        () => switch (field) {
+          'name' => draft(name: text),
+          'title' => draft(title: text),
+          _ => draft(body: text),
+        },
+        throwsA(
+          isA<SchedulerException>().having(
+            (e) => e.code,
+            'code',
+            'invalidText',
+          ),
+        ),
+      );
+    });
+  }
   test('T1 exact immutable snapshot roundtrip includes every cursor field', () {
     final due = anchor.add(const Duration(minutes: 1));
     final rule = ScheduledRule(
