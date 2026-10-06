@@ -205,7 +205,7 @@
 ## Handoff
 
 - **Feature**: scheduled-game-actions / .specs/features/scheduled-game-actions.
-- **Phase / Task**: Execute T7 editor next. T6 gateway is implemented: 172 app tests passed and analyze clean. T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07), T5(3cb4ecf) committed. Branch codex/scheduled-game-actions.
+- **Phase / Task**: Execute T7 editor next. T6 gateway committed 23360af; 172 app tests passed and analyze clean. T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07), T5(3cb4ecf) committed. Branch codex/scheduled-game-actions.
 - **Completed**: T6 secondary engine reconstructs the isolated service, reloads Auto Login credentials, discovery RPC returns DTOs only, EN/PT start notices name the saved character, destroy cancels HTTP and waits for cleanup, AppWiring fails pending RPC with serviceUnavailable. Local notification path still passes. No gameplay POST submitted.
 - **In-progress**: none in the working tree after the T6 commit. T7 editor owns the next SDK job. Device T8 waits for T7. Emulator 5554 was online earlier; production data preserved; one SDK job at a time.
 - **Next step**: shell T7 editor gate and atomic commit, device T8 proof, final global doc sync/release install preserving production, fresh independent verifier.

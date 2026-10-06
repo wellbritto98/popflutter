@@ -87,7 +87,7 @@ Depends on: T5. Owner: popmundo-app-shell.
 Requirement: SGA-02/03/07/08/09/10.
 Done when: secondary engine reconstructs isolated service; fresh secure reads; DTO-only RPC; start notification includes saved char; EN/PT; close cancels game traffic; local path preserved; AppWiring owns lifecycle.
 Tests: unit/widget. Gate: Full. Commit: feat(scheduler): wire native game execution gateway.
-Status: done; 172 app tests passed, analyze clean (evidence/t6-green.log).
+Status: done; commit 23360af; 172 app tests passed, analyze clean (evidence/t6-green.log).
 
 ### T7 — Game action editor component
 What: service/character/item/bonus selection, effect summaries, translated statuses and cards.
