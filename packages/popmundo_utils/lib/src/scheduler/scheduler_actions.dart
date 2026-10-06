@@ -31,7 +31,7 @@ sealed class ScheduledAction {
           artistId: json['artistId'] as int,
           artistName: json['artistName'] as String,
           bonusLevel: json['bonusLevel'] as int,
-          maxCostMinor: json['maxCostMinor'] as int,
+          maxCostMinor: json['maxCostMinor'] as int?,
         ),
         _ => throw const SchedulerException('invalidAction'),
       };
@@ -73,10 +73,10 @@ class PayCrewAction extends GameScheduledAction {
     required int artistId,
     required String artistName,
     required this.bonusLevel,
-    required int maxCostMinor,
+    int? maxCostMinor,
   }) : artistId = _positive(artistId),
        artistName = _actionText(artistName),
-       maxCostMinor = _positive(maxCostMinor) {
+       maxCostMinor = maxCostMinor == null ? null : _positive(maxCostMinor) {
     if (bonusLevel < 14 || bonusLevel > 20) {
       throw const SchedulerException('invalidAction');
     }
@@ -84,7 +84,7 @@ class PayCrewAction extends GameScheduledAction {
   final int artistId;
   final String artistName;
   final int bonusLevel;
-  final int maxCostMinor;
+  final int? maxCostMinor;
   @override
   String get type => 'payCrew';
   @override
