@@ -205,9 +205,9 @@
 ## Handoff
 
 - **Feature**: scheduled-game-actions / .specs/features/scheduled-game-actions.
-- **Phase / Task**: Execute T5 game dispatcher; T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07) committed.383 core tests/analyze clean; approved spec/design/tasks; branch codex/scheduled-game-actions.
+- **Phase / Task**: Execute T6 app gateway; T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07), T5(3cb4ecf) committed.405 core and165 app tests/analyzers passed; approved spec/design/tasks; branch codex/scheduled-game-actions.
 - **Completed**: supplied script/domain/browser mapping; user approval and char binding; AD-023; baseline core277/WebView31/app164. F1 live login/discovery passed; fresh visible Troy3327035 stayed authenticated while private HTTP selected Peter3155712 on same host74. No gameplay POST submitted.
-- **In-progress**: core T5 tests/integration; shell prepares typed bridge and T6/T7; device T8 prepared. Native ASMX/crew read-only probe passed; emulator5554 online, production installation/data preserved; one SDK job at a time.
-- **Next step**: finish sequential core T3..T5, shell T6..T7, device fixture T8, maintenance docs and fresh independent verifier; update task evidence and handoff after gates.
-- **Blockers**: no current external blocker. Domain host/form gaps corrected with red tests in T3; default device fixture uses loopback, no game host. No credentials/cookies/form state retained.
+- **In-progress**: shell T6 gateway then T7 editor owns SDK; core disposal race fixed red/green; device T8 prepared and awaits T7. Native ASMX/crew read-only probe passed; emulator5554 online, production data preserved; one SDK job at a time.
+- **Next step**: shell T6..T7 gates/atomic commits, device T8 proof, final global doc sync/release install preserving production, fresh independent verifier.
+- **Blockers**: no external blocker. Native gameplay has not been sent; default Android fixture uses loopback. Physical handset/overnight unmeasured. No credentials/cookies/form state retained.
 - **Prior feature**: service-scheduler complete; production emulator release/data preserved. Physical handset/overnight unmeasured.

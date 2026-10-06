@@ -78,7 +78,7 @@ Depends on: T4. Owner: popmundo-utils; shell bridge by app-shell.
 Requirement: SGA-01/07/08/09.
 Done when: old catalog roundtrip and cadence unchanged; claim before notice before HTTP; notice failure zero game requests; truthful persisted outcomes; no retry after effect/late notice; game dispose aborts; no5s orphan timeout.
 Tests: unit/integration. Gate: Quick + app compilation/tests after owned bridge. Commit: feat(scheduler): dispatch isolated game actions.
-Status: pending.
+Status: done; commit3cb4ecf;405 core and165 app tests passed, analyses clean; shutdown race red/green and typed bridge included (evidence/t5-*).
 
 ### T6 — App engine gateway component
 What: production service factory, GameActionsApi RPC, fresh secrets/settings/locale, mandatory native notifications/lifecycle wiring.
