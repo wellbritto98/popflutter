@@ -60,7 +60,7 @@ Depends on: T2. Owner: popmundo-utils with domain review.
 Requirement: SGA-04/05/08/09.
 Done when: exact name/first eligible direct row; only Item_Use.png; fresh hid preserved; .x/.y only; unavailable zero POST; uncertain no retry.
 Tests: unit/integration. Gate: Quick. Commit: feat(game-actions): execute scheduled item use.
-Status: pending.
+Status: done; commit18e26aa;366 core tests passed, analyze clean, domain host/form gaps reproduced red and corrected (evidence/t3-*).
 
 ### T4 — Crew bonus endpoint
 What: selected artist/bonus/price guarded single POST adapter.
@@ -69,7 +69,7 @@ Depends on: T3. Owner: popmundo-utils with domain review.
 Requirement: SGA-04/06/08/09.
 Done when: positive scoped artist guard, offered explicit14..20, integer-cent cap, fresh complete form, no substitute, missing/changed/weekly form zero POST; strict outcome.
 Tests: unit/integration. Gate: Quick. Commit: feat(game-actions): execute guarded crew bonuses.
-Status: pending.
+Status: done; commit25ded07;383 core tests passed, analyze clean, domain review passed (evidence/t4-*).
 
 ### T5 — Scheduler game dispatcher component
 What: typed Draft/Rule integration and durable game execution routing with start/result ordering.

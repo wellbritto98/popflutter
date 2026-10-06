@@ -1,7 +1,7 @@
 # Scheduled Game Actions — Research
 
 Date: 2026-10-05, America/Sao_Paulo. Source baseline: 5ce2153.
-Status: read-only investigation plus planning documents; no production changes.
+Status: research record; approved implementation is tracked in tasks.md and STATE.md.
 
 ## Evidence and boundaries
 
@@ -110,3 +110,5 @@ Fresh browser GET /World/Popmundo.aspx/Character verified a unique .charPresBox 
 No source proves GetPageNotifications drains old entries. Existing notifications_test.dart Status0/Text'n' fixture establishes that nonempty normal text can be neutral. Preflight must establish only neutral Status0/list-empty baseline in at most two reads; unknown/malformed/non-neutral baseline prevents gameplay. Mixed outcomes after POST are uncertain. This corrects any interpretation that the helper promises automatic clearing.
 
 Fresh browser renewal on 2026-10-06 assigned host75. Crew option14.textContent was exactly "notável 2.250,00 M$"; option20 exactly "sobrenatural 123.000,00 M$"; no parentheses/hyphen. Generic artist link text is "Informações gerais"; entityLogo has only its ID. Artist display label is available in document.title "(2) Popmundo - black panties" (optional notification count). Title supplies label only; scoped ID supplies identity. Browser session had redirected to Default.aspx?logout=true before renewal; cause unmeasured and no new native authentication had run yet.
+
+Native follow-up on 2026-10-06: opt-in discovery plus read-only ASMX probe PASS29s (evidence/t4-live-discovery-signals.log). Both ASMX reads returned HTTP200 and a valid neutral empty list. Native crew DTO: Troy3327035, artist2774797, levels14..20, costsMinor[225000,800000,1850000,3450000,5675000,8600000,12300000], agreeing with DOM. Browser fresh reload still authenticated as Troy. This checks the actual envelope/available form, not the signal after real gameplay; post-effect semantics remain covered by synthetic fixtures.

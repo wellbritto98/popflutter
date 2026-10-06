@@ -16,3 +16,5 @@ Reloaded browser profile after native test completed:
 - login form: absent
 
 Conclusion: in this observed run a separate native login/jar and selection did not replace or log out the visible session, even on the same assigned host. This verifies the requested isolation boundary for the tested session; it is not an overnight reliability measurement.
+
+Additional read-only probe: t4-live-discovery-signals.log PASS29s. Private notification endpoint returned HTTP200, valid=true, statuses=[], neutral=true on both reads. Fresh private crew discovery for Troy3327035 returned artist2774797 and explicit levels14..20 with quoted integer cents matching the browser mapping. After probe, fresh browser reload again retained unique profile ID3327035 and no login form. Neither probe submitted item use or payment.

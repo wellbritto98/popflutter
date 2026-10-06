@@ -1,0 +1,11 @@
+00:00 +0: loading test_live/game_actions_discovery_live_test.dart
+00:00 +0: independent native login selects owned character without gameplay
+game-route request GET www.popmundo.com /Default.aspx
+game-route response status=200
+game-route form method=post host=www.popmundo.com path=/Default.aspx
+game-route request POST www.popmundo.com /Default.aspx
+game-route response status=302
+game-route location 75.popmundo.com //Login.aspx
+game-route request GET 75.popmundo.com //Login.aspx
+game-route response status=302
+game-route location 75.popmundo.com /World/Popmundo.aspx/ChooseCharacter
