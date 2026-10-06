@@ -1,0 +1,110 @@
+00:00 +0: loading test/game_actions_transport_test.dart
+00:00 +0 -1: loading test/game_actions_transport_test.dart [E]
+  Failed to load "test/game_actions_transport_test.dart":
+  test/game_actions_transport_test.dart:10:377: Error: A '$' has special meaning inside a string, and must be followed by an identifier or an expression in curly braces ({}).
+  Try adding a backslash (\) to escape the '$'.
+  const crewHtml = '<form id="aspnetForm" action="./"><input name="__VIEWSTATE" value="fresh-crew"><div class="entityLogo gameimage idTrigger"><span class="idHolder">2774797</span></div><a href="/World/Popmundo.aspx/Artist/2774797">black panties</a><select name="ctl00$cphLeftColumn$ctl01$ddlCashBonus"><option value="0">Selecionar</option><option value="14">notável 2.250,00 M$</option><option value="20">sobrenatural 123.000,00 M$</option></select><input type="submit" name="ctl00$cphLeftColumn$ctl01$btnCashBonus" value="Entregar bônus"></form>';
+                                                                                                                                                                                                                                                                                                                                                                                          ^
+  test/game_actions_transport_test.dart:10:431: Error: A '$' has special meaning inside a string, and must be followed by an identifier or an expression in curly braces ({}).
+  Try adding a backslash (\) to escape the '$'.
+  const crewHtml = '<form id="aspnetForm" action="./"><input name="__VIEWSTATE" value="fresh-crew"><div class="entityLogo gameimage idTrigger"><span class="idHolder">2774797</span></div><a href="/World/Popmundo.aspx/Artist/2774797">black panties</a><select name="ctl00$cphLeftColumn$ctl01$ddlCashBonus"><option value="0">Selecionar</option><option value="14">notável 2.250,00 M$</option><option value="20">sobrenatural 123.000,00 M$</option></select><input type="submit" name="ctl00$cphLeftColumn$ctl01$btnCashBonus" value="Entregar bônus"></form>';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                ^
+  test/game_actions_transport_test.dart:13:35: Error: Type 'GameHttpTransport' not found.
+  class FixtureTransport implements GameHttpTransport {
+                                    ^^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:45:1: Error: Type 'GameActionsService' not found.
+  GameActionsService serviceFor(FixtureTransport transport, {Future<GameCredentials> Function()? credentials,
+  ^^^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:46:3: Error: Type 'GameActionLimits' not found.
+    GameActionLimits? limits}) => GameActionsService(
+    ^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:45:67: Error: Type 'GameCredentials' not found.
+  GameActionsService serviceFor(FixtureTransport transport, {Future<GameCredentials> Function()? credentials,
+                                                                    ^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:10:268: Error: Undefined name 'cphLeftColumn'.
+  const crewHtml = '<form id="aspnetForm" action="./"><input name="__VIEWSTATE" value="fresh-crew"><div class="entityLogo gameimage idTrigger"><span class="idHolder">2774797</span></div><a href="/World/Popmundo.aspx/Artist/2774797">black panties</a><select name="ctl00$cphLeftColumn$ctl01$ddlCashBonus"><option value="0">Selecionar</option><option value="14">notável 2.250,00 M$</option><option value="20">sobrenatural 123.000,00 M$</option></select><input type="submit" name="ctl00$cphLeftColumn$ctl01$btnCashBonus" value="Entregar bônus"></form>';
+                                                                                                                                                                                                                                                                             ^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:10:282: Error: Undefined name 'ctl01'.
+  const crewHtml = '<form id="aspnetForm" action="./"><input name="__VIEWSTATE" value="fresh-crew"><div class="entityLogo gameimage idTrigger"><span class="idHolder">2774797</span></div><a href="/World/Popmundo.aspx/Artist/2774797">black panties</a><select name="ctl00$cphLeftColumn$ctl01$ddlCashBonus"><option value="0">Selecionar</option><option value="14">notável 2.250,00 M$</option><option value="20">sobrenatural 123.000,00 M$</option></select><input type="submit" name="ctl00$cphLeftColumn$ctl01$btnCashBonus" value="Entregar bônus"></form>';
+                                                                                                                                                                                                                                                                                           ^^^^^
+  test/game_actions_transport_test.dart:10:288: Error: Undefined name 'ddlCashBonus'.
+  const crewHtml = '<form id="aspnetForm" action="./"><input name="__VIEWSTATE" value="fresh-crew"><div class="entityLogo gameimage idTrigger"><span class="idHolder">2774797</span></div><a href="/World/Popmundo.aspx/Artist/2774797">black panties</a><select name="ctl00$cphLeftColumn$ctl01$ddlCashBonus"><option value="0">Selecionar</option><option value="14">notável 2.250,00 M$</option><option value="20">sobrenatural 123.000,00 M$</option></select><input type="submit" name="ctl00$cphLeftColumn$ctl01$btnCashBonus" value="Entregar bônus"></form>';
+                                                                                                                                                                                                                                                                                                 ^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:10:482: Error: Undefined name 'cphLeftColumn'.
+  const crewHtml = '<form id="aspnetForm" action="./"><input name="__VIEWSTATE" value="fresh-crew"><div class="entityLogo gameimage idTrigger"><span class="idHolder">2774797</span></div><a href="/World/Popmundo.aspx/Artist/2774797">black panties</a><select name="ctl00$cphLeftColumn$ctl01$ddlCashBonus"><option value="0">Selecionar</option><option value="14">notável 2.250,00 M$</option><option value="20">sobrenatural 123.000,00 M$</option></select><input type="submit" name="ctl00$cphLeftColumn$ctl01$btnCashBonus" value="Entregar bônus"></form>';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:10:496: Error: Undefined name 'ctl01'.
+  const crewHtml = '<form id="aspnetForm" action="./"><input name="__VIEWSTATE" value="fresh-crew"><div class="entityLogo gameimage idTrigger"><span class="idHolder">2774797</span></div><a href="/World/Popmundo.aspx/Artist/2774797">black panties</a><select name="ctl00$cphLeftColumn$ctl01$ddlCashBonus"><option value="0">Selecionar</option><option value="14">notável 2.250,00 M$</option><option value="20">sobrenatural 123.000,00 M$</option></select><input type="submit" name="ctl00$cphLeftColumn$ctl01$btnCashBonus" value="Entregar bônus"></form>';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ^^^^^
+  test/game_actions_transport_test.dart:10:502: Error: Undefined name 'btnCashBonus'.
+  const crewHtml = '<form id="aspnetForm" action="./"><input name="__VIEWSTATE" value="fresh-crew"><div class="entityLogo gameimage idTrigger"><span class="idHolder">2774797</span></div><a href="/World/Popmundo.aspx/Artist/2774797">black panties</a><select name="ctl00$cphLeftColumn$ctl01$ddlCashBonus"><option value="0">Selecionar</option><option value="14">notável 2.250,00 M$</option><option value="20">sobrenatural 123.000,00 M$</option></select><input type="submit" name="ctl00$cphLeftColumn$ctl01$btnCashBonus" value="Entregar bônus"></form>';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:21:4: Error: Not a constant expression.
+    @override
+     ^^^^^^^^
+  test/game_actions_transport_test.dart:42:4: Error: Not a constant expression.
+    @override
+     ^^^^^^^^
+  test/game_actions_transport_test.dart:45:67: Error: 'GameCredentials' isn't a type.
+  GameActionsService serviceFor(FixtureTransport transport, {Future<GameCredentials> Function()? credentials,
+                                                                    ^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:46:3: Error: 'GameActionLimits' isn't a type.
+    GameActionLimits? limits}) => GameActionsService(
+    ^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:47:89: Error: Couldn't find constructor 'GameCredentials'.
+      createTransport: () => transport, readCredentials: credentials ?? () async => const GameCredentials(username: 'account', password: 'synthetic-password'),
+                                                                                          ^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:48:29: Error: Couldn't find constructor 'GameActionLimits'.
+      limits: limits ?? const GameActionLimits(cooldown: Duration.zero));
+                              ^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:46:33: Error: Method not found: 'GameActionsService'.
+    GameActionLimits? limits}) => GameActionsService(
+                                  ^^^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:49:46: Error: 'GameActionException' isn't a type.
+  Matcher code(String expected) => throwsA(isA<GameActionException>().having((e) => e.code, 'code', expected));
+                                               ^^^^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:49:85: Error: The getter 'code' isn't defined for the type 'Object?'.
+   - 'Object' is from 'dart:core'.
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'code'.
+  Matcher code(String expected) => throwsA(isA<GameActionException>().having((e) => e.code, 'code', expected));
+                                                                                      ^^^^
+  test/game_actions_transport_test.dart:95:16: Error: Method not found: 'GameCredentials'.
+          return GameCredentials(username: kind == 'accountChanged' ? 'other' : 'account', password: kind == 'credentialsMissing' ? '' : 'synthetic-password');
+                 ^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:113:57: Error: Couldn't find constructor 'GameActionLimits'.
+      final service = serviceFor(transport, limits: const GameActionLimits(cooldown: Duration.zero, transactionTimeout: Duration(milliseconds: 20), requestTimeout: Duration(seconds: 1)));
+                                                          ^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:136:59: Error: Couldn't find constructor 'GameActionLimits'.
+      await expectLater(serviceFor(transport, limits: const GameActionLimits(cooldown: Duration.zero, requestTimeout: Duration(milliseconds: 20))).discoverCharacters(), code('requestTimeout'));
+                                                            ^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:141:59: Error: Couldn't find constructor 'GameActionLimits'.
+      await expectLater(serviceFor(transport, limits: const GameActionLimits(cooldown: Duration.zero, maxDecodedBodyBytes: 4)).discoverCharacters(), code('responseTooLarge'));
+                                                            ^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:146:12: Error: Undefined name 'GameNotificationSignals'.
+      expect(GameNotificationSignals.parse('{"d":[]}').isNeutral, true);
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:147:12: Error: Undefined name 'GameNotificationSignals'.
+      expect(GameNotificationSignals.parse('{"d":{"Status":0,"Text":"normal"}}').isNeutral, true);
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:148:12: Error: Undefined name 'GameNotificationSignals'.
+      expect(GameNotificationSignals.parse('{"d":"[{\\"Status\\":1,\\"Text\\":\\"ok\\"}]"}').outcome.status, GameActionStatus.confirmed);
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:148:108: Error: Undefined name 'GameActionStatus'.
+      expect(GameNotificationSignals.parse('{"d":"[{\\"Status\\":1,\\"Text\\":\\"ok\\"}]"}').outcome.status, GameActionStatus.confirmed);
+                                                                                                             ^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:149:12: Error: Undefined name 'GameNotificationSignals'.
+      expect(GameNotificationSignals.parse('{"d":[{"Status":2,"Text":"no"}]}').outcome.status, GameActionStatus.failed);
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:149:94: Error: Undefined name 'GameActionStatus'.
+      expect(GameNotificationSignals.parse('{"d":[{"Status":2,"Text":"no"}]}').outcome.status, GameActionStatus.failed);
+                                                                                               ^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:151:14: Error: Undefined name 'GameNotificationSignals'.
+        expect(GameNotificationSignals.parse(body).outcome.status, GameActionStatus.uncertain);
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  test/game_actions_transport_test.dart:151:66: Error: Undefined name 'GameActionStatus'.
+        expect(GameNotificationSignals.parse(body).outcome.status, GameActionStatus.uncertain);
+                                                                   ^^^^^^^^^^^^^^^^
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  test/game_actions_transport_test.dart: loading test/game_actions_transport_test.dart

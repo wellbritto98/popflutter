@@ -26,8 +26,12 @@ class AutoLoginRequests {
     required String username,
     required String password,
     required int status,
+    bool strictDisabledControls = false,
   }) {
-    final form = AspNetFormData.fromDocument(loginPage);
+    final form = AspNetFormData.fromDocument(
+      loginPage,
+      strictDisabledControls: strictDisabledControls,
+    );
     if (form.isEmpty) return form;
     form.set('__EVENTTARGET', '');
     form.set('__EVENTARGUMENT', '');

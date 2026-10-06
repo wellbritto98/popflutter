@@ -38,3 +38,6 @@ export 'src/userscript/userscript_gm_shim.dart';
 export 'src/userscript/userscript_importer.dart';
 export 'src/userscript/userscript_parser.dart';
 export 'src/facades/utils.dart';
+export 'src/game_actions/game_action_contracts.dart';
+export 'src/game_actions/game_actions_service.dart';
+export 'src/game_actions/game_notification_signals.dart';

@@ -45,3 +45,5 @@ dart test test_live/login_page_live_test.dart
 - `.envexample` na raiz usa `TEST_*`; o código lê `POPMUNDO_*`. **Hipótese:** o `.envexample` está desatualizado ou serve outro harness não referenciado neste pacote.
 - Tag `@Tags(['live'])` declarada em `dart_test.yaml`.
 - ToS / auth real: não commitar senhas; não ligar isso em CI.
+
+game_actions_discovery_live_test.dart is a separate opt-in read-only independent-login proof. It uses GameActionsService with runtime POPMUNDO_USERNAME/PASSWORD plus POPMUNDO_VISIBLE_CHARACTER_ID and optional POPMUNDO_DISCOVERY_CHARACTER_ID. It selects an owned character different from the visible browser, lists eligible item choices, logs only public numeric IDs/counts and bounded failure codes, and never calls gameplay execute or LiveCapture. Browser identity verification after this test is external evidence; this test alone cannot claim it.

@@ -26,6 +26,7 @@ class AspNetFormData {
   factory AspNetFormData.fromDocument(
     Document doc, {
     String formId = 'aspnetForm',
+    bool strictDisabledControls = false,
   }) {
     final form = doc.getElementById(formId);
     if (form == null) return AspNetFormData.empty();
@@ -35,6 +36,12 @@ class AspNetFormData {
       final name = el.attributes['name'];
       if (name == null || name.isEmpty) continue;
       if (el.attributes.containsKey('disabled')) continue;
+      if (strictDisabledControls && isDisabledControl(el)) continue;
+      if (strictDisabledControls &&
+          el.attributes.containsKey('form') &&
+          el.attributes['form'] != form.id) {
+        continue;
+      }
 
       switch (el.localName) {
         case 'input':
@@ -49,7 +56,7 @@ class AspNetFormData {
         case 'textarea':
           entries.add(MapEntry(name, el.text));
         case 'select':
-          entries.addAll(_selectEntries(el, name));
+          entries.addAll(_selectEntries(el, name, strictDisabledControls));
       }
     }
     return AspNetFormData(entries);
@@ -75,8 +82,7 @@ class AspNetFormData {
   List<String> get names => [for (final e in _entries) e.key];
 
   /// Name/value pairs in document order — for logging and diagnostics.
-  List<MapEntry<String, String>> get entries =>
-      List.unmodifiable(_entries);
+  List<MapEntry<String, String>> get entries => List.unmodifiable(_entries);
 
   /// First value for [name], or null when absent.
   String? operator [](String name) {
@@ -103,26 +109,63 @@ class AspNetFormData {
   }
 
   String encode() => [
-        for (final e in _entries)
-          '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value)}',
-      ].join('&');
+    for (final e in _entries)
+      '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value)}',
+  ].join('&');
+
+  /// Strict game forms obey inherited disabled state; default codecs unchanged.
+  static bool isDisabledControl(Element element) {
+    if (element.attributes.containsKey('disabled')) return true;
+    for (var parent = element.parent; parent != null; parent = parent.parent) {
+      if (parent.localName == 'optgroup' &&
+          parent.attributes.containsKey('disabled')) {
+        return true;
+      }
+      if (parent.localName != 'fieldset' ||
+          !parent.attributes.containsKey('disabled')) {
+        continue;
+      }
+      final legends = parent.children.where(
+        (child) => child.localName == 'legend',
+      );
+      final firstLegend = legends.isEmpty ? null : legends.first;
+      var insideLegend = false;
+      for (
+        var ancestor = element.parent;
+        ancestor != null && ancestor != parent;
+        ancestor = ancestor.parent
+      ) {
+        if (ancestor == firstLegend) insideLegend = true;
+      }
+      if (!insideLegend) return true;
+    }
+    return false;
+  }
 
   static Iterable<MapEntry<String, String>> _selectEntries(
     Element select,
     String name,
+    bool strictDisabledControls,
   ) {
     final options = select.querySelectorAll('option');
-    final selected =
-        options.where((o) => o.attributes.containsKey('selected')).toList();
+    final selected = options
+        .where((o) => o.attributes.containsKey('selected'))
+        .toList();
+    final enabled = options
+        .where((o) => !strictDisabledControls || !isDisabledControl(o))
+        .toList();
     if (select.attributes.containsKey('multiple')) {
-      return [for (final o in selected) MapEntry(name, _optionValue(o))];
+      return [
+        for (final o in selected)
+          if (!strictDisabledControls || !isDisabledControl(o))
+            MapEntry(name, _optionValue(o)),
+      ];
     }
-    // A non-multiple select always submits something: the marked option, or
-    // the first one, which is what the browser pre-selects.
     final chosen = selected.isNotEmpty
         ? selected.first
-        : (options.isEmpty ? null : options.first);
-    return chosen == null
+        : (enabled.isEmpty ? null : enabled.first);
+    return chosen == null ||
+            (strictDisabledControls && isDisabledControl(chosen))
         ? const <MapEntry<String, String>>[]
         : [MapEntry(name, _optionValue(chosen))];
   }

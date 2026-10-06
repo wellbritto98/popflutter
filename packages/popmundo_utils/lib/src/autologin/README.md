@@ -60,3 +60,5 @@ Nome duplicado → `characterAmbiguous` (não chuta). Sem `LastUrlStore`.
 - Sem CookieSink o handshake autentica o cliente `dart:io` e a WebView permanece deslogada (trace avisa). Sem CookieSource o heartbeat não roda.
 - Campo `ddlStatus`: 0 Normal, 1 Busy, 2 Mobile, 3 Drunk, 4 Away.
 - `auto_login_controller.dart` passou de ~300 linhas (heartbeat + handshake no mesmo arquivo).
+
+Scheduled game actions reuse AuthSession.postJson for the notification ASMX protocol. IoAuthHttpSender.maxDecodedBodyBytes is optional; the previous unlimited default and20s per-stage/body deadline stay intact. AspNetFormData.fromDocument and AutoLoginRequests.loginBody expose strictDisabledControls (defaultfalse), used only by the independent game boundary to respect inherited disabled controls and foreign form ownership. AutoLoginController behavior and its visible cookie/navigation collaborators are unchanged.

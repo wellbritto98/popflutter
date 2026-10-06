@@ -81,8 +81,8 @@ class AuthSession {
     this.delay = const Duration(milliseconds: 750),
     ClockNow? now,
     Sleeper? sleep,
-  })  : _now = now ?? DateTime.now,
-        _sleep = sleep ?? Future<void>.delayed {
+  }) : _now = now ?? DateTime.now,
+       _sleep = sleep ?? Future<void>.delayed {
     _lastCall = _now().subtract(delay);
   }
 
@@ -123,11 +123,13 @@ class AuthSession {
   /// downloading the login page (AD-019).
   Future<AuthHttpResponse> probe(Uri url) async {
     await _cooldown();
-    final response = await send(AuthHttpRequest(
-      url: url,
-      method: 'GET',
-      headers: _headersFor(url, null, null),
-    ));
+    final response = await send(
+      AuthHttpRequest(
+        url: url,
+        method: 'GET',
+        headers: _headersFor(url, null, null),
+      ),
+    );
     _lastCall = _now();
     _absorb(response, url);
     return response;
@@ -140,12 +142,11 @@ class AuthSession {
   ///
   /// Redirects after a POST are re-issued as GET, which is what a browser does
   /// for 302 and what the game's `Location` to `Login.aspx` expects.
-  Future<AuthExchange> postForm(Uri url, String body) => _run(
-        url,
-        'POST',
-        body,
-        'application/x-www-form-urlencoded',
-      );
+  Future<AuthExchange> postJson(Uri url, String body) =>
+      _run(url, 'POST', body, 'application/json; charset=utf-8');
+
+  Future<AuthExchange> postForm(Uri url, String body) =>
+      _run(url, 'POST', body, 'application/x-www-form-urlencoded');
 
   Future<AuthExchange> _run(
     Uri url,
@@ -161,12 +162,14 @@ class AuthSession {
 
     for (var hop = 0; hop < maxHops; hop++) {
       await _cooldown();
-      final response = await send(AuthHttpRequest(
-        url: current,
-        method: currentMethod,
-        headers: _headersFor(current, currentType, currentBody),
-        body: currentBody,
-      ));
+      final response = await send(
+        AuthHttpRequest(
+          url: current,
+          method: currentMethod,
+          headers: _headersFor(current, currentType, currentBody),
+          body: currentBody,
+        ),
+      );
       _lastCall = _now();
       _absorb(response, current);
 

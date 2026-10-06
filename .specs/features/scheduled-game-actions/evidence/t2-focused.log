@@ -1,0 +1,42 @@
+00:00 +0: loading test/game_actions_transport_test.dart
+00:00 +0: test/game_actions_transport_test.dart: SGA-09 transactions serialize complete authentication and return fresh catalogs
+00:00 +1: test/game_actions_io_limits_test.dart: SGA-09 native sender rejects decoded UTF8 bytes over ceiling
+00:00 +2: test/game_actions_io_limits_test.dart: SGA-09 native sender rejects decoded UTF8 bytes over ceiling
+00:00 +3: test/game_actions_io_limits_test.dart: SGA-09 native sender rejects decoded UTF8 bytes over ceiling
+00:00 +4: test/game_actions_io_limits_test.dart: SGA-09 native sender rejects decoded UTF8 bytes over ceiling
+00:00 +5: test/game_actions_io_limits_test.dart: SGA-09 native sender rejects decoded UTF8 bytes over ceiling
+00:00 +6: test/game_actions_io_limits_test.dart: SGA-09 native sender rejects decoded UTF8 bytes over ceiling
+00:00 +7: test/game_actions_transport_test.dart: SGA-04 full successful controls retain duplicates excluding disabled ancestry
+00:00 +8: test/game_actions_io_limits_test.dart: SGA-09 native optional limit accepts exact bytes and legacy default intact
+00:00 +9: test/game_actions_transport_test.dart: SGA-04 strict notification rejects booleans string statuses and null envelope
+00:00 +10: test/game_actions_transport_test.dart: SGA-04 neutral baseline bounded JSON protocol 1 reads
+00:00 +11: test/game_actions_transport_test.dart: SGA-04 neutral baseline bounded JSON protocol 2 reads
+00:00 +12: test/game_actions_transport_test.dart: SGA-04 no neutral baseline stops at most two reads {"d":{"Status":1,"Text":"stale"}}
+00:00 +13: test/game_actions_transport_test.dart: SGA-04 no neutral baseline stops at most two reads {"d":{"Status":true,"Text":"bad"}}
+00:00 +14: test/game_actions_transport_test.dart: SGA-04 outside-form inventory/select cannot become choices
+00:00 +15: test/game_actions_transport_test.dart: SGA-06 ambiguous/unsupported/overflow price not offered notável 2,250.00 M$
+00:00 +16: test/game_actions_transport_test.dart: SGA-06 ambiguous/unsupported/overflow price not offered notável 22.50,00 M$
+00:00 +17: test/game_actions_transport_test.dart: SGA-06 ambiguous/unsupported/overflow price not offered notável 123.000,00 M$ 2.250,00 M$
+00:00 +18: test/game_actions_transport_test.dart: SGA-06 ambiguous/unsupported/overflow price not offered notável 184467440737095517,00 M$
+00:00 +19: test/game_actions_transport_test.dart: SGA-03 missing owned target never submits choose-character
+00:00 +20: test/game_actions_transport_test.dart: SGA-03 fresh jar, full credential form and assigned host discovery
+00:00 +21: test/game_actions_transport_test.dart: SGA-02/03 selection governed by ID and fresh scoped profile not name
+00:00 +22: test/game_actions_transport_test.dart: SGA-02 crew discovery exact artist and quotes in cents
+00:00 +23: test/game_actions_transport_test.dart: SGA-03 profile mismatch/ambiguity blocks target 0
+00:00 +24: test/game_actions_transport_test.dart: SGA-03 profile mismatch/ambiguity blocks target 2
+00:00 +25: test/game_actions_transport_test.dart: SGA-03 profile mismatch/ambiguity blocks target 3327035</span><span class="idHolder">3327035
+00:00 +26: test/game_actions_transport_test.dart: SGA-03 duplicate owned ID cannot select
+00:00 +27: test/game_actions_transport_test.dart: SGA-03 fresh credentials accountChanged prevent HTTP
+00:00 +28: test/game_actions_transport_test.dart: SGA-03 fresh credentials credentialsMissing prevent HTTP
+00:00 +29: test/game_actions_transport_test.dart: SGA-03 fresh credentials credentialsUnavailable prevent HTTP
+00:00 +30: test/game_actions_transport_test.dart: SGA-03 redirect policy rejects http://74.popmundo.com/World before transmission
+00:00 +31: test/game_actions_transport_test.dart: SGA-03 redirect policy rejects https://evil.example/x before transmission
+00:00 +32: test/game_actions_transport_test.dart: SGA-03 redirect policy rejects https://popmundo.com.evil.example/x before transmission
+00:00 +33: test/game_actions_transport_test.dart: SGA-03 redirect policy rejects https://user@74.popmundo.com/x before transmission
+00:00 +34: test/game_actions_transport_test.dart: SGA-03 redirect policy rejects https://74.popmundo.com:444/x before transmission
+00:00 +35: test/game_actions_transport_test.dart: SGA-09 timeout aborts before late response can start another request
+00:00 +36: test/game_actions_transport_test.dart: SGA-09 dispose cancels active and queued transactions
+00:00 +37: test/game_actions_transport_test.dart: SGA-09 request deadline aborts and sanitizes raw exception
+00:00 +38: test/game_actions_transport_test.dart: SGA-09 body limit rejects before parsing and sanitized network errors
+00:00 +39: test/game_actions_transport_test.dart: SGA-04 strict notification signals prevent stale and mixed success
+00:00 +40: All tests passed!
