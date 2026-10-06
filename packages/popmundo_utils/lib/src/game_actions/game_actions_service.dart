@@ -9,6 +9,7 @@ import '../autologin/auth_http.dart';
 import '../scheduler/scheduler_models.dart';
 import 'game_action_contracts.dart';
 import 'game_forms.dart';
+import 'game_item_action.dart';
 import 'game_transaction.dart';
 
 /// Sole independent-session gateway for discovery and scheduled game actions.
@@ -136,7 +137,11 @@ class GameActionsService {
     final profile = await context.session.get(
       origin.replace(path: '/World/Popmundo.aspx/Character'),
     );
-    _requirePage(profile, '/World/Popmundo.aspx/Character');
+    _requirePage(
+      profile,
+      '/World/Popmundo.aspx/Character',
+      expectedOrigin: origin,
+    );
     verifyCharacter(parser.parse(profile.body), character.id);
     return origin;
   }
@@ -145,9 +150,12 @@ class GameActionsService {
     AuthExchange page,
     String path, {
     bool allowLoginForm = false,
+    Uri? expectedOrigin,
   }) {
     GameTransaction.validateUrl(page.finalUrl);
     if (page.status != 200 ||
+        (expectedOrigin != null &&
+            page.finalUrl.origin != expectedOrigin.origin) ||
         page.finalUrl.path != path ||
         (!allowLoginForm && AspNetForm.looksLikeLoginForm(page.body))) {
       throw const GameActionException('routeMismatch');
@@ -192,18 +200,59 @@ class GameActionsService {
     final login = await _login(context, credentials);
     final origin = await _select(context, login, character);
     final page = await context.session.get(origin.replace(path: path));
-    _requirePage(page, path);
+    _requirePage(page, path, expectedOrigin: origin);
     freshForm(parser.parse(page.body), page.finalUrl);
     return parse(parser.parse(page.body));
   });
 
-  /// Endpoint implementation is added by the item/crew tasks.
-  Future<GameActionOutcome> execute(GameScheduledAction action) async =>
-      const GameActionOutcome(
+  Future<GameActionOutcome> execute(GameScheduledAction action) async {
+    try {
+      return await _transaction(action.boundUsername, (
+        context,
+        credentials,
+      ) async {
+        try {
+          final login = await _login(context, credentials);
+          final origin = await _select(context, login, action.character);
+          if (action is! UseItemAction) {
+            throw const GameActionException("executorUnavailable");
+          }
+          final url = origin.replace(
+            path: "/World/Popmundo.aspx/Character/Items/",
+          );
+          final page = await context.session.get(url);
+          _requirePage(page, url.path, expectedOrigin: origin);
+          final form = itemPost(parser.parse(page.body), page.finalUrl, action);
+          await context.establishNeutralBaseline(origin);
+          context.check();
+          context.gameplayUrl = url;
+          final posted = await context.session.postForm(url, form.encode());
+          _requirePage(posted, url.path, expectedOrigin: origin);
+          return await context.readOutcome(origin);
+        } on GameActionException catch (error) {
+          if (context.gameplaySent) {
+            return const GameActionOutcome(
+              status: GameActionStatus.uncertain,
+              errorCode: "outcomeUncertain",
+            );
+          }
+          return GameActionOutcome(
+            status: ["itemUnavailable", "formUnavailable"].contains(error.code)
+                ? GameActionStatus.unavailable
+                : GameActionStatus.failed,
+            errorCode: error.code,
+          );
+        }
+      });
+    } on GameActionException catch (error) {
+      return GameActionOutcome(
         status: GameActionStatus.failed,
-        errorCode: 'executorUnavailable',
+        errorCode: error.code,
       );
-  void cancel() => _active?.cancel('serviceUnavailable');
+    }
+  }
+
+  void cancel() => _active?.cancel("serviceUnavailable");
   Future<void> dispose() async {
     _disposed = true;
     cancel();

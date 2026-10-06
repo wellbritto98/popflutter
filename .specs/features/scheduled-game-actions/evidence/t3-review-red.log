@@ -1,0 +1,53 @@
+00:00 +0: loading test/game_actions_item_test.dart
+00:00 +0: SGA-03 verified origin cannot change on target GET
+00:00 +0 -1: SGA-03 verified origin cannot change on target GET [E]
+  Expected: GameActionStatus:<GameActionStatus.failed>
+    Actual: GameActionStatus:<GameActionStatus.confirmed>
+
+  package:matcher                         expect
+  test\game_actions_item_test.dart 217:5  guardedItemTests.<fn>
+
+00:00 +0 -1: SGA-08 missing or empty item form unavailable no POST <html>no form</html>
+00:00 +0 -2: SGA-08 missing or empty item form unavailable no POST <html>no form</html> [E]
+  Expected: GameActionStatus:<GameActionStatus.unavailable>
+    Actual: GameActionStatus:<GameActionStatus.failed>
+
+  package:matcher                         expect
+  test\game_actions_item_test.dart 226:7  guardedItemTests.<fn>
+
+00:00 +0 -2: SGA-08 missing or empty item form unavailable no POST <form method="post" id="aspnetForm" action="./"></form>
+00:00 +0 -3: SGA-08 missing or empty item form unavailable no POST <form method="post" id="aspnetForm" action="./"></form> [E]
+  Expected: GameActionStatus:<GameActionStatus.unavailable>
+    Actual: GameActionStatus:<GameActionStatus.failed>
+
+  package:matcher                         expect
+  test\game_actions_item_test.dart 226:7  guardedItemTests.<fn>
+
+00:00 +0 -3: SGA-05 full fresh form chooses one exact first eligible use row
+00:00 +1 -3: SGA-05 tune homonym skipped, first eligible matching row selected
+00:00 +2 -3: SGA-05 unavailable absent sends zero gameplay POST
+00:00 +3 -3: SGA-05 unavailable substring sends zero gameplay POST
+00:00 +4 -3: SGA-05 unavailable tune sends zero gameplay POST
+00:00 +5 -3: SGA-05 unavailable wear sends zero gameplay POST
+00:00 +6 -3: SGA-05 unavailable disabled sends zero gameplay POST
+00:00 +7 -3: SGA-05 unavailable hiddenMissing sends zero gameplay POST
+00:00 +8 -3: SGA-05 unavailable nested sends zero gameplay POST
+00:00 +9 -3: SGA-04 stale/malformed baseline aborts effect {"d":{"Status":1,"Text":"old"}}
+00:00 +10 -3: SGA-04 stale/malformed baseline aborts effect invalid
+00:00 +11 -3: SGA-08 post outcome uncertain no resend {"d":[]}
+00:00 +12 -3: SGA-08 post outcome uncertain no resend {"d":{"Status":0,"Text":"normal"}}
+00:00 +13 -3: SGA-08 post outcome uncertain no resend invalid
+00:00 +14 -3: SGA-08 post outcome uncertain no resend {"d":[{"Status":1,"Text":"ok"},{"Status":2,"Text":"no"}]}
+00:00 +15 -3: SGA-08 post outcome uncertain no resend {"d":{"Status":9,"Text":"?"}}
+00:00 +16 -3: SGA-08 fresh explicit rejection records failed
+00:00 +17 -3: SGA-08 lost gameplay response uncertain and never resent
+00:00 +18 -3: SGA-09 gameplay cancellation closes and late response cannot verify or retry
+00:00 +19 -3: Some tests failed.
+
+Failing tests:
+  test/game_actions_item_test.dart: SGA-03 verified origin cannot change on target GET
+  test/game_actions_item_test.dart: SGA-08 missing or empty item form unavailable no POST <form method="post" id="aspnetForm" action="./"></form>
+  test/game_actions_item_test.dart: SGA-08 missing or empty item form unavailable no POST <html>no form</html>
+
+Consider enabling the flag chain-stack-traces to receive more detailed exceptions.
+For example, 'dart test --chain-stack-traces'.
