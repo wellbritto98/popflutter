@@ -1,4 +1,4 @@
-import '../timed_fetch.dart' show ClockNow, Sleeper;
+import '../core/timed_fetch.dart' show ClockNow, Sleeper;
 import 'game_cookie.dart';
 
 /// One outgoing request of the auth handshake.

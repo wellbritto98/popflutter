@@ -18,9 +18,10 @@ Persistir settings não-secretos no `KeyValueStore` e a senha no `SecretStore`. 
 | `secure_secret_store.dart` | `FlutterSecureStorage` (iOS `first_unlock`) |
 | `auto_login_messages.dart` | `autoLoginStatusMessage` → chaves `autologin.cycle.*` |
 | `auto_login_notifications.dart` | Notifica done/failed em background; id fixo 2, texto EN/PT, falha do plugin contida |
+| `auto_login_status_snackbar.dart` | `showAutoLoginStatusSnackBar(...)` — renderiza o snackbar a partir de `AutoLoginStatus` |
+| `auto_login_menu_item.dart` | `autoLoginMenuItem({required onTap})` — `AppMenuItem` desta feature, consumido em `app.dart`'s `items:` |
 
-Wiring: `PopmundoHome` cria um `InAppCookieSink()` compartilhado como `cookieSink` e `cookieSource`, `start()`, escuta `status`.
-O User-Agent vem de `InAppWebViewController.getDefaultUserAgent`, via plataforma nativa; não exige renderer ativo nem depende de captura anterior à criação da WebView.
+Wiring: `AppWiring` (`app_wiring.dart`) cria um `InAppCookieSink()` compartilhado (`cookieJar`) como `cookieSink`/`cookieSource` do `AutoLoginController` e chama `start()`. O User-Agent vem de `InAppWebViewController.getDefaultUserAgent`, via plataforma nativa; não exige renderer ativo nem depende de captura anterior à criação da WebView. `_PopmundoHomeState` (`app.dart`) assina `wiring.autoLoginStatus` (precisa de `BuildContext` para a cor do snackbar de erro), chama `showAutoLoginStatusSnackBar` em foreground e `notifyAutoLoginResult` quando o app não está `resumed`.
 
 ## Dependências
 

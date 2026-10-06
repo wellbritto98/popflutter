@@ -2,7 +2,7 @@
 
 > Documento gerado por análise estática do código-fonte real (imports, chamadas, configs) e dos artefatos em `.specs/STATE.md` e `.specs/features/`. Onde a análise exigiu inferência sem confirmação direta no código, o trecho está marcado como **Hipótese**.
 >
-> Última atualização: 2026-08-19.
+> Última atualização: 2026-08-20.
 
 ---
 
@@ -66,14 +66,13 @@ graph TD
 | Padrão | Onde | Evidência no código |
 | ------ | ---- | -------------------- |
 | **Porta/Adapter** | `PopmundoRuntime` vs. `InAppPopmundoRuntime`; `CookieSink`/`CookieSource` vs. `InAppCookieSink`; `SecretStore` vs. `FlutterSecureSecretStore`; `KeyValueStore` vs. `SharedPreferencesStore` / `MemoryKeyValueStore`; `UserScriptWebViewPort` vs. `InAppUserScriptWebViewPort`; `BackgroundPlatform` vs. `FlutterForegroundTaskPlatform`; `NotificationService` vs. `LocalNotificationsService` / `FakeNotificationService` | Contratos em `popmundo_utils` (e `background_platform.dart`/`notifications/notification_service.dart` no app); implementações no adapter/app |
-| **Composition root** | `apps/popmundo_app/lib/main.dart` monta runtime, store, keepalive e `EasyLocalization`; `PopmundoHome` monta catalog, TimedFetch, AutoLogin, GM host | Nenhum outro ponto instancia `InAppPopmundoRuntime()` |
-| **Facade** | `Notifications` / `Scoring` / `CssSelectorHelper` / `XPathHelper` — `runtime.evaluate('window.__popmundo.<fn>(...)')`; `Utils.getMyID`/`getMyName` — TimedFetch GET `/World/Popmundo.aspx/Character` + parse HTML | `packages/popmundo_utils/lib/src/{utils,notifications,scoring,css_selector}.dart` |
-| **Event Bus** | `PopmundoEventBus` com streams `network`, `console`, `navigation`, `gmValue`, `gmCall` | `packages/popmundo_utils/lib/src/events.dart` |
+| **Composition root** | `apps/popmundo_app/lib/main.dart` monta um único `AppWiring` (runtime, store, keepalive, notificationService) e o entrega para `PopmundoApp`/`PopmundoHome`; `AppWiring` (não `PopmundoHome`) monta catalog, TimedFetch, AutoLogin, GM host e os demais 15 colaboradores (AD-022) | Nenhum outro ponto instancia `InAppPopmundoRuntime()`; `apps/popmundo_app/lib/app_wiring.dart` |
+| **Facade** | `Notifications` / `Scoring` / `CssSelectorHelper` / `XPathHelper` — `runtime.evaluate('window.__popmundo.<fn>(...)')`; `Utils.getMyID`/`getMyName` — TimedFetch GET `/World/Popmundo.aspx/Character` + parse HTML | `packages/popmundo_utils/lib/src/facades/{utils,notifications,scoring,css_selector}.dart` |
+| **Event Bus** | `PopmundoEventBus` com streams `network`, `console`, `navigation`, `gmValue`, `gmCall` | `packages/popmundo_utils/lib/src/core/events.dart` |
 | **Fila serial / rate limiter** | `TimedFetch` (in-page) e `AuthSession` (HTTP nativo do Auto Login) — delay padrão 750 ms | `timed_fetch.dart`, `auth_http.dart` |
 | **DI manual** | Construtores recebem portas explicitamente; sem framework de DI | Todo `popmundo_utils` e o composition root |
 | **Buffer até bridge pronto** | `hooks.js` enfileira até `flutterInAppWebViewPlatformReady` | `packages/popmundo_webview/assets/js/hooks.js` |
-| **InheritedWidget** | `PopmundoScope` expõe `runtime`/`storage` | `apps/popmundo_app/lib/app.dart` — **nenhum** `PopmundoScope.of` no repositório |
-| **Registro de menu** | `buildAppMenuItems` é a única fonte da lista fixa do sidebar | `apps/popmundo_app/lib/menu/app_menu_registry.dart` |
+| **Registro de menu** | `buildAppMenuItems` só preserva a ordem da lista recebida e anexa o item de debug por último quando o gate permite; cada feature dona seu próprio `AppMenuItem` (`autoLoginMenuItem`, `userscriptsMenuItem`, `languageMenuItem`, `debugMenuItem`) | `apps/popmundo_app/lib/menu/app_menu_registry.dart`; chamada única em `app.dart` (`build`) |
 | **Polyfill por prelude JS** | `UserScriptGmShim` gera closure por script; host APIs voltam pelo canal `type: 'gm'` | `userscript_gm_shim.dart`, `js_bridge.dart`, `gm_host_handler.dart` |
 
 ---
@@ -123,7 +122,7 @@ Registradas em `.specs/STATE.md` (AD-001 a AD-018; AD-011 e AD-017 **superseded*
 | ------ | ----------------- | ------- |
 | `packages/popmundo_utils` | Contrato `PopmundoRuntime`; host sticky; TimedFetch; parsing ASP.NET; Auto Login (orquestração + HTTP abstrato); catálogo/parser/shim GM; storage lógico; eventos | Não renderiza UI; não importa Flutter; persistência de disco é injetada (`KeyValueStore`/`SecretStore`); `CookieManager` fica atrás de `CookieSink` |
 | `packages/popmundo_webview` | `InAppPopmundoRuntime`; widget `PopmundoWebView`; JS bridge; UserScripts builtins + injector; `InAppCookieSink`; back navigation; settings do WebView | Não decide throttle, parsing de login, catálogo persistido, i18n, FGS |
-| `apps/popmundo_app` | Composition root; shell (`AppShell`/sidebar); telas Auto Login / UserScripts / idioma; `GmHostHandler`; keepalive; notificação de teste local (debug-only, `lib/notifications/`); i18n; `SharedPreferencesStore` / `FlutterSecureSecretStore` | Não implementa parsing de form ASP.NET nem política de host; **ainda** importa `flutter_inappwebview` em `app.dart` para ler nomes de cookies; não dispara notificações a partir de eventos de jogo (fora de escopo, MVP é só o botão manual) |
+| `apps/popmundo_app` | Composition root (`AppWiring`); shell (`AppShell`/sidebar); telas Auto Login / UserScripts / idioma; `GmHostHandler`; keepalive; notificação de teste local (debug-only, `lib/notifications/`); i18n; `SharedPreferencesStore` / `FlutterSecureSecretStore` | Não implementa parsing de form ASP.NET nem política de host; **ainda** importa `flutter_inappwebview` em `cookie_watcher.dart` para ler nomes de cookies; não dispara notificações a partir de eventos de jogo (fora de escopo, MVP é só o botão manual) |
 | `packages/popmundo_webview/assets/js` | Hooks de `fetch`/`XHR`/`console` e helpers DOM **na página** | Não decide política — só captura e `callHandler` |
 | `apps/popmundo_app/integration_test` | Tier device-real (Patrol): FGS, Keystore, prefs, sockets loopback | Não constrói `PopmundoApp` / `InAppPopmundoRuntime`; não carrega o jogo |
 | `packages/popmundo_utils/test_live` | Suite **opt-in** contra o site real (credenciais em env); `dart test` **não** a executa | Não substitui o tier fake; não é CI |
@@ -238,7 +237,7 @@ DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
 | Risco/acoplamento | Local | Impacto | Mitigação existente |
 | ------------------ | ----- | ------- | -------------------- |
 | iOS sem `shouldInterceptRequest` nativo | `web_settings.dart` / widget | Stream de assets nativos incompleto no iOS | Hooks JS cobrem fetch/XHR/console |
-| `app.dart` importa `CookieManager`/`WebUri` | `apps/popmundo_app/lib/app.dart` | Shell acoplada ao plugin, fora do adapter | Documentado; overlay só lê name+domain |
+| `cookie_watcher.dart` importa `CookieManager`/`WebUri` | `apps/popmundo_app/lib/cookie_watcher.dart` | Shell acoplada ao plugin, fora do adapter | Documentado; overlay só lê name+domain |
 | `app` também importa `url_launcher` | `gm_host_handler.dart` | Segunda call site além de `popmundo_webview` | `GM.openInTab` vive no app porque usa clipboard/UI |
 | Cookie sync nativo ↔ WebView | `InAppCookieSink` | Sessão "quase" válida se host-only ganhar `domain=` | Testes de `GameCookie` + `gameCookieFromInApp`; write omite `domain` quando o servidor não enviou; read trata domain=host como host-only |
 | Cliente HTTP fora do browser | `AuthSession` | Servidor pode distinguir o handshake da WebView | Escolha explícita (AD-018); UA copiado da WebView |
@@ -252,7 +251,6 @@ DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
 | `test_live/` vs. política "sem e2e live" | `packages/popmundo_utils/test_live` | Suite opt-in **acessa** popmundo.com com credenciais de env; o `dart test` padrão **não** a inclui (`dart_test.yaml` globa só `test/`) | Não é CI; `.env` / `.envexample` não devem ser commitados com segredos. **Hipótese:** `.envexample` usa `TEST_*` enquanto o código lê `POPMUNDO_*` — nomes divergem |
 | `gm-host-apis` sem `validation.md` | `.specs/features/gm-host-apis/` | Só `spec.md` + `context.md`; Handoff pede smoke em device com `.user.js` real | Código e testes unitários existem; Verifier da feature não está no repo |
 | Spec Auto Login (Goals) ainda cita TimedFetch | `.specs/features/auto-login/spec.md` | Drift spec vs. AD-018 / controller | Resolvido no heartbeat: Goals citam `AuthSession` |
-| `PopmundoScope` sem call sites | `app.dart` | InheritedWidget morto | Decisão de manter o menu agnóstico do runtime |
 | `packages/popmundo_utils/example/` | example | `main` só imprime `HostTracker.defaultOrigin` | Boilerplate; não é ponto de entrada do produto |
 | Cache TimedFetch só em memória | `timed_fetch.dart` | Perde ao matar o processo | AD-006, aceito |
 | Retenção do processo Android / iOS suspende JS | keepalive | Force-stop e reboot encerram manutenção; iOS suspende | specialUse com subtype declarado; overlay mostra status |
@@ -268,7 +266,7 @@ DebugOverlay botão 'debug-send-notification' → _sendTestNotification()
 5. **Chamada auxiliar same-origin ao jogo passa por TimedFetch (750 ms).** Handshake de login é a exceção documentada (AD-018) e replica o cooldown em `AuthSession`.
 6. **Gameplay da extensão original (mass interact, call friends, etc.) continua fora de escopo** até nova spec.
 7. **GPL-3.0-or-later**; não copiar `chrome.*`.
-8. **Item de menu nativo = entrada em `buildAppMenuItems`.** Comandos GM são dinâmicos (`GmMenuRegistry`), limpos na navegação — não misturar os dois.
+8. **Item de menu nativo = função `AppMenuItem` na pasta da própria feature + uma linha na lista `items:` em `app.dart`.** `buildAppMenuItems` só ordena e aplica o gate do item de debug. Comandos GM são dinâmicos (`GmMenuRegistry`), limpos na navegação — não misturar os dois.
 9. **UserScript: nunca `removeAllUserScripts`.** Só `userscript:<id>`.
 10. **String de UI de release no app passa pelos catálogos EN/PT.** Overlay de debug permanece em inglês.
 11. **Patrol: um `patrolTest` por arquivo; harness mínimo; analyze antes do device.**

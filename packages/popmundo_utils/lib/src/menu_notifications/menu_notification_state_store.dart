@@ -1,4 +1,4 @@
-import '../storage.dart';
+import '../core/storage.dart';
 
 /// Dedup state for the menu-notifications watcher: the last observed
 /// `GetMenuNotificationCount` value plus the set of UIDs already notified.

@@ -206,6 +206,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: apps/popmundo_app/android/app/build.gradle.kts checkDebugAarMetadata (android-gradle)
 - last seen: 2026-08-20T00:53:47Z
 
+### L-034 — Extracting a class out of a widget does not give it coverage: CookieWatcher was created by this feature's own design doc and shipped with no test file at all — when adding a file, grep test/ for its name before calling the task done.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `apps/popmundo_app` · harmful: 0
+- features: composition-root-scaling
+- evidence: apps/popmundo_app/lib/cookie_watcher.dart:33 (apps/popmundo_app)
+- last seen: 2026-08-20T16:14:30Z
+
+### L-035 — A post-dispose race test that uses MemoryKeyValueStore never runs the race — the read always resolves before dispose(); gate the store with a Completer so the read lands after dispose, or the guard under test is never exercised.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `apps/popmundo_app` · harmful: 0
+- features: composition-root-scaling
+- evidence: apps/popmundo_app/test/app_wiring_test.dart CRS-11 (apps/popmundo_app)
+- last seen: 2026-08-20T16:14:30Z
+
+### L-036 — expectLater(future, completes) cannot prove a post-dispose guard in Dart: ValueNotifier's setter assigns _value before notifyListeners() throws, and a broad catch swallows the assertion — assert the observable value instead.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `apps/popmundo_app` · harmful: 0
+- features: composition-root-scaling
+- evidence: apps/popmundo_app/test/cookie_watcher_test.dart CRS-11 (apps/popmundo_app)
+- last seen: 2026-08-20T16:14:30Z
+
+### L-037 — Do not write a LOC target into an AC before the code exists — CRS-03's 180-line estimate predated build() and ignored the ~55 lines ValueListenableBuilder wrappers cost; state the structural requirement (zero collaborators in the State) and leave LOC as a reported metric.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `.specs` · harmful: 0
+- features: composition-root-scaling
+- evidence: CRS-03 (.specs)
+- last seen: 2026-08-20T16:14:30Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

@@ -29,7 +29,7 @@ Responda em ptbr.
 - `packages/popmundo_utils/lib/src/userscript/gm_connect_policy.dart` — allowlist `@connect` + teto de bytes de resource.
 - `packages/popmundo_utils/lib/src/userscript/userscript_parser.dart` — **só** a constante `_allowedGrants` (o resto do parser não é seu).
 - `packages/popmundo_utils/lib/src/userscript/userscript_importer.dart` — **só** download/persistência de `@resource` (`httpGetBytes`, `resourceStore`).
-- `packages/popmundo_utils/lib/src/events.dart` — **só** `GmValueEvent`, `GmCallEvent`, streams `gmValue`/`gmCall`.
+- `packages/popmundo_utils/lib/src/core/events.dart` — **só** `GmValueEvent`, `GmCallEvent`, streams `gmValue`/`gmCall`.
 - `packages/popmundo_webview/lib/src/userscript_injector.dart` — splice do shim em `toUserScript`, parâmetro `valueStore` em `mergeInitial`/`sync`, e `refreshGmSnapshots`.
 - `packages/popmundo_webview/lib/src/in_app_runtime.dart` — **só** o wrapper `refreshGmSnapshots`.
 - `packages/popmundo_webview/lib/src/js_bridge.dart` — **só** `case 'gmValue':` e `case 'gm':`.

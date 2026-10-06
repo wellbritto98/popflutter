@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import '../events.dart';
-import '../popmundo_runtime.dart';
+import '../core/events.dart';
+import '../core/popmundo_runtime.dart';
 import 'menu_notification.dart';
 import 'menu_notification_state_store.dart';
 import 'menu_notifications_service.dart';

@@ -1,4 +1,4 @@
-import '../host_tracker.dart';
+import '../core/host_tracker.dart';
 
 /// Runtime allowlist for `GM.xmlHttpRequest` to non-Popmundo hosts.
 ///

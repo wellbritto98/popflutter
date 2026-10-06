@@ -8,14 +8,16 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 
 ## Responsabilidade principal
 
-**Composition root** — único lugar que instancia `InAppPopmundoRuntime`, `SharedPreferencesStore`, `FlutterSecureSecretStore` e `BackgroundKeepalive`. Hospeda UI nativa; parsing/throttle ficam nos packages.
+**Composition root** — `main.dart` monta um único `AppWiring` (único lugar que instancia `InAppPopmundoRuntime`, `SharedPreferencesStore`, `FlutterSecureSecretStore` e `BackgroundKeepalive`) e o entrega para a UI. Hospeda UI nativa; parsing/throttle ficam nos packages.
 
 ## Funcionalidades existentes
 
 | Área | Arquivos | Função |
 | ---- | -------- | ------ |
-| Boot | `lib/main.dart` | `EasyLocalization`, `initCommunicationPort`, prefs, keepalive, `runApp` |
-| Shell | `lib/app.dart`, `app_shell.dart` | `MaterialApp`, `PopmundoHome`, `PopmundoScope`, wiring Auto Login/GM/catalog |
+| Boot | `lib/main.dart` | `EasyLocalization`, `initCommunicationPort`, prefs, keepalive, monta `AppWiring`, `runApp` |
+| Composition | `lib/app_wiring.dart` | `AppWiring` — dono dos 15 colaboradores não-UI (catalog, gmValueStore, gmResourceStore, gmMenuRegistry, gmNotificationController, settingsStore, timedFetch, importer, gmHostHandler, cookieJar, autoLogin, menuNotifications{Service,StateStore,Watcher,Bridge}) + `start()`/`dispose()`/`applyUserScripts()`/`connectHeadersFor()`, `ValueNotifier<UserscriptsState>` e `CookieWatcher` |
+| Cookies (debug) | `lib/cookie_watcher.dart` | `CookieWatcher` — único import direto de `flutter_inappwebview` no app; lê `CookieManager` para o overlay |
+| Shell | `lib/app.dart`, `app_shell.dart` | `MaterialApp`, `PopmundoHome` (lifecycle observer, subscription de `autoLoginStatus`, navegação/diálogos, visibilidade do painel de debug, `build`), wiring recebido via `AppWiring` |
 | Menu | `lib/menu/` | [README](lib/menu/README.md) |
 | Debug | `lib/debug_overlay.dart` | Painel controlado; cookies name@domain; status do FGS |
 | Prefs | `lib/prefs_store.dart` | `KeyValueStore` via `shared_preferences` |
@@ -47,26 +49,27 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 
 ## Fluxos importantes
 
-- **Boot:** prefs + EasyLocalization + porta FGS antes do primeiro frame. `PopmundoHome` espera `_bootstrapReady` (lista do catálogo) antes de montar a WebView.
-- **Auto Login:** `autoLogin.start()` no `initState`; snackbars via `scaffoldMessengerKey`. Heartbeat 60 s usa o mesmo `InAppCookieSink` como source.
-- **UserScripts:** `syncUserScripts` após import/toggle; delete limpa GM values/resources.
-- **Navegação:** atualiza cookies do overlay e `gmMenuRegistry.clear()`.
-- **Lifecycle:** `didChangeAppLifecycleState` → keepalive.
+- **Boot:** prefs + EasyLocalization + porta FGS antes do primeiro frame. `AppWiring.start()` (chamado em `PopmundoHome.initState`) dispara `_bootstrap()`, que publica a lista do catálogo em `userscripts`; a WebView só monta quando `scripts.ready`.
+- **Auto Login:** `AppWiring.start()` chama `autoLogin.start()`; a `_PopmundoHomeState` assina `wiring.autoLoginStatus` no `initState` e mostra os snackbars via `scaffoldMessengerKey` (precisa de `BuildContext` para colorir o erro, por isso fica no shell). Heartbeat 60 s usa o mesmo `InAppCookieSink` (`cookieJar` em `AppWiring`) como source.
+- **UserScripts:** `AppWiring.applyUserScripts` chama `syncUserScripts` após import/toggle; delete limpa GM values/resources.
+- **Navegação:** `AppWiring._onNavigation` limpa `gmMenuRegistry` e chama `cookieWatcher.refresh()`.
+- **Lifecycle:** `didChangeAppLifecycleState` (no shell) → `wiring.keepalive?.onLifecycle`.
 - **Notificação de teste:** `LocalNotificationsService().initialize()` roda antes do `runApp`; botão `debug-send-notification` pede permissão e mostra uma notificação fixa (id/canal fixos, negação/erro nunca derrubam o painel).
-- **Notificações do jogo:** `main.dart` chama `requestPermission()` logo após `initialize()` (não depende mais do painel de debug); `_PopmundoHomeState` inicia `menuNotificationsWatcher`/`menuNotificationsBridge` no `initState` e os finaliza no `dispose`. Cada lote novo de `MenuNotificationsWatcher` resolve `Utils.getMyName()` uma vez e chama `showNotification` por item (id = hash do `UID`, `Url` guardado como `payload` para uso futuro — tap ainda não navega).
+- **Notificações do jogo:** `main.dart` chama `requestPermission()` logo após `initialize()` (não depende mais do painel de debug); `AppWiring.start()`/`dispose()` iniciam e finalizam `menuNotificationsWatcher`/`menuNotificationsBridge`. Cada lote novo de `MenuNotificationsWatcher` resolve `Utils.getMyName()` uma vez e chama `showNotification` por item (id = hash do `UID`, `Url` guardado como `payload` para uso futuro — tap ainda não navega).
 
 ## Arquivos críticos
 
 - `lib/main.dart` — composition + FGS port (Patrol precisa recriar isso no harness).
-- `lib/app.dart` — acoplamento `CookieManager`; wiring de todas as features de shell.
-- `lib/menu/app_menu_registry.dart` — extensão de itens nativos.
+- `lib/app_wiring.dart` — dono de todos os colaboradores não-UI e seu lifecycle (`start`/`dispose`); mudar aqui afeta toda feature da shell.
+- `lib/cookie_watcher.dart` — acoplamento `CookieManager`/`WebUri`.
+- `lib/app.dart` — `PopmundoApp`/`PopmundoHome`; monta o `items:` da sidebar a partir dos `AppMenuItem` de cada feature.
+- `lib/menu/app_menu_registry.dart` — ordenação + gate do item de debug.
 - Manifest / Info.plist — FGS e ATS.
 
 ## Observações técnicas e débitos
 
-- `app.dart` importa `flutter_inappwebview` direto (cookies do overlay) — exceção à regra “só o adapter fala com o plugin”.
+- `cookie_watcher.dart` importa `flutter_inappwebview` direto (cookies do overlay) — exceção à regra “só o adapter fala com o plugin”; é o único arquivo do app com esse import.
 - `url_launcher` também no app (`GmHostHandler`), não só no webview.
-- `PopmundoScope.of` **não tem call sites**.
 - `DebugOverlay` assina network/console sem cancelar `StreamSubscription` no `dispose` (débito já registrado no spec do sidebar).
 - Overlay e exceções dos packages permanecem em inglês (AD-014).
 - Testes widget/unit em `test/`. Device: `integration_test/` (nunca `PopmundoApp`).

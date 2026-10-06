@@ -1,5 +1,5 @@
-import '../events.dart';
-import '../storage.dart';
+import '../core/events.dart';
+import '../core/storage.dart';
 
 /// Persists per-userscript `GM_setValue`/`GM_getValue` data (USM GM-polyfill).
 ///

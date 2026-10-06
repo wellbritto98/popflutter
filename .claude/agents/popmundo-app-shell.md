@@ -16,7 +16,9 @@ Responda em ptbr.
 ## Arquivos que você dono
 
 - `apps/popmundo_app/lib/main.dart`
-- `apps/popmundo_app/lib/app.dart` (`PopmundoApp`, `PopmundoHome`, `PopmundoScope`)
+- `apps/popmundo_app/lib/app.dart` (`PopmundoApp`, `PopmundoHome`)
+- `apps/popmundo_app/lib/app_wiring.dart` (`AppWiring` — dono dos colaboradores não-UI e seu lifecycle)
+- `apps/popmundo_app/lib/cookie_watcher.dart` (`CookieWatcher` — único import direto de `flutter_inappwebview` no app)
 - `apps/popmundo_app/lib/debug_overlay.dart`
 - `apps/popmundo_app/lib/prefs_store.dart` (`SharedPreferencesStore` implementa `KeyValueStore`)
 - `apps/popmundo_app/android/app/src/main/AndroidManifest.xml`

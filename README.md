@@ -43,7 +43,7 @@ Android mantém a sessão por FGS specialUse e auto login HTTP nativo, com notif
 
 ## Overlay e menu
 
-Um FAB (`menu-toggle`) abre o sidebar. Itens fixos vêm de `buildAppMenuItems` (Auto Login, Userscripts, Language; Debug só em debug). Cookies no overlay: **nome@domínio**, nunca o valor.
+Um FAB (`menu-toggle`) abre o sidebar. Cada feature define o seu próprio `AppMenuItem` na própria pasta (Auto Login, Userscripts, Language; Debug só em debug); `buildAppMenuItems` só ordena a lista e anexa o item de debug por último quando o gate permite. Cookies no overlay: **nome@domínio**, nunca o valor.
 
 ## Estender
 
@@ -55,7 +55,7 @@ final id = await Utils(runtime, timed).getMyID();
 
 Scoring **não** roda no load. Storage: `KeyValueStore` (`MemoryKeyValueStore` nos testes, `SharedPreferencesStore` no app). Senha de Auto Login: `SecretStore` / `flutter_secure_storage`.
 
-Novo item de menu nativo = uma entrada em `buildAppMenuItems`. Nova regra de negócio = `popmundo_utils` + teste fake. Depois de mudar comportamento documentado, atualize `docs/` e o README do módulo (`CLAUDE.md`, Documentation maintenance).
+Novo item de menu nativo = uma função `<feature>MenuItem()` na pasta da feature + uma linha na lista `items:` do único call site em `app.dart`. Nova regra de negócio = `popmundo_utils` + teste fake. Depois de mudar comportamento documentado, atualize `docs/` e o README do módulo (`CLAUDE.md`, Documentation maintenance).
 
 ## Licença
 

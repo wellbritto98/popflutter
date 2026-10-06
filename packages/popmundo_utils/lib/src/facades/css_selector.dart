@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'popmundo_runtime.dart';
+import '../core/popmundo_runtime.dart';
 
 class CssSelectorHelper {
   CssSelectorHelper(this.runtime, this.selector);

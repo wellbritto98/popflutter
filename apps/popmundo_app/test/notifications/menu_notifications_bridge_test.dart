@@ -19,6 +19,33 @@ NetworkEvent _countEvent(int count) => NetworkEvent(
 String _notificationsResponse(List<Map<String, Object?>> items) =>
     jsonEncode({'d': jsonEncode(items)});
 
+/// `Utils.getMyName()` reads the character page over [TimedFetch] and parses
+/// the HTML (it no longer calls `evaluate`), so the fake has to serve that
+/// page too. Same selectors as `packages/popmundo_utils/test/utils_test.dart`.
+String _characterHtml(String name) =>
+    '''
+<html><body>
+<div class="idHolder">42</div>
+<div id="ppm-content">
+  <div class="box ofauto charPresBox"><h2>$name</h2></div>
+</div>
+</body></html>
+''';
+
+/// One fetch handler serving both endpoints the bridge exercises: the
+/// character page (for `getMyName()`) and `GetMenuNotifications`.
+InPageFetchResult Function(String, Map<String, dynamic>?) _serve(
+  String notificationsBody, {
+  String characterName = 'Ada',
+}) =>
+    (url, options) => InPageFetchResult(
+      ok: true,
+      status: 200,
+      text: url.contains(Utils.characterPath)
+          ? _characterHtml(characterName)
+          : notificationsBody,
+    );
+
 Map<String, Object?> _item(
   String uid, {
   String text = 'Item offer',
@@ -32,6 +59,21 @@ Map<String, Object?> _item(
   'TimeCreated': timeCreated,
   'Url': url,
 };
+
+/// `TimedFetch` caches `METHOD:URL`, so the character page is fetched at most
+/// once no matter how often `getMyName()` is called — counting fetches would
+/// pass even for a once-per-item implementation. Count the calls themselves.
+class _CountingUtils extends Utils {
+  _CountingUtils(super.runtime, super.timedFetch);
+
+  int getMyNameCalls = 0;
+
+  @override
+  Future<String> getMyName() {
+    getMyNameCalls++;
+    return super.getMyName();
+  }
+}
 
 class _Clock {
   DateTime now = DateTime.utc(2026, 1, 1);
@@ -64,9 +106,10 @@ class _Harness {
       service: service,
       stateStore: stateStore,
     );
+    utils = _CountingUtils(runtime, timedFetch);
     bridge = MenuNotificationsBridge(
       watcher: watcher,
-      utils: Utils(runtime, timedFetch),
+      utils: utils,
       notificationService: notificationService,
     );
   }
@@ -78,31 +121,18 @@ class _Harness {
   late final MenuNotificationsService service;
   late final MenuNotificationStateStore stateStore;
   late final MenuNotificationsWatcher watcher;
+  late final _CountingUtils utils;
   late final MenuNotificationsBridge bridge;
 
-  String characterName = 'Ada';
-
-  String responseFor(String url, List<Map<String, Object?>> items) {
-    if (Uri.parse(url).path.startsWith(Utils.characterPath)) {
-      return '<div id="ppm-content"><div class="box ofauto charPresBox">'
-          '<h2>$characterName</h2></div></div>';
-    }
-    return _notificationsResponse(items);
-  }
-
-  int get getMyNameCalls => runtime.fetchCalls
-      .where((c) => Uri.parse(c.url).path.startsWith(Utils.characterPath))
-      .length;
+  int get getMyNameCalls => utils.getMyNameCalls;
 }
 
 void main() {
   test('shows one notification per new item, with title/body/id/payload shape '
       '(MENUNOTIF-06)', () async {
     final h = _Harness();
-    h.runtime.fetchHandler = (url, options) => InPageFetchResult(
-      ok: true,
-      status: 200,
-      text: h.responseFor(url, [
+    h.runtime.fetchHandler = _serve(
+      _notificationsResponse([
         _item(
           'u1',
           text: 'Item offer',
@@ -128,10 +158,8 @@ void main() {
 
   test('getMyName() is resolved once per batch, not once per item', () async {
     final h = _Harness();
-    h.runtime.fetchHandler = (url, options) => InPageFetchResult(
-      ok: true,
-      status: 200,
-      text: h.responseFor(url, [_item('u1'), _item('u2'), _item('u3')]),
+    h.runtime.fetchHandler = _serve(
+      _notificationsResponse([_item('u1'), _item('u2'), _item('u3')]),
     );
     h.watcher.start();
     h.bridge.start();
@@ -147,11 +175,7 @@ void main() {
     'already-notified items do not produce a second call on a repeat batch',
     () async {
       final h = _Harness();
-      h.runtime.fetchHandler = (url, options) => InPageFetchResult(
-        ok: true,
-        status: 200,
-        text: h.responseFor(url, [_item('u1')]),
-      );
+      h.runtime.fetchHandler = _serve(_notificationsResponse([_item('u1')]));
       h.watcher.start();
       h.bridge.start();
 
@@ -161,10 +185,8 @@ void main() {
 
       // Count changes again, but the same item ('u1') is still the only one
       // outstanding — already in notifiedUids, so it must not be re-shown.
-      h.runtime.fetchHandler = (url, options) => InPageFetchResult(
-        ok: true,
-        status: 200,
-        text: h.responseFor(url, [_item('u1'), _item('u2')]),
+      h.runtime.fetchHandler = _serve(
+        _notificationsResponse([_item('u1'), _item('u2')]),
       );
       h.runtime.events.emitNetwork(_countEvent(2));
       await Future<void>.delayed(Duration.zero);
@@ -186,11 +208,7 @@ void main() {
 
   test('dispose() stops delivering further batches', () async {
     final h = _Harness();
-    h.runtime.fetchHandler = (url, options) => InPageFetchResult(
-      ok: true,
-      status: 200,
-      text: h.responseFor(url, [_item('u1')]),
-    );
+    h.runtime.fetchHandler = _serve(_notificationsResponse([_item('u1')]));
     h.watcher.start();
     h.bridge.start();
 

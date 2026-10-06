@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import '../popmundo_runtime.dart';
-import '../timed_fetch.dart';
+import '../core/popmundo_runtime.dart';
+import '../core/timed_fetch.dart';
 import 'menu_notification.dart';
 
 /// Fetches and parses the game's own `GetMenuNotifications` webservice.

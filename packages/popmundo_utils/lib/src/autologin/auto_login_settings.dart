@@ -1,4 +1,4 @@
-import '../storage.dart';
+import '../core/storage.dart';
 
 class AutoLoginSettings {
   const AutoLoginSettings({
