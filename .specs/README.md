@@ -14,14 +14,14 @@ Pipeline Specify → Design → Tasks → Execute. Não é código de runtime. A
 
 | Caminho | Função |
 | ------- | ------ |
-| `STATE.md` | Decisions AD-001…AD-022 + Handoff |
+| `STATE.md` | Decisions AD-001…AD-023 + Handoff |
 | `LESSONS.md` / `lessons.json` | Lições; **não** editar `LESSONS.md` à mão — `scripts/lessons.py` da skill |
 | `features/popmundo-wrapper/` | Fundação WebView / utils |
 | `features/app-sidebar-menu/` | Drawer + registro |
 | `features/userscript-manager/` | Catálogo + injector |
 | `features/auto-login/` | Relog silencioso (código = AD-018; handshake nativo AuthSession) |
 | features/service-scheduler/ | Regras locais persistentes Android; intervalos, dias da semana, skip de perdidas e AD-021 |
-| features/scheduled-game-actions/ | Draft de usarItem/pagarEquipe; mapeamento no navegador e proposta HTTP isolada aguardando revisão |
+| features/scheduled-game-actions/ | UsarItem/pagarEquipe aprovado; execução HTTP isolada, personagem por regra, implementação em andamento (AD-023) |
 | features/background-session-reliability/ | Sessão contínua specialUse, UA limitado e notificações de Auto Login; AD-020 |
 | `features/background-keepalive/` | FGS |
 | `features/app-i18n/` | EN/PT |

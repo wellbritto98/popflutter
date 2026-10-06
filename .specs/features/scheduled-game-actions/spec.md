@@ -55,7 +55,7 @@ SGA-04 — Common form and outcome helpers
 1. WHEN preparing a game POST, THEN the helper SHALL read a fresh #aspnetForm and serialize the entire set of successful controls, preserving repeated names and current hidden state, excluding disabled/unchecked controls and unrelated submit/image buttons.
 2. WHEN applying action overrides, THEN it SHALL clear __EVENTTARGET/__EVENTARGUMENT, use the chosen control's name attribute, preserve the row's runtime hidItemIDstring, and submit only the intended gameplay button. Empty/missing forms or controls SHALL prevent gameplay.
 3. WHEN a login, route or form validation fails, THEN the executor SHALL expose only a bounded non-secret code; it SHALL NOT persist or publish the raw HTTP exception, query string, cookie, payload or authenticated document.
-4. WHEN checking gameplay outcome, THEN it SHALL use a fresh server success/error signal from the same isolated session. A notification check SHALL clear prior selection notifications before the gameplay POST, then read the current outcome using the known GetPageNotifications protocol. HTTP 200 or redirect completion alone SHALL NOT imply success.
+4. WHEN checking gameplay outcome, THEN it SHALL use a fresh server success/error signal from the same isolated session. A notification check SHALL establish a neutral baseline before the gameplay POST in at most two reads, then read the current outcome using the known GetPageNotifications protocol. HTTP 200 or redirect completion alone SHALL NOT imply success.
 
 ### Use one item
 

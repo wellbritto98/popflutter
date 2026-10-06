@@ -102,3 +102,9 @@ Knowledge chain followed: current source, project docs/ADs, installed package, o
 Default pure-Dart fake transport/form tests: exact full payload, malformed identities/routes, host-only cookies, no visible ports, item-use versus tune, bonus choice/budget, uncertain POST, notification order and real cancellation model. Widget tests: editor/catalog options, existing local-rule roundtrip, EN/PT text, failure recovery. Android Patrol: one patrolTest per file, loopback server + real Keystore/preferences/notification APIs in FGS secondary engine with no Activity; repeat future occurrence after restart/reboot without replay. Fresh independent verifier plus behavior fault sensor mandatory.
 
 Live evidence is separate: browser DOM mapping already performed. A read-only independent-login/character-isolation check can follow using opt-in native transport. Any item-use or bonus-delivery live test must name the chosen item/bonus amount before submission; it is not a default test gate. No real account credential or runtime form token enters committed fixtures.
+
+## Approved implementation precisions
+
+Fresh browser GET /World/Popmundo.aspx/Character verified a unique .charPresBox .idHolder with the mapped character ID; its parent is .avatar.idTrigger. Verify the scoped profile marker, never the first global idHolder.
+
+No source proves GetPageNotifications drains old entries. Existing notifications_test.dart Status0/Text'n' fixture establishes that nonempty normal text can be neutral. Preflight must establish only neutral Status0/list-empty baseline in at most two reads; unknown/malformed/non-neutral baseline prevents gameplay. Mixed outcomes after POST are uncertain. This corrects any interpretation that the helper promises automatic clearing.
