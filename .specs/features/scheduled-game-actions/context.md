@@ -1,27 +1,22 @@
 # Scheduled Game Actions — Context
 
-Gathered: 2026-10-05. Status: user review pending.
+Gathered: 2026-10-05. Status: Approved.
 
-## User decisions already given
+## User decisions
 
-- Extend the working scheduler, starting with usarItem and pagarEquipe.
-- Translate the supplied Puppeteer/webscraping functions into requests, sharing repeated helpers.
-- Protect the visible game screen from automated character switching.
-- Investigate a second hidden WebView; native HTTP in the scheduler is explicitly acceptable if it is unsuitable.
-- Submit a local notification every time a scheduled game action starts.
-- Use the embedded browser for live mapping. Test credentials are private session input and never part of these files.
-- Initial mapping target: Troy Drinkwater, artist black panties.
-- Prior scheduler decisions persist: work in background and after reboot; skip missed occurrences without replay.
-- User explains that an independent second browser login does not end the first session. This is the intended isolation model; a second WebView sharing the first jar does not reproduce it.
+- Extend the working scheduler with usarItem and pagarEquipe, translating supplied Puppeteer functions into requests with shared helpers.
+- Protect the visible session from automated character changes; native HTTP in scheduler is acceptable.
+- Use embedded browser for mapping. Test credentials are private session input, never files/logs.
+- Submit a local notification before each scheduled game execution.
+- Initial mapping: Troy Drinkwater / black panties. No gameplay POST submitted.
+- Background and reboot scheduling continue; skip missed slots without replay.
+- Independent second login coexistence is user-reported. Shared WebView cookies cannot reproduce independent jars.
+- User explicitly confirmed proposed isolation/configuration and added: retain which character belongs to each scheduled action. Rule stores account + positive character ID + name; ID determines execution.
 
-## Clarification in progress
+## Approved defaults
 
-One async question was sent: select item by exact name/first usable unit, or by a specific instance ID. No answer has been received at the time this draft is written. The spec transparently proposes exact name/first usable unit for replenishable consumables; revise if the user chooses otherwise.
+Private native sender/login and empty jar per transaction. Saved Auto Login credentials read freshly; visible session never seeded/updated. Exact normalized item name, first eligible row, one use per occurrence (proposed item policy accepted with feature confirmation). Explicit offered crew bonus/artist and cost cap at selected quote, no automatic20. Mandatory start notice; unavailable/uncertain distinct; no retry after possibly applied POST. Details and limits in design.md/spec.md.
 
-## Proposed defaults for review
+## Execution
 
-Use native HTTP with its own login and empty jar, not a hidden shared-cookie WebView. Reuse saved Auto Login credentials while binding each rule to its account and target character. Preserve artist identity, require explicit crew bonus and cap current price at the selected quote. One item use per occurrence. Abort gameplay if mandatory start notification cannot be submitted. Surface unavailable/uncertain separately; never retry a possibly applied POST. These defaults are not recorded as approved decisions yet.
-
-## Scope exclusions
-
-Remaining supplied functions and multi-account profile management are future features. No bonus payment or item use has been submitted during mapping. Production implementation, architectural AD amendment, tasks and independent verifier await the concrete design review.
+Scope/design approval received; tools already requested: tlc-spec-driven, embedded browser and Android/code debugging. Routine implementation choices delegated to specialists as required by CLAUDE.md. Eight atomic tasks; independent verifier automatic after implementation. Remaining supplied functions and multi-account profiles stay future scope.

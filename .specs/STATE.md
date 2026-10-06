@@ -193,14 +193,21 @@
 - **Date**: 2026-08-20
 - **Status**: active
 
+### AD-023
+
+- **Decision**: Scheduled usarItem/payCrew run in existing FGS engine through a separate native GameActionsService, empty jar and independent login per serial transaction. Rules bind account and character ID/name; identity verified before gameplay. No visible CookieSource/Sink/runtime/HostTracker access. Start notification follows durable claim and precedes HTTP; possibly applied POST never retries; unavailable/failed/uncertain outcomes persist.
+- **Reason**: User approved game action scheduling and HTTP alternative, explicitly requires retaining character per rule. Shared WebView cookie jar changes main session; renderer cannot guarantee background execution.
+- **Trade-off**: Additional native logins and best-effort Android scheduling; strict120s transaction/20s request/2MiB bounds,750ms cooldown and cancellation. Cash bonus and item effects require explicit configured rules. Current server state revalidated; price cap prevents higher spend. Device secondary-engine proof mandatory.
+- **Scope**: utils game_actions/scheduler, app scheduler/RPC/notifications/editor/background, Android fixture and maintenance docs.
+- **Date**: 2026-10-05.
+- **Status**: active; amends AD-021 restriction excluding auth/game HTTP from FGS for these two isolated actions. AD-018/019 visible login/heartbeat and AD-022 composition remain unchanged.
+
 ## Handoff
 
 - **Feature**: scheduled-game-actions / .specs/features/scheduled-game-actions.
-- **Phase / Task**: Specify; concrete spec and HTTP isolation proposal await user review. No production implementation started.
-- **Completed**: read supplied Puppeteer script and current architecture; domain/utils/shell specialist research; embedded-browser login, Troy selection, inventory and black panties crew DOM mapping; recorded research.md/spec.md/context.md. No item use or crew bonus was submitted.
-- **In-progress**: one async clarification asks exact item name/first usable unit versus a specific item ID. Draft proposes name/first usable unit and explicitly marks the decision pending.
-- **Next step**: user reviews spec and transport proposal; then close item policy, design/tasks, explicitly amend AD-021 for private HTTP in FGS, implement via specialists and run independent verifier.
-- **Blockers**: required spec/design approval from invoked skills; no technical blocker yet. Independent second-login coexistence has not been verified live. No raw credentials, cookies or authenticated HTML retained in planning files.
-- **Prior feature**: service-scheduler complete; independent PASS, production emulator release installed, physical handset/overnight unmeasured. Source baseline now 5ce2153 incorporates AD-022 AppWiring/composition-root-scaling; no prior behavior changed by this draft.
-- **Uncommitted files**: none after the planning commit; production files untouched.
-- **Branch**: codex/scheduled-game-actions.
+- **Phase / Task**: Execute T1; approved spec/design/tasks; branch codex/scheduled-game-actions.
+- **Completed**: supplied script/domain/browser mapping; user approval and char binding; AD-023; baseline core277/WebView31/app164 passed. No gameplay POST submitted.
+- **In-progress**: typed action/config codecs; specialists execute T1..T8 sequentially, one SDK job at a time.
+- **Next step**: core T1..T5, shell T6..T7, device fixture T8, fresh independent verifier; update task evidence and handoff after gates.
+- **Blockers**: none. Live independent-login coexistence remains unmeasured; default device fixture uses loopback, no game host. No credentials/cookies/form state retained.
+- **Prior feature**: service-scheduler complete; production emulator release/data preserved. Physical handset/overnight unmeasured.

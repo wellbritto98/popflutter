@@ -1,6 +1,6 @@
 # Scheduled Game Actions — Specification
 
-Status: Draft for user review; implementation not started.
+Status: Approved; implementation in progress. User confirmed isolated HTTP and character binding on 2026-10-05.
 Date: 2026-10-05 (America/Sao_Paulo).
 Scope: Complex; Android scheduler, isolated authentication, game forms and native UI.
 Baseline: 5ce2153; AD-021 scheduler and AD-022 AppWiring.
@@ -18,7 +18,7 @@ Included: service selection in the existing scheduler; discovery of owned charac
 
 Excluded: all other gameplay functions in the supplied script; arbitrary URLs/JS; multiple accounts/profiles; bulk item use; instrument tuning; a hidden WebView or a new Android process; changes to the visible Auto Login behavior; iOS continuous scheduling; recovery/replay of missed or uncertain effects.
 
-The user request explicitly expands the historical gameplay exclusion for these two actions. Broader gameplay exclusions remain in place. A future architectural decision must explicitly amend AD-021's auth/game-HTTP exclusion before execution; it must preserve its single writer, claims, notification IDs and recurrence semantics.
+The user request explicitly expands the historical gameplay exclusion for these two actions. Broader gameplay exclusions remain in place. AD-023 explicitly amends AD-021's auth/game-HTTP exclusion; it must preserve its single writer, claims, notification IDs and recurrence semantics.
 
 ## P1 stories and acceptance criteria
 
@@ -62,7 +62,7 @@ SGA-04 — Common form and outcome helpers
 SGA-05 — usarItem
 
 1. WHEN an eligible occurrence executes, THEN it SHALL GET /World/Popmundo.aspx/Character/Items/ on its authenticated host and match only item links inside #checkedlist rows by exact case/whitespace-normalized name, never substring matching.
-2. WHEN multiple eligible rows have that exact name, THEN the proposed default SHALL use the first eligible row in document order. The user can choose a specific-instance policy before approval; context.md records the pending selection question.
+2. WHEN multiple eligible rows have that exact name, THEN it SHALL use the first eligible row in document order. User confirmation accepted this proposed default; each occurrence uses only one item.
 3. WHEN the row contains input[type=image], THEN only an enabled button whose src pathname ends in /Item_Use.png SHALL be usable. Item_Tune.png, wearable buttons, unrelated images and missing buttons SHALL NOT be executed, even if named btnUse.
 4. WHEN submitting use, THEN the entire fresh form plus <use-button-name>.x=1 and <use-button-name>.y=1 SHALL be posted once. All hidItemIDstring values remain those returned in the current document; none are persisted for later reuse.
 5. WHEN the named item is absent or no eligible use row exists, THEN the occurrence SHALL be marked unavailable with zero gameplay POSTs; future recurrence remains enabled unless the user pauses it.
@@ -161,3 +161,9 @@ Coverage: 10 requirements; task mapping follows approved design. No implementati
 - [ ] Start notice precedes requests; results never infer gameplay success from HTTP 200 alone.
 - [ ] Timeout/restart cannot duplicate uncertain item use or payment.
 - [ ] Secondary-engine Android loopback proof and independent verification pass.
+
+## Approved precision notes
+
+- Character ID is authoritative; saved display name labels the action. Owned selection must be unique in its character box, then verified against a fresh scoped profile marker before gameplay.
+- Minor currency units are cents of M$: observed 2.250,00 M$ = 225000. Reject ambiguous unsupported numeric grammar.
+- Notification preflight must establish a neutral baseline in at most two reads, without assuming the endpoint drains previous notifications. Failed/non-neutral preflight prevents gameplay. Empty/malformed/unknown or mixed success/error outcome after a possibly sent POST is uncertain and never retried.
