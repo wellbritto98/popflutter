@@ -50,6 +50,24 @@ String _executionError(String? code) => switch (code) {
   'zoneUnavailable' => 'scheduler.zoneUnavailable'.tr(),
   _ => 'scheduler.notificationFailed'.tr(),
 };
+String actionSummary(ScheduledAction action) {
+  if (action is UseItemAction) {
+    return 'scheduler.cardItem'.tr(
+      args: [action.character.name, action.itemName],
+    );
+  }
+  if (action is PayCrewAction) {
+    return 'scheduler.cardCrew'.tr(
+      args: [
+        action.character.name,
+        action.artistName,
+        action.bonusLevel.toString(),
+      ],
+    );
+  }
+  return 'scheduler.localNotification'.tr();
+}
+
 String resultLabel(ScheduleResult result) => switch (result.status) {
   ScheduleResultStatus.neverExecuted => 'scheduler.never'.tr(),
   ScheduleResultStatus.submitted => 'scheduler.submitted'.tr(),

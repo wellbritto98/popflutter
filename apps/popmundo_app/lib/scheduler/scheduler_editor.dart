@@ -1,20 +1,27 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:popmundo_utils/popmundo_utils.dart';
 
 import 'scheduler_client.dart';
+import 'scheduler_game_fields.dart';
 import 'scheduler_labels.dart';
 import 'scheduler_recurrence_fields.dart';
+
+enum _Service { notification, item, crew }
 
 class SchedulerEditor extends StatefulWidget {
   const SchedulerEditor({
     super.key,
     required this.api,
     required this.ensurePermission,
+    this.discovery,
     this.rule,
     this.onSaved,
   });
   final SchedulerApi api;
+  final GameActionsApi? discovery;
   final Future<bool> Function() ensurePermission;
   final ScheduledRule? rule;
   final void Function(SchedulerSnapshot)? onSaved;
@@ -31,6 +38,15 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
   late final String _id = widget.rule?.id ?? SchedulerClient.newRuleId();
   ScheduledRule? _rule;
   bool _enabled = true, _weekly = false, _pending = false, _needsRead = false;
+  bool _loadingChoices = false, _targetLocked = false;
+  _Service _service = _Service.notification;
+  GameCharacterCatalog? _catalog;
+  GameCharacter? _character;
+  List<GameItemChoice> _items = const [];
+  GameCrewOptions? _crew;
+  String? _itemName;
+  int? _bonusLevel;
+  int _ticket = 0;
   IntervalUnit _unit = IntervalUnit.minutes;
   Set<int> _days = {};
   TimeOfDay _time = const TimeOfDay(hour: 9, minute: 0);
@@ -48,6 +64,8 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
       _body.text = action.body;
     }
     _enabled = rule.enabled;
+    final game = rule.action;
+    if (game is GameScheduledAction) _restoreSaved(game);
     final recurrence = rule.recurrence;
     if (recurrence is IntervalRecurrence) {
       _quantity.text = recurrence.quantity.toString();
@@ -98,8 +116,184 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
     }
   }
 
+  void _restoreSaved(GameScheduledAction action) {
+    _targetLocked = true;
+    _character = action.character;
+    _service = action is PayCrewAction ? _Service.crew : _Service.item;
+    _itemName = action is UseItemAction ? action.itemName : null;
+    _bonusLevel = action is PayCrewAction ? action.bonusLevel : null;
+  }
+
+  Future<void> _selectService(_Service service) async {
+    final saved = _rule?.action;
+    final sameSaved =
+        (service == _Service.item && saved is UseItemAction) ||
+        (service == _Service.crew && saved is PayCrewAction);
+    setState(() {
+      _service = service;
+      _error = null;
+      if (sameSaved) {
+        _restoreSaved(saved as GameScheduledAction);
+      } else if (service != _Service.notification) {
+        _targetLocked = false;
+        _character = null;
+        _itemName = null;
+        _bonusLevel = null;
+        _items = const [];
+        _crew = null;
+        _catalog = null;
+      }
+    });
+    if (service != _Service.notification && !sameSaved) {
+      await _loadCharacters();
+    }
+  }
+
+  Future<void> _loadCharacters() async {
+    final ticket = ++_ticket;
+    final discovery = widget.discovery;
+    if (discovery == null) {
+      setState(() => _error = 'scheduler.credentialsMissing'.tr());
+      return;
+    }
+    setState(() => _loadingChoices = true);
+    try {
+      final catalog = await discovery.discoverCharacters();
+      if (!mounted || ticket != _ticket) return;
+      setState(() {
+        _catalog = catalog;
+        _loadingChoices = false;
+      });
+    } catch (error) {
+      if (!mounted || ticket != _ticket) return;
+      setState(() {
+        _loadingChoices = false;
+        _error = _discoveryMessage(error);
+      });
+    }
+  }
+
+  Future<void> _selectCharacter(GameCharacter character) async {
+    final ticket = ++_ticket;
+    final discovery = widget.discovery;
+    final catalog = _catalog;
+    if (discovery == null || catalog == null) return;
+    setState(() {
+      _character = character;
+      _itemName = null;
+      _bonusLevel = null;
+      _items = const [];
+      _crew = null;
+      _loadingChoices = true;
+      _error = null;
+    });
+    try {
+      if (_service == _Service.item) {
+        final items = await discovery.discoverItems(
+          boundUsername: catalog.username,
+          character: character,
+        );
+        if (!mounted || ticket != _ticket) return;
+        setState(() {
+          _items = items;
+          _loadingChoices = false;
+        });
+      } else {
+        final crew = await discovery.discoverCrew(
+          boundUsername: catalog.username,
+          character: character,
+        );
+        if (!mounted || ticket != _ticket) return;
+        setState(() {
+          _crew = crew;
+          _loadingChoices = false;
+        });
+      }
+    } catch (error) {
+      if (!mounted || ticket != _ticket) return;
+      setState(() {
+        _loadingChoices = false;
+        _error = _discoveryMessage(error);
+      });
+    }
+  }
+
+  String _discoveryMessage(Object error) {
+    final code = error is SchedulerException ? error.code : '';
+    if (code == 'credentialsMissing' || code == 'credentialsUnavailable') {
+      return 'scheduler.credentialsMissing'.tr();
+    }
+    return 'scheduler.discoveryFailed'.tr();
+  }
+
+  String? get _effect {
+    if (_service == _Service.item && _character != null && _itemName != null) {
+      return 'scheduler.effectItem'.tr(args: [_itemName!, _character!.name]);
+    }
+    if (_service != _Service.crew || _bonusLevel == null) return null;
+    final saved = _rule?.action;
+    final artist =
+        _crew?.artistName ??
+        (saved is PayCrewAction ? saved.artistName : null);
+    final quoted = _crew?.bonuses.where((bonus) => bonus.level == _bonusLevel);
+    final cost = quoted != null && quoted.isNotEmpty
+        ? quoted.single.costMinor
+        : saved is PayCrewAction && saved.bonusLevel == _bonusLevel
+        ? saved.maxCostMinor
+        : null;
+    if (artist == null || cost == null) return null;
+    return 'scheduler.effectCrew'.tr(
+      args: [_bonusLevel.toString(), cost.toString(), artist],
+    );
+  }
+
+  ScheduledAction? _action() {
+    if (_service == _Service.notification) {
+      return LocalNotificationAction(title: _title.text, body: _body.text);
+    }
+    final saved = _rule?.action;
+    if (_targetLocked && saved is GameScheduledAction) return saved;
+    final character = _character;
+    final catalog = _catalog;
+    if (character == null || catalog == null) return null;
+    if (_service == _Service.item) {
+      final item = _itemName;
+      if (item == null || !_items.any((choice) => choice.name == item)) {
+        return null;
+      }
+      return UseItemAction(
+        boundUsername: catalog.username,
+        character: character,
+        itemName: item,
+      );
+    }
+    final crew = _crew;
+    final level = _bonusLevel;
+    if (crew == null || level == null) return null;
+    final matches = crew.bonuses.where((bonus) => bonus.level == level);
+    if (matches.length != 1) return null;
+    return PayCrewAction(
+      boundUsername: catalog.username,
+      character: character,
+      artistId: crew.artistId,
+      artistName: crew.artistName,
+      bonusLevel: level,
+      maxCostMinor: matches.single.costMinor,
+    );
+  }
+
   Future<void> _save() async {
-    if (_pending || _needsRead || !_form.currentState!.validate()) return;
+    if (_pending ||
+        _needsRead ||
+        _loadingChoices ||
+        !_form.currentState!.validate()) {
+      return;
+    }
+    final action = _action();
+    if (action == null) {
+      setState(() => _error = 'scheduler.choiceRequired'.tr());
+      return;
+    }
     setState(() {
       _pending = true;
       _error = null;
@@ -122,9 +316,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
                 unit: _unit,
                 anchorUtc: DateTime.now().toUtc(),
               ),
-        action: _rule?.action is GameScheduledAction
-            ? _rule!.action
-            : LocalNotificationAction(title: _title.text, body: _body.text),
+        action: action,
       );
       final snapshot = _rule == null
           ? await widget.api.create(draft, id: _id)
@@ -213,7 +405,9 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
                 Expanded(
                   child: FilledButton(
                     key: const Key('schedule-save'),
-                    onPressed: _pending || _needsRead ? null : _save,
+                    onPressed: _pending || _needsRead || _loadingChoices
+                        ? null
+                        : _save,
                     child: Text(
                       (_pending ? 'scheduler.saving' : 'scheduler.save').tr(),
                     ),
@@ -228,7 +422,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
     body: Form(
       key: _form,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 48),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -283,14 +477,36 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
               'scheduler.action'.tr(),
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            if (_rule?.action is GameScheduledAction)
-              Text((_rule!.action as GameScheduledAction).character.name)
-            else ...[
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.notifications_outlined),
-                title: Text('scheduler.localNotification'.tr()),
-              ),
+            Wrap(
+              spacing: 8,
+              children: [
+                ChoiceChip(
+                  key: const Key('schedule-service-local'),
+                  label: Text('scheduler.localNotification'.tr()),
+                  selected: _service == _Service.notification,
+                  onSelected: _pending || _loadingChoices
+                      ? null
+                      : (_) => unawaited(_selectService(_Service.notification)),
+                ),
+                ChoiceChip(
+                  key: const Key('schedule-service-item'),
+                  label: Text('scheduler.useItem'.tr()),
+                  selected: _service == _Service.item,
+                  onSelected: _pending || _loadingChoices
+                      ? null
+                      : (_) => unawaited(_selectService(_Service.item)),
+                ),
+                ChoiceChip(
+                  key: const Key('schedule-service-crew'),
+                  label: Text('scheduler.payCrew'.tr()),
+                  selected: _service == _Service.crew,
+                  onSelected: _pending || _loadingChoices
+                      ? null
+                      : (_) => unawaited(_selectService(_Service.crew)),
+                ),
+              ],
+            ),
+            if (_service == _Service.notification) ...[
               _field('schedule-title', 'notificationTitle', _title, 120),
               _field(
                 'schedule-body',
@@ -299,7 +515,35 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
                 1000,
                 lines: 3,
               ),
-            ],
+            ] else
+              SchedulerGameFields(
+                crew: _service == _Service.crew,
+                pending: _pending || _loadingChoices,
+                locked: _targetLocked,
+                catalog: _catalog,
+                character: _character,
+                items: _items,
+                itemName: _itemName,
+                crewOptions: _crew,
+                bonusLevel: _bonusLevel,
+                effect: _effect,
+                onCharacter: (value) => unawaited(_selectCharacter(value)),
+                onItem: (value) => setState(() => _itemName = value),
+                onBonus: (value) => setState(() => _bonusLevel = value),
+                onChangeTarget: () {
+                  setState(() {
+                    _targetLocked = false;
+                    _character = null;
+                    _itemName = null;
+                    _bonusLevel = null;
+                    _items = const [];
+                    _crew = null;
+                    _catalog = null;
+                    _error = null;
+                  });
+                  unawaited(_loadCharacters());
+                },
+              ),
           ],
         ),
       ),

@@ -93,6 +93,7 @@ class _SchedulerScreenState extends State<SchedulerScreen>
       MaterialPageRoute(
         builder: (_) => SchedulerEditor(
           api: _api,
+          discovery: _api is GameActionsApi ? _api as GameActionsApi : null,
           rule: rule,
           ensurePermission: _permission,
         ),
@@ -175,6 +176,7 @@ class _SchedulerScreenState extends State<SchedulerScreen>
               ),
             ],
           ),
+          Text(actionSummary(rule.action)),
           Text(recurrenceLabel(rule.recurrence)),
           Text(
             !rule.enabled
