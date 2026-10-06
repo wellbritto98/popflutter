@@ -205,7 +205,7 @@
 ## Handoff
 
 - **Feature**: scheduled-game-actions / .specs/features/scheduled-game-actions.
-- **Phase / Task**: Execute T8 Android proof next. T7 editor implemented; 179 app tests passed and analyze clean. T6 gateway 23360af. T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07), T5(3cb4ecf) committed. Branch codex/scheduled-game-actions.
+- **Phase / Task**: Execute T8 Android proof next. T7 editor committed 11f43ef; 179 app tests passed and analyze clean. T6 gateway 23360af. T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07), T5(3cb4ecf) committed. Branch codex/scheduled-game-actions.
 - **Completed**: T7 editor offers local notification, use item and pay crew. Item and bonus require an owned character and a discovered choice. Bonus 20 is not selected automatically; the saved cap is the chosen quote. Existing game rules edit offline. Changing the target requires fresh choices. Cards show service, character, item or artist/bonus and the truthful result in EN/PT. No gameplay POST submitted.
 - **In-progress**: none after the T7 commit. T8 device proof is next. Emulator 5554 was online earlier; production data preserved; one SDK job at a time.
 - **Next step**: device T8 loopback proof on the observed device, final docs/release install preserving production, fresh independent verifier.

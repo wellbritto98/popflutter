@@ -96,7 +96,7 @@ Depends on: T6. Owner: popmundo-app-shell.
 Requirement: SGA-01/02/06/07/08.
 Done when: explicit owned char ID/name persists; valid discovered choices required; no automatic20; quote cap saved; offline existing edit; action-only change retains cadence; cancellation/errors retain input; weekly/item effect stated; cards show char/action/outcome in EN/PT.
 Tests: widget. Gate: Full. Commit: feat(scheduler): configure scheduled game actions.
-Status: done; 179 app tests passed, analyze clean.
+Status: done; commit 11f43ef; 179 app tests passed, analyze clean (evidence/t7-green.log).
 
 ### T8 — Android proof fixture component and maintenance handoff
 What: isolated loopback-backed real secondary engine proof fixture, evidence and final docs/build sync.
