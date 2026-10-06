@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "nextSequence": 2,
+  "rules": [
+    {
+      "id": "e2e-lifecycle",
+      "revision": 1,
+      "notificationId": -1,
+      "name": "Lifecycle fixture",
+      "enabled": true,
+      "recurrence": {
+        "type": "interval",
+        "quantity": 10,
+        "unit": "seconds",
+        "anchorUtc": "2026-10-04T22:23:33.388769Z"
+      },
+      "action": {
+        "type": "localNotification",
+        "title": "Scheduler lifecycle fixture",
+        "body": "Home lock and Recents evidence"
+      },
+      "nextDueUtc": "2026-10-04T22:32:43.388769Z",
+      "lastAttemptUtc": "2026-10-04T22:32:33.388769Z",
+      "zoneId": "Unknown/Unavailable",
+      "lastClaim": {
+        "revision": 1,
+        "plannedUtc": "2026-10-04T22:32:33.388769Z",
+        "localSlot": null
+      },
+      "lastResult": {
+        "status": "submitted",
+        "atUtc": "2026-10-04T22:32:33.415541Z",
+        "errorCode": null
+      }
+    }
+  ]
+}

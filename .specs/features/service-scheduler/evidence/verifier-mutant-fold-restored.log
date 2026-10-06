@@ -1,0 +1,13 @@
+00:00 +0: loading test/recurrence_calculator_test.dart
+00:00 +0: (setUpAll)
+00:00 +0: SCHED-04/06 intervals stay anchored and skip exact/past restart slots
+00:00 +1: SCHED-04 a day is 24 elapsed hours through DST
+00:00 +2: SCHED-05 Monday/Thursday strict future boundary
+00:00 +3: SCHED-05 spring gap 02:30 shifts to 03:30 New York
+00:00 +4: SCHED-05 autumn fold picks first 01:30 and never the second copy
+00:00 +5: SCHED-05 zone change and local year crossing
+00:00 +6: SCHED-06 lateness is inclusive min(30s,D), never early
+00:00 +7: SCHED-06 weekly lateness inclusive 30 seconds
+00:00 +8: SCHED-05 unknown current IANA zone is unavailable
+00:00 +9: (tearDownAll)
+00:00 +9: All tests passed!

@@ -13,6 +13,7 @@ import 'gm/gm_host_handler.dart';
 import 'gm/gm_menu_registry.dart';
 import 'notifications/menu_notifications_bridge.dart';
 import 'notifications/notification_service.dart';
+import 'scheduler/scheduler_client.dart';
 import 'userscripts/userscript_http.dart';
 
 /// The userscript catalog as the UI needs to see it, in one value.
@@ -62,6 +63,7 @@ class AppWiring {
     this.cookieSource,
     this.keepalive,
     this.notificationService,
+    this.schedulerApi,
   }) : secretStore = secretStore ?? FlutterSecureSecretStore();
 
   final InAppPopmundoRuntime runtime;
@@ -69,6 +71,7 @@ class AppWiring {
   final SecretStore secretStore;
   final BackgroundKeepalive? keepalive;
   final NotificationService? notificationService;
+  final SchedulerApi? schedulerApi;
 
   /// Overrides for the WebView cookie jar. Both default to [cookieJar]; tests
   /// pass `MemoryCookieSink` because [InAppCookieSink] builds a

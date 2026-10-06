@@ -1,0 +1,13 @@
+lockStart=2026-10-04T22:24:44Z
+  mWakefulness=Dozing
+mWakefulness=3
+      showing=false
+      inputRestricted=false
+      screenState=SCREEN_STATE_ON
+      interactiveState=INTERACTIVE_STATE_GOING_TO_SLEEP
+2026-10-04T22:24:57Z
+  mWakefulness=Asleep
+mWakefulness=0
+2026-10-04T22:25:21Z
+  mWakefulness=Asleep
+mWakefulness=0

@@ -2,7 +2,7 @@
 
 > Documento gerado por análise do código-fonte e dos artefatos de spec em `.specs/features/` e `.specs/STATE.md`. Trechos sem base direta no repositório estão marcados como **Hipótese**.
 >
-> Última atualização: 2026-08-19.
+> Última atualização: 2026-10-04.
 
 Consistente com [ARQUITETURA.md](ARQUITETURA.md).
 
@@ -45,9 +45,10 @@ O propósito central é:
 4. **Reautenticar (Auto Login):** se enabled e (a) a navegação cai em `/` ou `/Default.aspx`, ou (b) o heartbeat 60 s em `{hostSticky}/World/Popmundo.aspx/Character` recebe 302 para `/Default.aspx`, o handshake nativo corre fora da tela; o jogador só vê `{host}/World/Popmundo.aspx`. Personagem pelo **nome completo** (`div.box > h2`). Snackbars EN/PT por fase; sucesso/falha em segundo plano também geram notificação local. Sem restore da última URL.
 5. **UserScripts:** item sempre visível no sidebar → import por URL, toggle, delete → injector recarrega a página. `@require`/`@resource` via HTTP do app. Scripts com `@grant` GM recebem shim.
 6. **GM host:** `GM.xmlHttpRequest` (TimedFetch no jogo / HttpClient fora), `GM.openInTab` (browser do SO), menu commands no sidebar (limpos a cada navegação), notificação in-app, clipboard, `getResourceUrl`.
-7. **Keepalive:** FGS sobe no boot; isolate só heartbeat; overlay de debug mostra se o serviço está rodando / bateria / ciclo de vida.
+7. **Keepalive:** bootstrap sobe o FGS Android; o isolate emite heartbeat e executa serviços locais. Reboot e atualização do pacote retomam o FGS quando há agendamentos ativos. O overlay mostra status, bateria e ciclo de vida.
 8. **Idioma:** item Language no sidebar; EN/PT; locale do dispositivo no primeiro uso; `setLocale` persiste via Easy Localization.
 9. **Observar/depurar:** streams de rede/console/navegação no overlay (debug). Cookies: nome@domínio, sem valor. Eval JS ad-hoc.
+10. **Agendamentos (Android):** sidebar → criar regra de notificação local → escolher intervalo de segundos/minutos/horas/dias ou dias da semana e hora local → salvar com confirmação do serviço. Lista mostra próxima execução, último resultado e permite editar, pausar ou excluir. Regras sobrevivem ao fechamento e reboot; horários perdidos são descartados, aguardando a próxima ocorrência.
 
 ---
 
@@ -82,11 +83,12 @@ Com base nas features em `.specs/features/` e no código vigente:
 | Polyfill GM Core + Host | userscript-manager + gm-host-apis, AD-016 | Sem `validation.md` da feature host no repo |
 | Auto Login silencioso + heartbeat | auto-login, AD-018, AD-019 | HTTP nativo + `CookieSink`/`CookieSource`; senha no cofre |
 | Keepalive em background | background-keepalive, AD-012/013 | FGS Android; iOS suspende a página |
+| Agendamentos de serviços locais | service-scheduler, AD-021 | Android; MVP de notificação local, persistência, intervalos e dias da semana |
 | i18n EN/PT | app-i18n, AD-014 | Catálogos JSON; DebugOverlay fora |
 | System-back no WebView | webview-back-navigation | `PopScope` no adapter |
 | Patrol device-real | mobile-e2e-tests, AD-015 | Não carrega o jogo |
 
-Itens **sempre visíveis** no sidebar (debug e release): Auto Login, Userscripts, Language. Debug panel só com `kDebugMode`. Em release o FAB continua visível.
+Itens **sempre visíveis** no sidebar (debug e release): Auto Login, Userscripts, Agendamentos, Language. Debug panel só com `kDebugMode`. Em release o FAB continua visível.
 
 ---
 
@@ -105,6 +107,8 @@ O sistema é **fundação observável + shell de qualidade de vida** (login, scr
 | Facebook OAuth no Auto Login | Fora do fluxo mapeado |
 | Restore da última URL após relog | Sempre World home (pedido explícito) |
 | Fallback visível (`form.submit`) no login | Removido no AD-018: um caminho só |
+| Outros serviços e automação de gameplay pelo scheduler | MVP executa apenas notificação local |
+| Agendamentos contínuos em segundos no iOS | Disponíveis apenas no Android; tela informa a limitação |
 | `GM.getResourceText`, XHR abort/progress | gm-host-apis Out of Scope |
 
 Suite `packages/popmundo_utils/test_live/` é opt-in local com credenciais de ambiente; **não** é o e2e de produto em CI. Ver [ARQUITETURA.md](ARQUITETURA.md) seção 8.
@@ -121,5 +125,5 @@ Suite `packages/popmundo_utils/test_live/` é opt-in local com credenciais de am
   - `packages/popmundo_utils`: `dart test` (fakes). `test_live/` só se apontado explicitamente.
   - `popmundo_webview` / `popmundo_app`: `flutter test`.
   - Device: `patrol test --target integration_test/<file>.dart`.
-- **Estado (`.specs/STATE.md` Handoff, 2026-08-19):** feature auto-login (rework) com Execute completo (AD-017/018). Próximo passo registrado: smoke em device com `.user.js` real usando `GM_xmlhttpRequest` + `registerMenuCommand`. `gm-host-apis` não tem `validation.md` no repositório.
+- **Estado:** consultar .specs/STATE.md e os relatórios validation.md por feature para commits, gates e limitações atuais.
 - **Segredos:** senha do Auto Login no Keystore/Keychain. Credenciais de `test_live` só em variáveis de ambiente (`POPMUNDO_USERNAME` / `POPMUNDO_PASSWORD` / `POPMUNDO_CHARACTER`). Não commitar `.env` com valores reais.

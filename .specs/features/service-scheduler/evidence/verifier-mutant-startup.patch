@@ -1,0 +1,13 @@
+diff --git a/packages/popmundo_utils/lib/src/scheduler/scheduler_coordinator.dart b/packages/popmundo_utils/lib/src/scheduler/scheduler_coordinator.dart
+index 366314a..51ad5d5 100644
+--- a/packages/popmundo_utils/lib/src/scheduler/scheduler_coordinator.dart
++++ b/packages/popmundo_utils/lib/src/scheduler/scheduler_coordinator.dart
+@@ -66,7 +66,7 @@ class SchedulerCoordinator {
+               )
+             : null,
+       );
+-      return _arm(restored, now);
++      return restored;
+     }).toList();
+     final restored = SchedulerSnapshot(
+       nextSequence: stored.nextSequence,

@@ -8,7 +8,7 @@ Documentação oficial: [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md), [`docs/OBJ
 
 | Package | Função | README |
 | ------- | ------ | ------ |
-| `packages/popmundo_utils` | Dart puro: contrato `PopmundoRuntime`, host sticky, TimedFetch, Auto Login, UserScripts/GM, storage | [README](packages/popmundo_utils/README.md) |
+| `packages/popmundo_utils` | Dart puro: contrato `PopmundoRuntime`, host sticky, TimedFetch, Auto Login, UserScripts/GM, scheduler, storage | [README](packages/popmundo_utils/README.md) |
 | `packages/popmundo_webview` | Adapter InAppWebView 6.x, JS bridge `popmundo`, injector de scripts, cookie sink | [README](packages/popmundo_webview/README.md) |
 | `apps/popmundo_app` | Shell, composition root, sidebar, i18n, keepalive, telas nativas | [README](apps/popmundo_app/README.md) |
 
@@ -43,7 +43,11 @@ Android mantém a sessão por FGS specialUse e auto login HTTP nativo, com notif
 
 ## Overlay e menu
 
-Um FAB (`menu-toggle`) abre o sidebar. Cada feature define o seu próprio `AppMenuItem` na própria pasta (Auto Login, Userscripts, Language; Debug só em debug); `buildAppMenuItems` só ordena a lista e anexa o item de debug por último quando o gate permite. Cookies no overlay: **nome@domínio**, nunca o valor.
+Um FAB (`menu-toggle`) abre o sidebar. Cada feature define o seu próprio `AppMenuItem` na própria pasta (Auto Login, Userscripts, Agendamentos, Language; Debug só em debug); `buildAppMenuItems` só ordena a lista e anexa o item de debug por último quando o gate permite. Cookies no overlay: **nome@domínio**, nunca o valor.
+
+## Agendamentos Android
+
+O menu Agendamentos configura notificações locais por intervalos (segundos, minutos, horas ou dias) ou dias da semana e horário local. As regras ficam persistidas e executam no serviço em segundo plano, com restauração após reboot enquanto houver regras ativas. Ocorrências perdidas são descartadas. Segundos funcionam em melhor esforço; force-stop do Android impede execução até abrir o app novamente. O iOS apresenta a limitação na tela. Ver [spec e critérios](.specs/features/service-scheduler/spec.md).
 
 ## Estender
 

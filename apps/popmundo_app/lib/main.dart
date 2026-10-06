@@ -11,17 +11,29 @@ import 'background/background_keepalive.dart';
 import 'background/flutter_foreground_task_platform.dart';
 import 'notifications/local_notifications_service.dart';
 import 'prefs_store.dart';
+import 'scheduler/scheduler_client.dart';
+import 'scheduler/scheduler_connection.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   FlutterForegroundTask.initCommunicationPort();
   final prefs = await SharedPreferences.getInstance();
+  final backgroundPlatform = FlutterForegroundTaskPlatform();
   final keepalive = BackgroundKeepalive(
-    platform: FlutterForegroundTaskPlatform(),
+    platform: backgroundPlatform,
     translator: (key) => key.tr(),
   );
   final notificationService = LocalNotificationsService();
+  final schedulerApi = backgroundPlatform.isAndroid
+      ? SchedulerClient(
+          send: FlutterForegroundTask.sendDataToTask,
+          addListener: FlutterForegroundTask.addTaskDataCallback,
+          removeListener: FlutterForegroundTask.removeTaskDataCallback,
+          ensureRunning: () =>
+              waitForSchedulerService(keepalive, backgroundPlatform),
+        )
+      : null;
   await notificationService.initialize();
   // This feature (menu-notification → local-notification bridge) has no
   // manual UI trigger, so permission must be requested at startup rather
@@ -34,6 +46,7 @@ Future<void> main() async {
     store: SharedPreferencesStore(prefs),
     keepalive: keepalive,
     notificationService: notificationService,
+    schedulerApi: schedulerApi,
   );
   runApp(
     EasyLocalization(

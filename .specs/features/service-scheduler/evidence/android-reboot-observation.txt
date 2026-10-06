@@ -1,0 +1,8 @@
+firstDue=2026-10-04T22:44:08.816289Z
+firstEpoch=1791153848
+rebootCommandUtc=2026-10-04T22:44:03Z
+bootPid=
+beforeFutureUtc=2026-10-04T22:45:30Z
+beforeFutureUtc=2026-10-04T22:46:14Z
+bootOnStartUtc=2026-10-04T22:45:53.811874Z
+futureObservedUtc=2026-10-04T22:47:23Z

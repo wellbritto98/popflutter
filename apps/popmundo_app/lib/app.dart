@@ -12,6 +12,7 @@ import 'autologin/auto_login_notifications.dart';
 import 'autologin/auto_login_screen.dart';
 import 'autologin/auto_login_status_snackbar.dart';
 import 'background/background_status.dart';
+import 'background/flutter_foreground_task_platform.dart';
 import 'debug_overlay.dart';
 import 'gm/gm_menu_registry.dart';
 import 'gm/gm_notification_overlay.dart';
@@ -20,6 +21,8 @@ import 'language/language_selector.dart';
 import 'menu/app_menu_registry.dart';
 import 'menu/debug_menu_item.dart';
 import 'menu/gm_menu_command_item.dart';
+import 'scheduler/scheduler_menu_item.dart';
+import 'scheduler/scheduler_screen.dart';
 import 'userscripts/userscripts_menu_item.dart';
 import 'userscripts/userscripts_screen.dart';
 
@@ -133,6 +136,17 @@ class _PopmundoHomeState extends State<PopmundoHome>
 
   void _openLanguage() => unawaited(showLanguageDialog(context));
 
+  void _openSchedules() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => SchedulerScreen(
+          api: _wiring.schedulerApi,
+          platform: FlutterForegroundTaskPlatform(),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // GmMenuRegistry is already a ChangeNotifier, so the drawer listens to it
@@ -144,6 +158,7 @@ class _PopmundoHomeState extends State<PopmundoHome>
           items: [
             autoLoginMenuItem(onTap: _openAutoLogin),
             userscriptsMenuItem(onTap: _openUserScripts),
+            schedulesMenuItem(onTap: _openSchedules),
             languageMenuItem(onTap: _openLanguage),
           ],
           debugItem: debugMenuItem(

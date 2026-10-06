@@ -1,6 +1,6 @@
 # menu (`popmundo_app`)
 
-Sidebar nativo. Spec: `app-sidebar-menu`. AD-009 (amendment: Userscripts/Auto Login/Language sempre visíveis).
+Sidebar nativo. Spec: `app-sidebar-menu`. AD-009 (amendment: Userscripts/Auto Login/Agendamentos/Language sempre visíveis).
 
 ## Objetivo
 
@@ -28,13 +28,15 @@ Renderizar `AppMenuItem` e `GmMenuCommandItem`. Agnóstico de `PopmundoRuntime`.
 
 ## Relacionados
 
-Telas Auto Login / UserScripts / Language / DebugOverlay. `GmMenuRegistry`.
+Telas Auto Login / UserScripts / Scheduler / Language / DebugOverlay. `GmMenuRegistry`.
 
 ## Pontos de entrada
 
-Novo item nativo = a própria feature define uma função `AppMenuItem` na sua pasta (ver `autologin/auto_login_menu_item.dart`, `userscripts/userscripts_menu_item.dart`, `language/language_menu_item.dart` como exemplos), e essa função ganha uma linha na lista `items:` passada a `buildAppMenuItems` no único call site, no `build` do `app.dart`. `buildAppMenuItems` em si não conhece nenhuma feature — só ordena `items` e, se o gate permitir, anexa `debugItem` por último. Não hardcodar em `AppSidebar`.
+Novo item nativo = a própria feature define uma função `AppMenuItem` na sua pasta (ver `autologin/auto_login_menu_item.dart`, `userscripts/userscripts_menu_item.dart`, `scheduler/scheduler_menu_item.dart`, `language/language_menu_item.dart`), e essa função ganha uma linha na lista `items:` passada a `buildAppMenuItems` no único call site, no `build` do `app.dart`. `buildAppMenuItems` em si não conhece nenhuma feature — só ordena `items` e, se o gate permitir, anexa `debugItem` por último. Não hardcodar em `AppSidebar`.
 
 ## Observações e débitos
 
-- Em release o FAB permanece; os três itens QoL preenchem o drawer (não fica só “No options available” como no AD-009 original).
+- Em release o FAB permanece; os quatro itens QoL preenchem o drawer (não fica só “No options available” como no AD-009 original).
 - Keys: `app-sidebar`, `menu-toggle`, `menu-item-<id>`, `menu-empty`.
+
+`schedulesMenuItem` abre `SchedulerScreen` por `PopmundoHome`; o item usa ícone `schedule` e as strings `menu.schedules` / `menu.schedulesSubtitle` EN/PT. A ordem em release é auto-login, userscripts, schedules, language. No iOS a mesma entrada abre a explicação de indisponibilidade; gating de debug e comandos GM permanecem independentes.

@@ -1,0 +1,3 @@
+-rw-r--r--  0 0      0     9241480 jan 01  1981 lib/x86_64/libapp.so
+-rw-r--r--  0 0      0    13922960 jan 01  1981 lib/x86_64/libflutter.so
+-rw-r--r--  0 0      0     1704840 jan 01  1981 lib/x86_64/libvmservice_snapshot.so

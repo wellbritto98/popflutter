@@ -3,6 +3,11 @@ import 'dart:io';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 import 'background_platform.dart';
+
+import 'package:popmundo_utils/popmundo_utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../scheduler/scheduler_store.dart';
 import 'keepalive_task_handler.dart';
 
 /// Real [BackgroundPlatform] backed by `flutter_foreground_task`.
@@ -21,8 +26,7 @@ class FlutterForegroundTaskPlatform implements BackgroundPlatform {
 
   @override
   Future<bool> requestNotificationPermission() async {
-    final status =
-        await FlutterForegroundTask.requestNotificationPermission();
+    final status = await FlutterForegroundTask.requestNotificationPermission();
     return status == NotificationPermission.granted;
   }
 
@@ -40,9 +44,40 @@ class FlutterForegroundTaskPlatform implements BackgroundPlatform {
 
   @override
   Future<bool> isRunningService() => FlutterForegroundTask.isRunningService;
+  static ForegroundTaskOptions schedulerOptions(bool enabled) =>
+      ForegroundTaskOptions(
+        eventAction: ForegroundTaskEventAction.repeat(5000),
+        autoRunOnBoot: enabled,
+        autoRunOnMyPackageReplaced: enabled,
+        allowWakeLock: true,
+        allowWifiLock: false,
+        allowAutoRestart: true,
+        stopWithTask: false,
+      );
+
+  static bool? _appliedBoot;
+  static Future<void> configureSchedulerBoot(bool enabled) async {
+    if (_appliedBoot == enabled) return;
+    final result = await FlutterForegroundTask.updateService(
+      foregroundTaskOptions: schedulerOptions(enabled),
+    );
+    if (result is ServiceRequestFailure) throw result.error;
+    _appliedBoot = enabled;
+  }
 
   @override
   Future<void> initService() async {
+    var enabled = false;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = await PreferencesSchedulerStore(prefs).read();
+      if (raw != null) {
+        enabled = SchedulerSnapshot.decode(raw).rules.any((r) => r.enabled);
+      }
+    } catch (_) {
+      // An unavailable scheduler must not prevent the existing session service.
+      // Its corrupt blob is preserved and the runner reports the read error.
+    }
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'popmundo_keepalive',
@@ -55,15 +90,7 @@ class FlutterForegroundTaskPlatform implements BackgroundPlatform {
         showNotification: false,
         playSound: false,
       ),
-      foregroundTaskOptions: ForegroundTaskOptions(
-        eventAction: ForegroundTaskEventAction.repeat(5000),
-        autoRunOnBoot: false,
-        autoRunOnMyPackageReplaced: false,
-        allowWakeLock: true,
-        allowWifiLock: false,
-        allowAutoRestart: true,
-        stopWithTask: false,
-      ),
+      foregroundTaskOptions: schedulerOptions(enabled),
     );
   }
 

@@ -1,0 +1,6 @@
+removedAt=2026-10-04T22:32:09Z
+commands=input swipe 540 1500 540 180 450 (twice, verified task42 then41)
+frame=1080x2400 own-center-card approx bounds(170,260)-(906,1880)
+isolatedTaskRecords=0
+2026-10-04T22:32:21Z
+2026-10-04T22:32:35Z

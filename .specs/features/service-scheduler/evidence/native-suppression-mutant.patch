@@ -1,0 +1,12 @@
+diff --git a/apps/popmundo_app/lib/notifications/local_notifications_service.dart b/apps/popmundo_app/lib/notifications/local_notifications_service.dart
+index 2009c44..e91e5a1 100644
+--- a/apps/popmundo_app/lib/notifications/local_notifications_service.dart
++++ b/apps/popmundo_app/lib/notifications/local_notifications_service.dart
+@@ -72,6 +72,7 @@ class LocalNotificationsService implements NotificationService {
+     if (android == null || await android.areNotificationsEnabled() != true) {
+       throw const SchedulerException('permissionDenied');
+     }
++    if (id < 0) return; // T6 scratch suppression mutant.
+     await _plugin.show(
+       id: id,
+       title: title,

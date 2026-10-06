@@ -14,12 +14,14 @@ Pipeline Specify → Design → Tasks → Execute. Não é código de runtime. A
 
 | Caminho | Função |
 | ------- | ------ |
-| `STATE.md` | Decisions AD-001…AD-018 + Handoff |
+| `STATE.md` | Decisions AD-001…AD-021 + Handoff |
 | `LESSONS.md` / `lessons.json` | Lições; **não** editar `LESSONS.md` à mão — `scripts/lessons.py` da skill |
 | `features/popmundo-wrapper/` | Fundação WebView / utils |
 | `features/app-sidebar-menu/` | Drawer + registro |
 | `features/userscript-manager/` | Catálogo + injector |
-| `features/auto-login/` | Relog silencioso (código = AD-018; Goals do spec ainda mencionam TimedFetch — drift) |
+| `features/auto-login/` | Relog silencioso (código = AD-018; handshake nativo AuthSession) |
+| features/service-scheduler/ | Regras locais persistentes Android; intervalos, dias da semana, skip de perdidas e AD-021 |
+| features/background-session-reliability/ | Sessão contínua specialUse, UA limitado e notificações de Auto Login; AD-020 |
 | `features/background-keepalive/` | FGS |
 | `features/app-i18n/` | EN/PT |
 | `features/mobile-e2e-tests/` | Patrol |
@@ -45,6 +47,7 @@ Packages e app documentados em `docs/` e nos READMEs locais. Skill: `.claude/ski
 ## Fluxos importantes
 
 Execute termina com Verifier (author ≠ verifier). Lições só via `python3 .claude/skills/tlc-spec-driven/scripts/lessons.py`.
+Quando scripts não forem autorizados no ambiente, use o fallback da skill: registre candidatos a lição no validation.md, preservando LESSONS.md e lessons.json como arquivos geridos pela ferramenta.
 
 ## Arquivos críticos
 
@@ -54,5 +57,4 @@ Execute termina com Verifier (author ≠ verifier). Lições só via `python3 .c
 ## Observações técnicas e débitos
 
 - `gm-host-apis` sem design/tasks/validation no disco; implementação existe no código.
-- Goals de `auto-login/spec.md` ainda falam em TimedFetch; o controller vigente usa `AuthSession`/`dart:io`.
 - `LastUrlStore` foi removido do código; specs antigas ainda citam — banners no próprio spec apontam para `spec.md`/`validation.md`.

@@ -1,0 +1,12 @@
+diff --git a/packages/popmundo_utils/lib/src/scheduler/scheduler_coordinator.dart b/packages/popmundo_utils/lib/src/scheduler/scheduler_coordinator.dart
+index 366314a..3c909b7 100644
+--- a/packages/popmundo_utils/lib/src/scheduler/scheduler_coordinator.dart
++++ b/packages/popmundo_utils/lib/src/scheduler/scheduler_coordinator.dart
+@@ -185,7 +185,6 @@ class SchedulerCoordinator {
+         lastAttemptUtc: due,
+         lastResult: ScheduleResult(status: ScheduleResultStatus.neverExecuted),
+       );
+-      await _replace(rule); // No platform action occurs before this succeeds.
+       ScheduleResult result;
+       try {
+         final executor = _executors['localNotification'];

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "nextSequence": 3,
+  "rules": [
+    {
+      "id": "e2e-lifecycle",
+      "revision": 5,
+      "notificationId": -1,
+      "name": "Reboot fixture",
+      "enabled": false,
+      "recurrence": {
+        "type": "interval",
+        "quantity": 180,
+        "unit": "seconds",
+        "anchorUtc": "2026-10-04T22:41:08.816289Z"
+      },
+      "action": {
+        "type": "localNotification",
+        "title": "Scheduler reboot fixture",
+        "body": "Next future occurrence only"
+      },
+      "nextDueUtc": null,
+      "lastAttemptUtc": "2026-10-05T22:50:08.816289Z",
+      "zoneId": "GMT",
+      "lastClaim": {
+        "revision": 4,
+        "plannedUtc": "2026-10-05T22:50:08.816289Z",
+        "localSlot": null
+      },
+      "lastResult": {
+        "status": "submitted",
+        "atUtc": "2026-10-05T22:50:08.883008Z",
+        "errorCode": null
+      }
+    },
+    {
+      "id": "e2e-weekly-gmt",
+      "revision": 1,
+      "notificationId": -2,
+      "name": "Weekly GMT fixture",
+      "enabled": true,
+      "recurrence": {
+        "type": "weekly",
+        "weekdays": [
+          1
+        ],
+        "hour": 22,
+        "minute": 53
+      },
+      "action": {
+        "type": "localNotification",
+        "title": "Scheduler weekly GMT fixture",
+        "body": "GMT alias database evidence"
+      },
+      "nextDueUtc": "2026-10-12T22:53:00.000Z",
+      "lastAttemptUtc": "2026-10-05T22:53:00.000Z",
+      "zoneId": "GMT",
+      "lastClaim": {
+        "revision": 1,
+        "plannedUtc": "2026-10-05T22:53:00.000Z",
+        "localSlot": "2026-10-05T22:53"
+      },
+      "lastResult": {
+        "status": "submitted",
+        "atUtc": "2026-10-05T22:53:00.030766Z",
+        "errorCode": null
+      }
+    }
+  ]
+}

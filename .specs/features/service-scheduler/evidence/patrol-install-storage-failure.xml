@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuites tests="0" failures="0" errors="0" skipped="0" time="0.006" timestamp="2026-10-04T21:27:40" hostname="localhost">
+  <system-err>ErrorName: INSTALL_FAILED_INSUFFICIENT_STORAGE
+NameSpace: DdmlibAndroidDeviceController
+ErrorCode: 1
+ErrorType: TEST
+Message: Failed to install split APK(s): [C:\Users\Wellington\Documents\projetos\popflutter\apps\popmundo_app\build\app\outputs\apk\release\app-release.apk]
+Failed to install split APK(s): [C:\Users\Wellington\Documents\projetos\popflutter\apps\popmundo_app\build\app\outputs\apk\release\app-release.apk]
+Failed to commit install session 2122577888 with command package install-commit 2122577888. Error: INSTALL_FAILED_INSUFFICIENT_STORAGE: Failed to override installation location
+com.android.ddmlib.InstallException: Failed to commit install session 2122577888 with command package install-commit 2122577888. Error: INSTALL_FAILED_INSUFFICIENT_STORAGE: Failed to override installation location
+	at com.android.ddmlib.SplitApkInstallerBase.installCommit(SplitApkInstallerBase.java:171)
+	at com.android.ddmlib.SplitApkInstaller.install(SplitApkInstaller.java:85)
+	at com.android.ddmlib.IDeviceSharedImpl.installPackages(IDeviceSharedImpl.java:395)
+	at com.android.ddmlib.internal.DeviceImpl.lambda$installPackages$34(DeviceImpl.java:1491)
+	at com.android.ddmlib.internal.DeviceImpl.logRun3(DeviceImpl.java:1833)
+	at com.android.ddmlib.internal.DeviceImpl.installPackages(DeviceImpl.java:1488)
+	at com.android.ddmlib.internal.DeviceImpl.lambda$installPackages$35(DeviceImpl.java:1503)
+	at com.android.ddmlib.internal.DeviceImpl.logRun3(DeviceImpl.java:1833)
+	at com.android.ddmlib.internal.DeviceImpl.installPackages(DeviceImpl.java:1499)
+	at com.android.tools.utp.plugins.deviceprovider.ddmlib.DdmlibAndroidDevice.installPackages(DdmlibAndroidDevice.kt:80)
+	at com.android.tools.utp.plugins.deviceprovider.ddmlib.DdmlibAndroidDeviceController$executeAsync$deferred$1.invokeSuspend(DdmlibAndroidDeviceController.kt:251)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:108)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+
+</system-err>
+</testsuites>

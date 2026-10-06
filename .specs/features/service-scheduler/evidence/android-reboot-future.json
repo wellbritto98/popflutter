@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "nextSequence": 2,
+  "rules": [
+    {
+      "id": "e2e-lifecycle",
+      "revision": 4,
+      "notificationId": -1,
+      "name": "Reboot fixture",
+      "enabled": true,
+      "recurrence": {
+        "type": "interval",
+        "quantity": 180,
+        "unit": "seconds",
+        "anchorUtc": "2026-10-04T22:41:08.816289Z"
+      },
+      "action": {
+        "type": "localNotification",
+        "title": "Scheduler reboot fixture",
+        "body": "Next future occurrence only"
+      },
+      "nextDueUtc": "2026-10-04T22:50:08.816289Z",
+      "lastAttemptUtc": "2026-10-04T22:47:08.816289Z",
+      "zoneId": "Unknown/Unavailable",
+      "lastClaim": {
+        "revision": 4,
+        "plannedUtc": "2026-10-04T22:47:08.816289Z",
+        "localSlot": null
+      },
+      "lastResult": {
+        "status": "submitted",
+        "atUtc": "2026-10-04T22:47:08.869586Z",
+        "errorCode": null
+      }
+    }
+  ]
+}

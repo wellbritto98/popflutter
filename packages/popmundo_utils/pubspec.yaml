@@ -13,6 +13,7 @@ dependencies:
   # HTML parsing for ASP.NET WebForms pages (login / ChooseCharacter).
   # Pure Dart — keeps this package Flutter-free (AD-002).
   html: ^0.15.6
+  timezone: ^0.11.1
 
 dev_dependencies:
   lints: ^6.0.0

@@ -1,0 +1,2 @@
+lib/x86_64/libapp.so
+lib/x86_64/libflutter.so

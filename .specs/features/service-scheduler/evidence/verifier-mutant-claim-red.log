@@ -1,0 +1,67 @@
+00:00 +0: loading test/scheduler_coordinator_test.dart
+00:00 +0: (setUpAll)
+00:00 +0: SCHED-03 save returns exact authoritative persisted state
+00:00 +1: SCHED-06 restart :35 and exact due skip everything without notifications
+00:00 +2: SCHED-04/07 :10/:20 submit saved payload with stable card and no drift
+00:00 +3: SCHED-06 active overdue beyond bound skips, inclusive bound attempts one
+00:00 +4: SCHED-03 text preserves cadence, recurrence change resets from now
+00:00 +5: SCHED-03 pause and reenable establishes new future anchor
+00:00 +6: SCHED-10 stale revisions and unknown identities rejected without mutation
+00:00 +7: SCHED-07 deleted IDs never recycle after fresh coordinator
+00:00 +8: SCHED-09 failed command write never acknowledges or mutates memory
+00:00 +9: SCHED-09 failed claim prevents action and reload skips due
+00:00 +9 -1: SCHED-09 failed claim prevents action and reload skips due [E]
+  Expected: throws <Instance of 'SchedulerException'> with `code`: 'writeFailed'
+    Actual: <Instance of 'Future<SchedulerSnapshot>'>
+     Which: threw SchedulerException:<resultUncertain>
+            stack package:popmundo_utils/src/scheduler/scheduler_coordinator.dart 218:9  SchedulerCoordinator.reconcile.<fn>
+                  ===== asynchronous gap ===========================
+                  test\scheduler_coordinator_test.dart 309:5                             main.<fn>
+
+            which has `code` with value 'resultUncertain' which is different.
+                  Expected: writeFaile ...
+                    Actual: resultUnce ...
+                            ^
+                   Differ at offset 0
+
+  test\scheduler_coordinator_test.dart 309:5  main.<fn>
+
+00:00 +9 -1: SCHED-10 durable claim exists before action starts
+00:00 +9 -2: SCHED-10 durable claim exists before action starts [E]
+  Expected: ScheduleResultStatus:<ScheduleResultStatus.submitted>
+    Actual: ScheduleResultStatus:<ScheduleResultStatus.failed>
+
+  package:matcher                             expect
+  test\scheduler_coordinator_test.dart 334:5  main.<fn>
+
+00:00 +9 -2: SCHED-09 failed action continues separate rule and never retries
+00:00 +10 -2: SCHED-09 five-second timeout is failed uncertain and does not retry
+00:05 +11 -2: SCHED-09 failed result write is uncertain, fresh load drops pending claim
+00:05 +11 -3: SCHED-09 failed result write is uncertain, fresh load drops pending claim [E]
+  Expected: throws <Instance of 'SchedulerException'> with `code`: 'resultUncertain'
+    Actual: <Instance of 'Future<SchedulerSnapshot>'>
+     Which: emitted <Instance of 'SchedulerSnapshot'>
+
+  test\scheduler_coordinator_test.dart 390:7  main.<fn>
+
+00:05 +11 -3: SCHED-10 overlapping commands and ticks have no lost updates/duplicates
+00:05 +12 -3: SCHED-10 completed pause/delete/recurrence edit beats queued tick
+00:05 +13 -3: SCHED-05 unknown zone preserves weekly but intervals continue and zone changes rearm
+00:05 +14 -3: SCHED-09 corrupt persisted blob is preserved, no commands or actions
+00:05 +15 -3: SCHED-03/09 uncertain command rereads committed rule and rejects duplicate nonce
+00:05 +16 -3: SCHED-03 action claimed before pause may finish, no later claim
+00:05 +17 -3: SCHED-05 weekly claim remembers intended fold slot across restart
+00:05 +18 -3: SCHED-09 startup drops claim interrupted before platform submission
+00:05 +19 -3: SCHED-10 backward clock restart never repeats an already claimed UTC slot
+00:05 +20 -3: SCHED-09 backward clock also skips an interrupted future claim
+00:05 +21 -3: SCHED-10 durable attempt watermark roundtrips, migrates and resets only for new cadence
+00:05 +22 -3: (tearDownAll)
+00:05 +22 -3: Some tests failed.
+
+Failing tests:
+  test/scheduler_coordinator_test.dart: SCHED-09 failed claim prevents action and reload skips due
+  test/scheduler_coordinator_test.dart: SCHED-09 failed result write is uncertain, fresh load drops pending claim
+  test/scheduler_coordinator_test.dart: SCHED-10 durable claim exists before action starts
+
+Consider enabling the flag chain-stack-traces to receive more detailed exceptions.
+For example, 'dart test --chain-stack-traces'.

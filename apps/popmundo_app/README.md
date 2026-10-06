@@ -4,7 +4,7 @@
 
 ## Objetivo do módulo
 
-Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` num app instalável: jogo em tela cheia, sessão persistente, Auto Login, UserScripts/GM, i18n EN/PT, keepalive e overlay de debug.
+Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` num app instalável: jogo em tela cheia, sessão persistente, Auto Login, UserScripts/GM, agendamentos locais Android, i18n EN/PT, keepalive e overlay de debug.
 
 ## Responsabilidade principal
 
@@ -25,6 +25,7 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 | UserScripts UI | `lib/userscripts/` | [README](lib/userscripts/README.md) |
 | GM host | `lib/gm/` | [README](lib/gm/README.md) |
 | Keepalive | `lib/background/` | [README](lib/background/README.md) |
+| Agendamentos | lib/scheduler/ | [README](lib/scheduler/README.md): regras locais recorrentes, UI EN/PT e executor único no FGS Android |
 | Notificações | `lib/notifications/` | `NotificationService`/`LocalNotificationsService`/`FakeNotificationService` (`showNotification` genérico); botão manual `debug-send-notification` no overlay; `MenuNotificationsBridge` traduz `MenuNotificationsWatcher.newNotifications` (popmundo_utils) em notificações reais, uma por item novo do jogo, canal `popflutter_game_notifications_channel`; Auto Login em background usa notificação de resultado id 2 |
 | Idioma | `lib/language/`, `lib/l10n.dart` | [README](lib/language/README.md) |
 | i18n assets | `assets/translations/{en,pt}.json` | Strings de release |
@@ -33,7 +34,7 @@ Shell Flutter (Android + iOS) que compõe `popmundo_utils` + `popmundo_webview` 
 ## Dependências internas e externas
 
 - **Internas:** `popmundo_utils`, `popmundo_webview` (`path:`).
-- **Externas:** `easy_localization`, `shared_preferences`, `flutter_secure_storage`, `flutter_inappwebview` (cookies no overlay), `flutter_foreground_task`, `flutter_local_notifications` (só `LocalNotificationsService`), `url_launcher` (`GM.openInTab`), `cupertino_icons`. Dev: `flutter_lints`, `patrol`.
+- **Externas:** `easy_localization`, `shared_preferences`, `flutter_secure_storage`, `flutter_inappwebview` (cookies no overlay), `flutter_foreground_task`, `flutter_local_notifications` (só `LocalNotificationsService`), `url_launcher` (`GM.openInTab`), `cupertino_icons`, flutter_timezone, timezone. Dev: `flutter_lints`, `patrol`.
 - **Não depende de** um backend próprio.
 
 ## Módulos relacionados
@@ -80,4 +81,6 @@ flutter analyze apps/popmundo_app integration_test
 ```
 
 
-Manutenção contínua de sessão Android usa FGS specialUse com subtype declarado (AD-020). Force-stop, reboot e morte do processo encerram manutenção; distribuição Play exige revisão do caso de uso.
+Manutenção contínua de sessão e agendamentos locais Android usam FGS specialUse com subtype declarado (AD-020/021). Regras habilitadas configuram restauração no boot/package replacement; slots perdidos são pulados. Force-stop e políticas do OS/fabricante podem encerrar o serviço; distribuição Play exige revisão do caso de uso.
+
+O item Agendamentos/Schedules usa o registro do sidebar. main injeta SchedulerClient somente no Android e aguarda heartbeat Dart antes de RPC; iOS apresenta a explicação localizada. A tela confirma apenas snapshots devolvidos pelo escritor do FGS, mantém rascunhos após erro e adota a identidade estável após resposta perdida para evitar duplicação. Enquanto visível e ativa, atualiza próximo horário e último resultado por leitura coalescida. O catálogo fica em service_scheduler.v1, com reload antes de ler e sem reset silencioso de corrupção. Veja [scheduler](lib/scheduler/README.md) e [notifications](lib/notifications/README.md) para contratos, canais e limites.

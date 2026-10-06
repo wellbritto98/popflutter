@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuites tests="1" failures="0" errors="0" skipped="0" time="114.588" timestamp="2026-10-04T22:20:33" hostname="localhost">
+  <testsuite name="com.popmundo.popmundo_app.MainActivityTest" tests="1" failures="0" errors="0" skipped="0" time="113.74" timestamp="2026-10-04T22:20:33" hostname="localhost">
+    <properties>
+      <property name="device" value="Medium_Phone_API_36.1(AVD) - 16" />
+      <property name="flavor" value="" />
+      <property name="project" value=":app" />
+    </properties>
+    <testcase name="runDartTest[integration_test.scheduler_test scheduler: durable seconds, Home, real cards and pause]" classname="com.popmundo.popmundo_app.MainActivityTest" time="113.74" />
+  </testsuite>
+</testsuites>

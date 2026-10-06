@@ -1,0 +1,12 @@
+: Expected: an object with length of <2>
+:   Actual: WhereIterable<ActiveNotification>:[]
+:    Which: has length of <0>
+: SCHED-07/08: exact total scheduled OS records
+:
+: #0      fail (package:matcher/src/expect/expect.dart:187)
+: #1      _expect (package:matcher/src/expect/expect.dart:182)
+: #2      expect (package:matcher/src/expect/expect.dart:65)
+: #3      expect (package:flutter_test/src/widget_tester.dart:473)
+: #4      _assertAndroidIds (file:///C:/Users/Wellington/.codex/worktrees/scheduler-notification-mutant/popflutter/apps/popmundo_app/integration_test/scheduler_test.dart:34)
+: <asynchronous suspension>
+: #5      main.<anonymous closure> (file:///C:/Users/Wellington/.codex/worktrees/scheduler-notification-mutant/popflutter/apps/popmundo_app/integration_test/scheduler_test.dart:239)
