@@ -1,4 +1,6 @@
 import 'dart:convert';
+part 'scheduler_actions.dart';
+part 'game_action_choices.dart';
 
 class SchedulerException implements Exception {
   const SchedulerException(this.code);
@@ -105,10 +107,12 @@ class WeeklyRecurrence extends ScheduleRecurrence {
   };
 }
 
-class LocalNotificationAction {
+class LocalNotificationAction extends ScheduledAction {
   LocalNotificationAction({required String title, required String body})
     : title = _text(title, 120),
       body = _text(body, 1000);
+  @override
+  String get type => 'localNotification';
   final String title;
   final String body;
   factory LocalNotificationAction.fromJson(Map<String, dynamic> json) {
@@ -120,6 +124,7 @@ class LocalNotificationAction {
       body: json['body'] as String,
     );
   }
+  @override
   Map<String, Object?> toJson() => {
     'type': 'localNotification',
     'title': title,

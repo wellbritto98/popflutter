@@ -1,0 +1,55 @@
+00:00 +0: loading test/scheduler_game_actions_models_test.dart
+00:00 +0 -1: loading test/scheduler_game_actions_models_test.dart [E]
+  Failed to load "test/scheduler_game_actions_models_test.dart":
+  test/scheduler_game_actions_models_test.dart:18:12: Error: Undefined name 'ScheduledAction'.
+      expect(ScheduledAction.fromJson(action.toJson()).toJson(), {
+             ^^^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:25:20: Error: Undefined name 'ScheduledAction'.
+      final action = ScheduledAction.fromJson(item) as UseItemAction;
+                     ^^^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:25:54: Error: 'UseItemAction' isn't a type.
+      final action = ScheduledAction.fromJson(item) as UseItemAction;
+                                                       ^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:31:12: Error: Undefined name 'ScheduledAction'.
+      expect(ScheduledAction.fromJson(jsonDecode(jsonEncode(action.toJson()))).toJson(), item);
+             ^^^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:34:20: Error: Undefined name 'ScheduledAction'.
+      final action = ScheduledAction.fromJson(crew) as PayCrewAction;
+                     ^^^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:34:54: Error: 'PayCrewAction' isn't a type.
+      final action = ScheduledAction.fromJson(crew) as PayCrewAction;
+                                                       ^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:42:18: Error: Method not found: 'GameCharacter'.
+      final char = GameCharacter(id: 1, name: ' Troy  Drinkwater ');
+                   ^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:43:20: Error: Method not found: 'UseItemAction'.
+      final action = UseItemAction(boundUsername: ' account ', character: char, itemName: ' Cubo  mágico\t ');
+                     ^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:46:12: Error: Method not found: 'UseItemAction'.
+      expect(UseItemAction(boundUsername: 'a', character: char, itemName: accepted).itemName.length, 120);
+             ^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:47:18: Error: Method not found: 'UseItemAction'.
+      expect(() => UseItemAction(boundUsername: 'a', character: char, itemName: accepted + '\u{1F600}'), throwsA(isA<SchedulerException>().having((e) => e.code, 'code', 'invalidAction')));
+                   ^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:61:20: Error: Undefined name 'ScheduledAction'.
+        expect(() => ScheduledAction.fromJson(malformed[index]), throwsA(isA<SchedulerException>().having((e) => e.code, 'code', 'invalidAction')));
+                     ^^^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:65:21: Error: Undefined name 'ScheduledAction'.
+      final decoded = ScheduledAction.fromJson({...crew, 'password': 'synthetic-secret', 'cookie': 'synthetic-cookie', '__VIEWSTATE': 'synthetic-state'});
+                      ^^^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:70:19: Error: Undefined name 'GameCharacterCatalog'.
+      final chars = GameCharacterCatalog.fromJson({'username': 'account', 'characters': [character]});
+                    ^^^^^^^^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:72:19: Error: Undefined name 'GameItemChoice'.
+      final items = GameItemChoice.fromJson({'name': 'Cubo mágico'});
+                    ^^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:74:21: Error: Undefined name 'GameCrewOptions'.
+      final options = GameCrewOptions.fromJson({'artistId': 2774797, 'artistName': 'black panties', 'bonuses': [{'level': 14, 'label': 'notável', 'costMinor': 225000}]});
+                      ^^^^^^^^^^^^^^^
+  test/scheduler_game_actions_models_test.dart:76:39: Error: Method not found: 'GameCharacter'.
+      expect(() => chars.characters.add(GameCharacter(id: 2, name: 'Other')), throwsUnsupportedError);
+                                        ^^^^^^^^^^^^^
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  test/scheduler_game_actions_models_test.dart: loading test/scheduler_game_actions_models_test.dart

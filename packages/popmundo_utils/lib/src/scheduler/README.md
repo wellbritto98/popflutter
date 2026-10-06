@@ -71,3 +71,7 @@ Fuso IANA inválido produz zoneUnavailable. Criar/reativar uma regra semanal com
 ## Verificação
 
 Os testes ficam em packages/popmundo_utils/test/scheduler_models_test.dart, recurrence_calculator_test.dart e scheduler_coordinator_test.dart. Eles usam store/executor falsos e relógio determinístico, cobrindo limites e payload JSON, UTC/zonas/DST, startup e atraso, IDs, revisões e concorrência, falhas de escrita/ação, timeout e relógio retrocedendo. Execute dart test e dart analyze no pacote. A prova do serviço e das notificações no Android pertence ao tier de integração do app.
+
+## Configuração das ações de jogo (SGA-01)
+
+ScheduledAction é uma união selada de LocalNotificationAction, UseItemAction e PayCrewAction. As ações de jogo vinculam boundUsername e GameCharacter(id positivo, name), sem credenciais/cookies/estado de formulário. UseItemAction normaliza itemName por whitespace e limita a 120 unidades UTF-16. PayCrewAction guarda artistId/name, bonusLevel de 14 a 20 e maxCostMinor positivo em centésimos de M$. Os codecs emitem somente campos públicos e rejeitam tipos malformados com invalidAction. GameCharacterCatalog, GameItemChoice, GameBonusChoice e GameCrewOptions são DTOs de descoberta com coleções imutáveis. A integração de Draft/Rule e execução acontece nas tarefas seguintes; não implica que as novas ações já executem nesta etapa.
