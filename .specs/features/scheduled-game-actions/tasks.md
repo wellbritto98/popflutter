@@ -51,7 +51,7 @@ Depends on: T1. Owner: popmundo-utils with domain review. Reuses: AuthSession an
 Requirement: SGA-02/03/04/09.
 Done when: private empty jar, assigned-host routing, char verified, no visible runtime collaborator, fresh-account validation, limits/throttle/abort prevent late request and overlap; discovery exposes non-secret DTOs; forms retain successful repeated controls; neutral preflight/outcome fixtures strict.
 Tests: unit/integration. Gate: Quick. Commit: feat(game-actions): isolate native transactions and discovery.
-Status: done; commit3a7e0fb;341 core tests passed, analyze clean; opt-in live probe found routeMismatch, fixF1 pending.
+Status: done; commit3a7e0fb;341 core tests passed, analyze clean; opt-in live probe found initial-login routeMismatch; fixF1 committed1e5535d,342 core tests and analyze clean, opt-in read-only live discovery and fresh visible-session isolation passed.
 
 ### T3 — Use item endpoint
 What: one eligible row/button POST adapter and outcomes.

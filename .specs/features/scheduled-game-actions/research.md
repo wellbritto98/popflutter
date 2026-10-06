@@ -9,7 +9,7 @@ Sources: user-supplied Texto colado.txt (1,574 lines, read completely by domain 
 
 Embedded browser: normal login redirected to assigned host 74.popmundo.com; ChooseCharacter and Troy selection completed; inventory and crew pages inspected. All hidden session/form values and character-selector GUIDs are ephemeral; this document retains only names, paths and non-secret gameplay identity. No gameplay use/payment POST was sent. DOM confirms form method/action and submitter controls; raw network packets were not captured by the browser API. Do not label inferred browser form payloads as packet captures.
 
-Second independent live login and its effect on a first session have NOT been tested in this investigation. User reports coexistence. Proposed production isolation is backed by distinct local jars and must gain a specific two-session outcome test.
+Independent live login and its effect on a fresh visible session were tested on 2026-10-06. Native discovery selected Peter3155712 while a fresh browser reload remained authenticated as Troy3327035, both assigned host74. No gameplay POST. See evidence/f1-browser-isolation.md and f1-live-fresh-sessions.log.
 
 ## Observed routes and identities
 

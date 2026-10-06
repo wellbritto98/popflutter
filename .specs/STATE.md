@@ -205,9 +205,9 @@
 ## Handoff
 
 - **Feature**: scheduled-game-actions / .specs/features/scheduled-game-actions.
-- **Phase / Task**: Execute fixF1 native-login diagnosis; T1(09b83bc) and T2(3a7e0fb) committed,341 core tests and analyze clean; approved spec/design/tasks; branch codex/scheduled-game-actions.
-- **Completed**: supplied script/domain/browser mapping; user approval and char binding; AD-023; baseline core277/WebView31/app164 passed. No gameplay POST submitted.
-- **In-progress**: native-login routeMismatch before gameplay; emulator5554 reopened with production data preserved; specialists execute T1..T8 sequentially, one SDK job at a time.
-- **Next step**: core T1..T5, shell T6..T7, device fixture T8, fresh independent verifier; update task evidence and handoff after gates.
-- **Blockers**: live discovery failed routeMismatch; safe diagnostic wrapper pending. Independent-login coexistence remains unmeasured; default device fixture uses loopback, no game host. No credentials/cookies/form state retained.
+- **Phase / Task**: Execute T3 item endpoint domain review; T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d) committed. T3 gate361 core tests/analyze clean, awaiting domain review; approved spec/design/tasks; branch codex/scheduled-game-actions.
+- **Completed**: supplied script/domain/browser mapping; user approval and char binding; AD-023; baseline core277/WebView31/app164. F1 live login/discovery passed; fresh visible Troy3327035 stayed authenticated while private HTTP selected Peter3155712 on same host74. No gameplay POST submitted.
+- **In-progress**: core T3 review then T4/T5; shell prepares T5 bridge and T6/T7. Emulator5554 reopened, production installation/data preserved; one SDK job at a time.
+- **Next step**: finish sequential core T3..T5, shell T6..T7, device fixture T8, maintenance docs and fresh independent verifier; update task evidence and handoff after gates.
+- **Blockers**: no current external blocker. Domain review checks host/form boundaries before T3 commit; default device fixture uses loopback, no game host. No credentials/cookies/form state retained.
 - **Prior feature**: service-scheduler complete; production emulator release/data preserved. Physical handset/overnight unmeasured.

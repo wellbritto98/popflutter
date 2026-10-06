@@ -1,0 +1,40 @@
+00:00 +0: loading test_live/game_actions_discovery_live_test.dart
+00:00 +0: independent native login selects owned character without gameplay
+game-route request GET www.popmundo.com /Default.aspx
+game-route response status=200
+game-route form method=post host=www.popmundo.com path=/Default.aspx
+game-route request POST www.popmundo.com /Default.aspx
+game-route response status=302
+game-route location 75.popmundo.com //Login.aspx
+game-route request GET 75.popmundo.com //Login.aspx
+game-route response status=302
+game-route location 75.popmundo.com /World/Popmundo.aspx/ChooseCharacter
+game-route request GET 75.popmundo.com /World/Popmundo.aspx/ChooseCharacter
+game-route response status=200
+game-route form method=post host=75.popmundo.com path=/World/Popmundo.aspx/ChooseCharacter
+game-route request GET www.popmundo.com /Default.aspx
+game-route response status=200
+game-route form method=post host=www.popmundo.com path=/Default.aspx
+game-route request POST www.popmundo.com /Default.aspx
+game-route response status=302
+game-route location 73.popmundo.com //Login.aspx
+game-route request GET 73.popmundo.com //Login.aspx
+game-route response status=302
+game-route location 73.popmundo.com /World/Popmundo.aspx/ChooseCharacter
+game-route request GET 73.popmundo.com /World/Popmundo.aspx/ChooseCharacter
+game-route response status=200
+game-route form method=post host=73.popmundo.com path=/World/Popmundo.aspx/ChooseCharacter
+game-route request POST 73.popmundo.com /World/Popmundo.aspx/ChooseCharacter
+game-route response status=302
+game-route location 73.popmundo.com /World/Popmundo.aspx
+game-route request GET 73.popmundo.com /World/Popmundo.aspx
+game-route response status=200
+game-route form method=post host=73.popmundo.com path=/World/Popmundo.aspx
+game-route request GET 73.popmundo.com /World/Popmundo.aspx/Character
+game-route response status=200
+game-route form method=post host=73.popmundo.com path=/World/Popmundo.aspx/Character
+game-route request GET 73.popmundo.com /World/Popmundo.aspx/Character/Items/
+game-route response status=200
+game-route form method=post host=73.popmundo.com path=/World/Popmundo.aspx/Character/Items/
+game-discovery-live visibleId=3327035 selectedId=3155712 owned=7 itemChoices=2
+00:16 +1: All tests passed!
