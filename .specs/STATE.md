@@ -195,11 +195,12 @@
 
 ## Handoff
 
-- **Feature**: service-scheduler / .specs/features/service-scheduler.
-- **Phase / Task**: Complete; user approved design on 2026-10-04; independent review PASS on 2026-10-05. Merged onto master together with composition-root-scaling (AD-022): `SchedulerApi` is held by `AppWiring`, and the sidebar entry is `schedulesMenuItem`.
-- **Completed**: approved plan and AD-021; T1 dcd7781 (239 core tests), T2 c5e2782 (248), T3 77288a2 (273), analyzers clean; root spec/quality review passed for core and T4 runtime; T4 9467250 (116 app tests), T5 4f1c2e1 (132 app tests); native screen spec/quality review passed; startup recovery fix 3131a8f (136 app tests); background permission fix c56844c (137 app tests), native GMT alias fix d83414f (138 app tests), analyzers clean. T6 fac723d: all native lifecycle, reboot skip, weekly GMT and native suppression evidence passed; temporary configuration restored.
-- **In-progress**: none. T7 751bd77 maintenance and production release complete; independent validation PASS over 5ca0d99..ac79b13, 448 tests (core277/WebView31/app140), analyzers and normal build clean. Five independent behavior faults detected and discarded. Test-only Unicode repairs 2aec530/ac79b13 close F2; retained-log hygiene 74b9500 closes F1. Production data preserved and installed source unchanged.
-- **Next step**: Use sidebar Agendamentos to manage local notification rules. Physical-handset and overnight observation remain outside the recorded emulator evidence; no additional implementation or verifier fix remains. Full report: .specs/features/service-scheduler/validation.md.
-- **Blockers**: none. Keep test package/build changes temporary and preserve installed production data.
-- **Prior feature**: background-session-reliability Verifier PASS; overnight coverage was not observed. composition-root-scaling also merged (AD-022; Verifier PASS, commits `1ebf55b`…`8984376`).
-- **Branch**: master
+- **Feature**: scheduled-game-actions / .specs/features/scheduled-game-actions.
+- **Phase / Task**: Specify; concrete spec and HTTP isolation proposal await user review. No production implementation started.
+- **Completed**: read supplied Puppeteer script and current architecture; domain/utils/shell specialist research; embedded-browser login, Troy selection, inventory and black panties crew DOM mapping; recorded research.md/spec.md/context.md. No item use or crew bonus was submitted.
+- **In-progress**: one async clarification asks exact item name/first usable unit versus a specific item ID. Draft proposes name/first usable unit and explicitly marks the decision pending.
+- **Next step**: user reviews spec and transport proposal; then close item policy, design/tasks, explicitly amend AD-021 for private HTTP in FGS, implement via specialists and run independent verifier.
+- **Blockers**: required spec/design approval from invoked skills; no technical blocker yet. Independent second-login coexistence has not been verified live. No raw credentials, cookies or authenticated HTML retained in planning files.
+- **Prior feature**: service-scheduler complete; independent PASS, production emulator release installed, physical handset/overnight unmeasured. Source baseline now 5ce2153 incorporates AD-022 AppWiring/composition-root-scaling; no prior behavior changed by this draft.
+- **Uncommitted files**: none after the planning commit; production files untouched.
+- **Branch**: codex/scheduled-game-actions.
