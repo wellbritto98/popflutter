@@ -15,7 +15,7 @@ Gathered: 2026-10-05. Status: Approved.
 
 ## Approved defaults
 
-Private native sender/login and empty jar per transaction. Saved Auto Login credentials read freshly; visible session never seeded/updated. Exact normalized item name, first eligible row, one use per occurrence (proposed item policy accepted with feature confirmation). Explicit offered crew bonus/artist and cost cap at selected quote, no automatic20. Mandatory start notice; unavailable/uncertain distinct; no retry after possibly applied POST. Details and limits in design.md/spec.md.
+Private native sender/login and empty jar per transaction. Saved Auto Login credentials read freshly; visible session never seeded/updated. Exact normalized item name, first eligible row, one use per occurrence (proposed item policy accepted with feature confirmation). Crew default is maximum level20. Verified artist and character permit saving during weekly unavailability. Retain the selected quote cap when available; otherwise store no cap and disclose the fresh game price at execution. This user clarification on 2026-10-06 supersedes the initial explicit-choice-only default. Mandatory start notice; unavailable/uncertain distinct; no retry after possibly applied POST. Details and limits in design.md/spec.md.
 
 ## Execution
 

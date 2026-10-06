@@ -39,7 +39,7 @@ Total deadline120s; per-request20s; decoded-body2MiB; cooldown750ms after succes
 
 Use item: exact case/whitespace-normalized name; first eligible direct inventory row in DOM order; enabled image button pathname /Item_Use.png only; row-local hidItemIDstring preserved; button.x=1/button.y=1. No tuning/wearing/drop or persisted item form state.
 
-Crew bonus: verify current scoped artist ID; explicit selected offered enabled level14..20; parse quoted currency with exact observed PT grouping/decimal grammar into cents (2.250,00 M$ =225000); reject ambiguous unsupported formats. Current quote must not exceed maxCostMinor. Full fresh form includes selected bonus and actual button value. Missing form/option => unavailable; no substitute or fabricated reason.
+Crew bonus: verify current scoped artist ID; explicit selected offered enabled level14..20; parse quoted currency with exact observed PT grouping/decimal grammar into cents (2.250,00 M$ =225000); reject ambiguous unsupported formats. When maxCostMinor is present the current quote must not exceed it; a null cap authorizes the saved level at its freshly parsed game price. Existing non-null caps retain their guard. Full fresh form includes selected bonus and actual button value. Missing form/option => unavailable; no substitute or fabricated reason.
 
 Before gameplay, obtain a neutral notification baseline with at most two bounded ASMX reads; do not assume reads clear state merely from endpoint naming. Failure/non-neutral baseline prevents gameplay. After gameplay, strictly decode GetPageNotifications response; only unequivocal fresh success confirms, explicit error fails, mixed/empty/malformed/unknown signals are uncertain. HTTP200 alone never confirms.
 
@@ -51,7 +51,7 @@ Preserve ScheduledActionExecutor local port; add a game execution boundary retur
 
 Separate GameActionsApi discovery interface implemented by SchedulerClient preserves existing CRUD fakes. Secondary engine reconstructs service/credentials/notifications on startup; locale comes from fresh preferences and bundled EN/PT assets, not main UI localization state. Initialization failures are sanitized and prevent gameplay.
 
-Editor keeps current recurrence fields, adds service selection and independently loaded character/options. Each rule explicitly retains character ID and name. Saved rules can be edited offline without implicit HTTP; changing target requires fresh options. Crew choice displays cost/cap and weekly limitation; item choice explains one use per occurrence. Rule cards show target/effect/latest outcome.
+Editor keeps current recurrence fields, adds service selection and independently loaded character/options. Each rule explicitly retains character ID and name. Saved rules can be edited offline without implicit HTTP; changing target requires fresh verified character and artist discovery. Crew defaults to level20 and may be saved without currently available bonus options; its optional cost cap is the current quote when available. Discovery shows progress and clears loading on completion or failure. Crew choice displays cost/cap and weekly limitation; item choice explains one use per occurrence. Rule cards show target/effect/latest outcome.
 
 ## Risks & Concerns
 

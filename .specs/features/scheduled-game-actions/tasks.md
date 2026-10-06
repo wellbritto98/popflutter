@@ -144,3 +144,9 @@ Per task retain red/green gate logs, exact tests/assertions covering ACs, test c
 ## Fix F1 — Native login route diagnosis
 
 Found after T2 opt-in live probe: routeMismatch before gameplay; no item/payment POST. First gather sanitized method/host/path/status/form-action route shape, then reproduce actual shape in a red unit test. Implement only evidence-backed auth-route correction, preserve strict gameplay routes, full core gate/analyze and atomic fix commit. Re-run opt-in read-only discovery and check visible Troy ID unchanged. No credentials, cookies, body, query tokens or authenticated HTML in evidence. Execute before T3; routine required fix already authorized by user continue/debug request.
+
+## Fix F2 — Future crew scheduling and loading feedback (2026-10-06)
+
+User clarified the reported save problem occurs after a weekly crew bonus; that state must not prevent scheduling the next week. User requests maximum bonus as the default and visible feedback while requests run. This supersedes the original no-default20/current-quote-required configuration rule, not execution-time guards.
+
+Core: optional cost cap with backwards-compatible capped rules; null cap uses the selected level at the fresh parsed game price. Editor: default20, verified character/artist required, save without available bonus form, disclose unavailable-now/future price, visible loading and recoverable validation. Tests: empty bonus list saves bound crew20; pending discovery feedback; uncapped codec and guarded execution; legacy cap remains enforced. Owners: utils and app-shell; gate/commit separately before T8. No live payment authorized or submitted.
