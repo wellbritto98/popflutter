@@ -42,7 +42,7 @@ Depends on: None. Owner: popmundo-utils. Reuses: existing scheduler JSON validat
 Requirement: SGA-01, SGA-02, SGA-03 account/character binding.
 Done when: roundtrip retains char ID/name/account/item/bonus/cap; malformed/unknown rejects; no secret fields; baseline preserved.
 Tests: unit. Gate: Quick. Commit: feat(game-actions): add typed action configuration.
-Status: pending.
+Status: done; commit09b83bc; red then298 core tests passed, analyze clean (evidence/t1-*).
 
 ### T2 — Isolated HTTP transaction component
 What: GameActionsService auth/discovery/forms/strict outcome/cancellation contracts; endpoint execution hooks remain for T3/4.
