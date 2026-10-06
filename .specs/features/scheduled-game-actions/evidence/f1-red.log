@@ -1,0 +1,20 @@
+00:00 +0: loading test/game_actions_login_route_test.dart
+00:00 +0: SGA-03 login GET accepts actual login controls before authentication
+00:00 +0 -1: SGA-03 login GET accepts actual login controls before authentication [E]
+  routeMismatch
+  package:popmundo_utils/src/game_actions/game_actions_service.dart 149:7   GameActionsService._requirePage
+  package:popmundo_utils/src/game_actions/game_actions_service.dart 97:5    GameActionsService._login
+  ===== asynchronous gap ===========================
+  package:popmundo_utils/src/game_actions/game_actions_service.dart 155:23  GameActionsService.discoverCharacters.<fn>
+  ===== asynchronous gap ===========================
+  package:popmundo_utils/src/game_actions/game_actions_service.dart 76:16   GameActionsService._transaction.<fn>
+  ===== asynchronous gap ===========================
+  test\game_actions_login_route_test.dart 23:21                             main.<fn>
+
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  test/game_actions_login_route_test.dart: SGA-03 login GET accepts actual login controls before authentication
+
+Consider enabling the flag chain-stack-traces to receive more detailed exceptions.
+For example, 'dart test --chain-stack-traces'.

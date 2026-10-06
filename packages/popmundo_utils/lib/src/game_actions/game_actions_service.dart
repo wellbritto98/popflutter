@@ -94,7 +94,7 @@ class GameActionsService {
     final page = await context.session.get(
       Uri.parse('https://www.popmundo.com/Default.aspx'),
     );
-    _requirePage(page, '/Default.aspx');
+    _requirePage(page, '/Default.aspx', allowLoginForm: true);
     final doc = parser.parse(page.body);
     freshForm(doc, page.finalUrl);
     final form = AutoLoginRequests.loginBody(
@@ -141,11 +141,15 @@ class GameActionsService {
     return origin;
   }
 
-  static void _requirePage(AuthExchange page, String path) {
+  static void _requirePage(
+    AuthExchange page,
+    String path, {
+    bool allowLoginForm = false,
+  }) {
     GameTransaction.validateUrl(page.finalUrl);
     if (page.status != 200 ||
         page.finalUrl.path != path ||
-        AspNetForm.looksLikeLoginForm(page.body)) {
+        (!allowLoginForm && AspNetForm.looksLikeLoginForm(page.body))) {
       throw const GameActionException('routeMismatch');
     }
   }

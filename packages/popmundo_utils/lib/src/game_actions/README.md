@@ -13,3 +13,5 @@ Successful form controls use opt-in strictDisabledControls, including disabled f
 Notification preflight accepts an empty list or only normal Status0/Textstring signals. It seeks neutrality in at most two reads; malformed/non-neutral baseline aborts. After a possible effect, only an all-success response confirms, all-error fails; empty/normal/unknown/mixed is uncertain. Endpoint name does not imply draining.
 
 At the T2 foundation stage execute remains an unavailable hook; item and crew adapters follow in T3/T4. Production credentials and authenticated HTML never enter default tests. Tests use synthetic transports/loopback; the opt-in test_live/game_actions_discovery_live_test.dart only selects/discovers, never calls execute or writes captures.
+
+Login GET explicitly permits the actual login controls on /Default.aspx; every post-authentication route still rejects a login form. This distinction is regression-tested with synthetic real control names. Optional live diagnostics require POPMUNDO_TRACE_ROUTES=true and publish only method/host/path/status plus sanitized form action routing, never query strings or payloads.
