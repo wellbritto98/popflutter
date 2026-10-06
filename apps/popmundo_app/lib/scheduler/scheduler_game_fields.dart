@@ -10,6 +10,7 @@ class SchedulerGameFields extends StatelessWidget {
     required this.crew,
     required this.pending,
     required this.locked,
+    this.loading = false,
     this.catalog,
     this.character,
     this.items = const [],
@@ -23,7 +24,7 @@ class SchedulerGameFields extends StatelessWidget {
     this.onChangeTarget,
   });
 
-  final bool crew, pending, locked;
+  final bool crew, pending, locked, loading;
   final GameCharacterCatalog? catalog;
   final GameCharacter? character;
   final List<GameItemChoice> items;
@@ -40,6 +41,22 @@ class SchedulerGameFields extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
+      if (loading)
+        Padding(
+          key: const Key('schedule-options-loading'),
+          padding: const EdgeInsets.only(top: 12),
+          child: Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              const SizedBox(width: 12),
+              Expanded(child: Text('scheduler.loadingChoices'.tr())),
+            ],
+          ),
+        ),
       if (crew)
         Padding(
           padding: const EdgeInsets.only(top: 12),
@@ -98,6 +115,14 @@ class SchedulerGameFields extends StatelessWidget {
             ],
           ),
         if (crew && crewOptions != null) ...[
+          if (crewOptions!.bonuses.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Text(
+                'scheduler.crewUnavailableNow'.tr(),
+                key: const Key('schedule-crew-unavailable'),
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.only(top: 12),
             child: Text(

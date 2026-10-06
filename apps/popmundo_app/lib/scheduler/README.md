@@ -1,6 +1,6 @@
 # scheduler (popmundo_app)
 
-Adapter Android e UI nativa para regras recorrentes de notificação local. Spec: service-scheduler; decisão AD-021. Modelos, cálculo de recorrência e coordenador são do pacote puro popmundo_utils.
+Adapter Android e UI nativa para regras recorrentes de notificação local, uso de item e bônus de equipe. Specs: service-scheduler e scheduled-game-actions; decisões AD-021/023. Modelos, recorrência, coordenador e HTTP isolado são do pacote puro popmundo_utils.
 
 ## Responsabilidades
 
@@ -23,19 +23,19 @@ O engine do Foreground Service é o único escritor do JSON service_scheduler.v1
 
 ## Transporte e execução
 
-A comunicação usa FlutterForegroundTask.sendDataToTask/sendDataToMain. Requests têm type scheduler.request, requestId e command list/create/update/toggle/delete. Mutação inclui id estável, draft e revision quando aplicável. Replies type scheduler.response devolvem requestId e snapshot ou error tipado; heartbeat continua no envelope independente heartbeat.
+A comunicação usa FlutterForegroundTask.sendDataToTask/sendDataToMain. Requests têm type scheduler.request, requestId e command list/create/update/toggle/delete e discoverCharacters/discoverItems/discoverCrew. Mutação inclui id estável, draft e revision quando aplicável. Replies type scheduler.response devolvem requestId e snapshot ou error tipado; heartbeat continua no envelope independente heartbeat.
 
 SchedulerApi oferece list(), create(draft, id), update(rule, draft), toggle(rule, enabled) e delete(rule). SchedulerClient espera prontidão e limita o RPC a 15s; nunca reenvia uma mutação automaticamente. Timeout de resposta não prova que a gravação falhou.
 
-O editor oferece notificação local, usar item e pagar equipe. Item e bônus exigem personagem e opção descobertos; o bônus 20 não é escolhido sozinho, e o teto salvo é a cotação escolhida. Uma regra de jogo já salva abre sem nova descoberta. Trocar o alvo exige opções novas. O cartão mostra serviço, personagem, item ou artista/bônus e o último resultado. O editor guarda o mesmo ID durante a tentativa. Após falha, relê o catálogo antes de liberar novo save: se a criação foi persistida, adota a regra/revisão e uma nova submissão é update. Releitura falha mantém a edição e bloqueia ressubmissão. A UI só confirma após snapshot autoritativo; cancel não salva. Campos aceitam o conteúdo completo e validam limites UTF-16 após trim (nome 80, título 120, corpo 1000); quantidade inteira 1–9999.
+O editor oferece notificação local, usar item e pagar equipe. Item exige personagem e opção descobertos. Pagar equipe começa no bônus máximo 20: com cotação disponível, salva o teto daquele valor; sem bônus disponível agora, salva personagem e banda com nível 20 e custo a ser definido pelo jogo na execução. Uma escolha explícita de outro nível mantém sua cotação como teto. A restrição semanal não impede criar uma regra futura. Descoberta mostra progresso perto dos controles e no botão Salvar. Campos inválidos ficam visíveis ao salvar. Uma regra de jogo já salva abre sem nova descoberta. Trocar o alvo exige descobrir personagem e banda novos. O cartão mostra serviço, personagem, item ou artista/bônus e o último resultado. O editor guarda o mesmo ID durante a tentativa. Após falha, relê o catálogo antes de liberar novo save: se a criação foi persistida, adota a regra/revisão e uma nova submissão é update. Releitura falha mantém a edição e bloqueia ressubmissão. A UI só confirma após snapshot autoritativo; cancel não salva. Campos validam limites UTF-16 após trim (nome 80, título 120, corpo 1000); quantidade inteira 1–9999.
 
-O runner rearma um único Timer no vencimento mais próximo após comandos/reconciliação. Heartbeat nativo de 5s reconcilia interrupções e mudanças de zona; ticks simultâneos compartilham a mesma Future. DeviceZone conserva a última zona válida após falha transitória; primeira falha permanece indisponível, sem UTC silencioso. Intervalos continuam independentes da zona. O core define claim persistido antes do efeito, sem replay de slots perdidos e timeout da ação de 5s.
+O runner rearma um único Timer no vencimento mais próximo após comandos/reconciliação. Heartbeat nativo de 5s reconcilia interrupções e mudanças de zona; ticks simultâneos compartilham a mesma Future. DeviceZone conserva a última zona válida após falha transitória; primeira falha permanece indisponível, sem UTC silencioso. Intervalos continuam independentes da zona. O core define claim persistido antes do efeito, sem replay de slots perdidos e timeout local de 5s. A transação de jogo tem prazo total de 120s, 20s por request e cancelamento real do transporte.
 
 A lista aberta consulta snapshots a cada 5s, coalescendo leituras; pausa essas consultas quando o app está inativo ou o editor aberto e cancela ao destruir a rota. Resultado submitted significa que Android aceitou a chamada de notificação, não que o usuário a viu.
 
 ## Plataforma e limites
 
-Agendamentos contínuos são Android-only. iOS mostra explicação localizada e não oferece criação. Não há AlarmManager, WorkManager, backend, WebView, autenticação ou gameplay dentro do scheduler. O serviço mantém sua notificação de sessão separada dos cards dos agendamentos.
+Agendamentos contínuos são Android-only. iOS mostra explicação localizada e não oferece criação. Não há AlarmManager, WorkManager, backend ou WebView dentro do scheduler. Autenticação e gameplay usam somente o gateway HTTP isolado de AD-023. O serviço mantém sua notificação de sessão separada dos cards dos agendamentos.
 
 Boot/package replacement são configurados pela presença de qualquer regra enabled. Nenhuma regra ativa desliga esses flags, sem parar o keepalive existente. Após morte/reinício, o core pula vencimentos perdidos e arma o próximo futuro. Force-stop, permissão revogada e políticas do OS/fabricante impedem garantias de continuidade; a implementação não promete entrega em horário real rígido.
 

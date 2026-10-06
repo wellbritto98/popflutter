@@ -1,0 +1,18 @@
+Analyzing popmundo_app...                                       
+
+  error - Const variables must be initialized with a constant value. Try changing the initializer to be a constant expression - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:24:345 - const_initialized_with_non_constant_value
+  error - Undefined name 'cphLeftColumn'. Try correcting the name to one that is defined, or defining the name - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:24:345 - undefined_identifier
+  error - Undefined name 'ctl01'. Try correcting the name to one that is defined, or defining the name - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:24:359 - undefined_identifier
+  error - Undefined name 'ddlCashBonus'. Try correcting the name to one that is defined, or defining the name - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:24:365 - undefined_identifier
+  error - Expected an identifier - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:24:450 - missing_identifier
+  error - Expected an identifier - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:24:504 - missing_identifier
+  error - Undefined name 'cphLeftColumn'. Try correcting the name to one that is defined, or defining the name - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:24:555 - undefined_identifier
+  error - Undefined name 'ctl01'. Try correcting the name to one that is defined, or defining the name - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:24:569 - undefined_identifier
+  error - Undefined name 'btnCashBonus'. Try correcting the name to one that is defined, or defining the name - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:24:575 - undefined_identifier
+  error - Undefined name 'cphLeftColumn'. Try correcting the name to one that is defined, or defining the name - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:162:36 - undefined_identifier
+  error - Undefined name 'ctl01'. Try correcting the name to one that is defined, or defining the name - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:162:50 - undefined_identifier
+  error - Undefined name 'ddlCashBonus'. Try correcting the name to one that is defined, or defining the name - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:162:56 - undefined_identifier
+  error - Undefined name 'cphLeftColumn'. Try correcting the name to one that is defined, or defining the name - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:162:96 - undefined_identifier
+  error - Undefined name 'ctl01'. Try correcting the name to one that is defined, or defining the name - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:162:110 - undefined_identifier
+  error - Undefined name 'btnCashBonus'. Try correcting the name to one that is defined, or defining the name - apps\popmundo_app\integration_test\support\game_actions_fixture.dart:162:116 - undefined_identifier
+

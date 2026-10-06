@@ -1,0 +1,119 @@
+00:00 +0: loading C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_crew_save_regression_test.dart
+00:00 +0: empty crew options explain blocked save and refresh in en
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _KeyWidgetFinder:<Found 0 widgets with key [<'schedule-crew-unavailable'>]: []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_crew_save_regression_test.dart:55:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_crew_save_regression_test.dart line 55
+The test description was:
+  empty crew options explain blocked save and refresh in en
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -1: empty crew options explain blocked save and refresh in en [E]
+  Test failed. See exception logs above.
+  The test description was: empty crew options explain blocked save and refresh in en
+  
+00:01 +0 -1: empty crew options explain blocked save and refresh in pt
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded pt[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _KeyWidgetFinder:<Found 0 widgets with key [<'schedule-crew-unavailable'>]: []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_crew_save_regression_test.dart:55:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_crew_save_regression_test.dart line 55
+The test description was:
+  empty crew options explain blocked save and refresh in pt
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -2: empty crew options explain blocked save and refresh in pt [E]
+  Test failed. See exception logs above.
+  The test description was: empty crew options explain blocked save and refresh in pt
+  
+00:01 +0 -2: crew save reveals invalid fields above the selected bonus
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _HitTestableWidgetFinder:<Found 0 widgets with text "Required: 1–80 characters"
+(considering only hit-testable widgets with a RenderBox): []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_crew_save_regression_test.dart:102:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_crew_save_regression_test.dart line 102
+The test description was:
+  crew save reveals invalid fields above the selected bonus
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:02 +0 -3: crew save reveals invalid fields above the selected bonus [E]
+  Test failed. See exception logs above.
+  The test description was: crew save reveals invalid fields above the selected bonus
+  
+00:02 +0 -3: Some tests failed.
+
+Failing tests:
+  C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_crew_save_regression_test.dart: crew save reveals invalid fields above the selected bonus
+  C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_crew_save_regression_test.dart: empty crew options explain blocked save and refresh in en
+  C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_crew_save_regression_test.dart: empty crew options explain blocked save and refresh in pt

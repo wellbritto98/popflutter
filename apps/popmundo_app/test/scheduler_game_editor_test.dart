@@ -126,67 +126,59 @@ void main() {
     ]);
   });
 
-  testWidgets('crew save requires an explicit quote and never defaults to 20', (
-    tester,
-  ) async {
-    final api = FakeSchedulerApi();
-    final discovery = Discovery();
-    await pumpLocalized(
-      tester,
-      SchedulerEditor(
-        api: api,
-        discovery: discovery,
-        ensurePermission: () async => true,
-      ),
-    );
-    await field(tester, 'schedule-name', 'Crew bonus');
-    await tap(tester, const Key('schedule-service-crew'));
-    expect(
-      find.text(
-        'The game allows one crew bonus every seven days. An unavailable form spends nothing and waits for the next occurrence.',
-      ),
-      findsOneWidget,
-    );
-    await tap(tester, const Key('schedule-character-42'));
-    expect(
-      tester.widget<ChoiceChip>(find.byKey(const Key('schedule-bonus-20'))).selected,
-      false,
-    );
-    expect(
-      tester.widget<ChoiceChip>(find.byKey(const Key('schedule-bonus-14'))).selected,
-      false,
-    );
-    expect(find.text('Artist: Saved Band'), findsOneWidget);
-    expect(find.text('máximo · 900000'), findsOneWidget);
-    expect(find.text('notável · 225000'), findsOneWidget);
-    await save(tester);
-    expect(api.creates, 0);
-    expect(
-      find.text('Choose a character and an offered option before saving.'),
-      findsOneWidget,
-    );
-    expect(
-      tester
-          .widget<TextFormField>(find.byKey(const Key('schedule-name')))
-          .controller!
-          .text,
-      'Crew bonus',
-    );
-    await tap(tester, const Key('schedule-bonus-14'));
-    expect(
-      find.text(
-        'Each eligible occurrence distributes cash bonus 14 (225000) to Saved Band.',
-      ),
-      findsOneWidget,
-    );
-    await save(tester);
-    final action = (await api.list()).rules.single.action as PayCrewAction;
-    expect(action.character.id, 42);
-    expect(action.artistId, 77);
-    expect(action.artistName, 'Saved Band');
-    expect(action.bonusLevel, 14);
-    expect(action.maxCostMinor, 225000);
-  });
+  testWidgets(
+    'crew defaults to maximum but an explicit lower quote is preserved',
+    (tester) async {
+      final api = FakeSchedulerApi();
+      final discovery = Discovery();
+      await pumpLocalized(
+        tester,
+        SchedulerEditor(
+          api: api,
+          discovery: discovery,
+          ensurePermission: () async => true,
+        ),
+      );
+      await field(tester, 'schedule-name', 'Crew bonus');
+      await tap(tester, const Key('schedule-service-crew'));
+      expect(
+        find.text(
+          'The game allows one crew bonus every seven days. An unavailable form spends nothing and waits for the next occurrence.',
+        ),
+        findsOneWidget,
+      );
+      await tap(tester, const Key('schedule-character-42'));
+      expect(
+        tester
+            .widget<ChoiceChip>(find.byKey(const Key('schedule-bonus-20')))
+            .selected,
+        true,
+      );
+      expect(
+        tester
+            .widget<ChoiceChip>(find.byKey(const Key('schedule-bonus-14')))
+            .selected,
+        false,
+      );
+      expect(find.text('Artist: Saved Band'), findsOneWidget);
+      expect(find.text('máximo · 900000'), findsOneWidget);
+      expect(find.text('notável · 225000'), findsOneWidget);
+      await tap(tester, const Key('schedule-bonus-14'));
+      expect(
+        find.text(
+          'Each eligible occurrence distributes cash bonus 14 (225000) to Saved Band.',
+        ),
+        findsOneWidget,
+      );
+      await save(tester);
+      final action = (await api.list()).rules.single.action as PayCrewAction;
+      expect(action.character.id, 42);
+      expect(action.artistId, 77);
+      expect(action.artistName, 'Saved Band');
+      expect(action.bonusLevel, 14);
+      expect(action.maxCostMinor, 225000);
+    },
+  );
 
   testWidgets('discovery failure keeps input and does not save a game rule', (
     tester,
@@ -340,29 +332,29 @@ void main() {
     tester,
   ) async {
     final api = FakeSchedulerApi();
-    final crew = (await api.create(
-      intervalDraft(
-        PayCrewAction(
-          boundUsername: 'bound',
-          character: GameCharacter(id: 42, name: 'Saved Character'),
-          artistId: 77,
-          artistName: 'Saved Band',
-          bonusLevel: 14,
-          maxCostMinor: 225000,
-        ),
-        name: 'Band',
-      ),
-      id: 'crew-rule',
-    )).rules.singleWhere((rule) => rule.id == 'crew-rule').copyWith(
-      lastResult: ScheduleResult(
-        status: ScheduleResultStatus.unavailable,
-        atUtc: DateTime.utc(2026, 10, 4, 12),
-      ),
-    );
-    api.refreshedSnapshot = SchedulerSnapshot(
-      nextSequence: 3,
-      rules: [crew],
-    );
+    final crew =
+        (await api.create(
+              intervalDraft(
+                PayCrewAction(
+                  boundUsername: 'bound',
+                  character: GameCharacter(id: 42, name: 'Saved Character'),
+                  artistId: 77,
+                  artistName: 'Saved Band',
+                  bonusLevel: 14,
+                  maxCostMinor: 225000,
+                ),
+                name: 'Band',
+              ),
+              id: 'crew-rule',
+            )).rules
+            .singleWhere((rule) => rule.id == 'crew-rule')
+            .copyWith(
+              lastResult: ScheduleResult(
+                status: ScheduleResultStatus.unavailable,
+                atUtc: DateTime.utc(2026, 10, 4, 12),
+              ),
+            );
+    api.refreshedSnapshot = SchedulerSnapshot(nextSequence: 3, rules: [crew]);
     await pumpLocalized(
       tester,
       SchedulerScreen(api: api, platform: FakeBackgroundPlatform()),

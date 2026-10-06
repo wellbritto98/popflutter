@@ -138,7 +138,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
         _targetLocked = false;
         _character = null;
         _itemName = null;
-        _bonusLevel = null;
+        _bonusLevel = service == _Service.crew ? 20 : null;
         _items = const [];
         _crew = null;
         _catalog = null;
@@ -181,7 +181,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
     setState(() {
       _character = character;
       _itemName = null;
-      _bonusLevel = null;
+      _bonusLevel = _service == _Service.crew ? 20 : null;
       _items = const [];
       _crew = null;
       _loadingChoices = true;
@@ -233,15 +233,19 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
     if (_service != _Service.crew || _bonusLevel == null) return null;
     final saved = _rule?.action;
     final artist =
-        _crew?.artistName ??
-        (saved is PayCrewAction ? saved.artistName : null);
+        _crew?.artistName ?? (saved is PayCrewAction ? saved.artistName : null);
     final quoted = _crew?.bonuses.where((bonus) => bonus.level == _bonusLevel);
     final cost = quoted != null && quoted.isNotEmpty
         ? quoted.single.costMinor
         : saved is PayCrewAction && saved.bonusLevel == _bonusLevel
         ? saved.maxCostMinor
         : null;
-    if (artist == null || cost == null) return null;
+    if (artist == null) return null;
+    if (cost == null) {
+      return 'scheduler.effectCrewFuture'.tr(
+        args: [_bonusLevel.toString(), artist],
+      );
+    }
     return 'scheduler.effectCrew'.tr(
       args: [_bonusLevel.toString(), cost.toString(), artist],
     );
@@ -271,22 +275,27 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
     final level = _bonusLevel;
     if (crew == null || level == null) return null;
     final matches = crew.bonuses.where((bonus) => bonus.level == level);
-    if (matches.length != 1) return null;
+    if (matches.length > 1 || (matches.isEmpty && level != 20)) return null;
     return PayCrewAction(
       boundUsername: catalog.username,
       character: character,
       artistId: crew.artistId,
       artistName: crew.artistName,
       bonusLevel: level,
-      maxCostMinor: matches.single.costMinor,
+      maxCostMinor: matches.isEmpty ? null : matches.single.costMinor,
     );
   }
 
   Future<void> _save() async {
-    if (_pending ||
-        _needsRead ||
-        _loadingChoices ||
-        !_form.currentState!.validate()) {
+    if (_pending || _needsRead || _loadingChoices) return;
+    final invalid = _form.currentState!.validateGranularly();
+    if (invalid.isNotEmpty) {
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) return;
+      await Scrollable.ensureVisible(
+        invalid.first.context,
+        duration: const Duration(milliseconds: 200),
+      );
       return;
     }
     final action = _action();
@@ -409,7 +418,12 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
                         ? null
                         : _save,
                     child: Text(
-                      (_pending ? 'scheduler.saving' : 'scheduler.save').tr(),
+                      (_loadingChoices
+                              ? 'scheduler.loadingChoices'
+                              : _pending
+                              ? 'scheduler.saving'
+                              : 'scheduler.save')
+                          .tr(),
                     ),
                   ),
                 ),
@@ -518,6 +532,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
             ] else
               SchedulerGameFields(
                 crew: _service == _Service.crew,
+                loading: _loadingChoices,
                 pending: _pending || _loadingChoices,
                 locked: _targetLocked,
                 catalog: _catalog,
@@ -535,7 +550,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
                     _targetLocked = false;
                     _character = null;
                     _itemName = null;
-                    _bonusLevel = null;
+                    _bonusLevel = _service == _Service.crew ? 20 : null;
                     _items = const [];
                     _crew = null;
                     _catalog = null;
