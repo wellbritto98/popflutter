@@ -1,0 +1,19 @@
+00:00 +0: loading test/game_actions_crew_test.dart
+00:00 +0: SGA-06 full fresh form posts explicitly selected bonus and actual button
+00:00 +1: SGA-06 selected level20 only when explicitly approved exact current cap
+00:00 +2: SGA-06 artistChanged unavailable without payment or replacement
+00:00 +3: SGA-06 artistMissing unavailable without payment or replacement
+00:00 +4: SGA-06 selectMissing unavailable without payment or replacement
+00:00 +5: SGA-06 levelMissing unavailable without payment or replacement
+00:00 +6: SGA-06 optionDisabled unavailable without payment or replacement
+00:00 +7: SGA-06 selectDisabled unavailable without payment or replacement
+00:00 +8: SGA-06 buttonMissing unavailable without payment or replacement
+00:00 +9: SGA-06 buttonDisabled unavailable without payment or replacement
+00:00 +10: SGA-06 buttonEmpty unavailable without payment or replacement
+00:00 +11: SGA-06 invalidPrice unavailable without payment or replacement
+00:00 +12: SGA-06 ambiguousPrice unavailable without payment or replacement
+00:00 +13: SGA-06 overBudget unavailable without payment or replacement
+00:00 +14: SGA-06 formMissing unavailable without payment or replacement
+00:00 +15: SGA-08 crew outcome reflects actual signal no resend {"d":[]}
+00:00 +16: SGA-08 crew outcome reflects actual signal no resend {"d":{"Status":2,"Text":"rejected"}}
+00:00 +17: All tests passed!

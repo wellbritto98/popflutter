@@ -9,6 +9,7 @@ import '../autologin/auth_http.dart';
 import '../scheduler/scheduler_models.dart';
 import 'game_action_contracts.dart';
 import 'game_forms.dart';
+import 'game_crew_action.dart';
 import 'game_item_action.dart';
 import 'game_transaction.dart';
 
@@ -214,15 +215,18 @@ class GameActionsService {
         try {
           final login = await _login(context, credentials);
           final origin = await _select(context, login, action.character);
-          if (action is! UseItemAction) {
-            throw const GameActionException("executorUnavailable");
-          }
-          final url = origin.replace(
-            path: "/World/Popmundo.aspx/Character/Items/",
-          );
+          final path = switch (action) {
+            UseItemAction() => "/World/Popmundo.aspx/Character/Items/",
+            PayCrewAction() => "/World/Popmundo.aspx/Artist/Crew/",
+          };
+          final url = origin.replace(path: path);
           final page = await context.session.get(url);
           _requirePage(page, url.path, expectedOrigin: origin);
-          final form = itemPost(parser.parse(page.body), page.finalUrl, action);
+          final document = parser.parse(page.body);
+          final form = switch (action) {
+            UseItemAction() => itemPost(document, page.finalUrl, action),
+            PayCrewAction() => crewPost(document, page.finalUrl, action),
+          };
           await context.establishNeutralBaseline(origin);
           context.check();
           context.gameplayUrl = url;
@@ -237,7 +241,14 @@ class GameActionsService {
             );
           }
           return GameActionOutcome(
-            status: ["itemUnavailable", "formUnavailable"].contains(error.code)
+            status:
+                [
+                  "itemUnavailable",
+                  "formUnavailable",
+                  "artistUnavailable",
+                  "artistMismatch",
+                  "bonusUnavailable",
+                ].contains(error.code)
                 ? GameActionStatus.unavailable
                 : GameActionStatus.failed,
             errorCode: error.code,
