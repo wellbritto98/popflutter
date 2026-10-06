@@ -95,7 +95,7 @@ SGA-08 — Truthful persisted results
 SGA-09 — Serial execution, deadlines and lifecycle
 
 1. WHEN multiple rules/discovery calls compete, THEN one HTTP transaction at a time SHALL include login, selection, target GET, gameplay POST and outcome verification. Requests within the transaction SHALL honor at least 750 ms after the prior request finishes, including failed requests. No unbounded backlog of overdue occurrences SHALL be created.
-2. WHEN a game transaction runs, THEN its proposed overall deadline SHALL be 120 seconds, with at most 20 seconds per request and a 2 MiB decoded response ceiling. The local-notification deadline remains five seconds. Limits are injectable in tests.
+2. WHEN a game transaction runs, THEN its overall deadline SHALL be 120 seconds, with at most 20 seconds per request and a 2 MiB decoded response ceiling. The local-notification deadline remains five seconds. Limits are injectable in tests.
 3. WHEN deadline/disposal/service destruction cancels HTTP, THEN the sender SHALL actually abort/close, and a cancellation check SHALL prevent every subsequent request, especially gameplay POST. The transaction lock SHALL remain held until prior work can no longer send; merely Future.timeout followed by queue release is forbidden.
 4. WHEN a gameplay POST is in progress at cancellation, THEN its result SHALL be uncertain; cancellation before gameplay SHALL be a failed/timeout result. A late response SHALL NOT launch a POST or change a newer execution's session.
 5. WHEN a long transaction delays another occurrence beyond the existing eligibility window, THEN the scheduler SHALL skip that overdue slot and arm the next future occurrence, preserving the existing no-replay semantics.
@@ -106,21 +106,21 @@ SGA-10 — Android evidence and maintenance
 2. WHEN gates run, THEN default tests SHALL use fakes and device tests SHALL use loopback, never real Popmundo. User-authorized browser inspection/live checks SHALL remain opt-in and separate, with no production credentials or authenticated HTML committed.
 3. WHEN validation completes, THEN a fresh independent verifier SHALL map every AC to evidence and kill behavior-level faults for wrong item button, wrong bonus, shared cookies, missing start notice and unsafe timeout/duplicate behavior. Documentation SHALL describe the final supported behavior and concrete limits.
 
-## Assumptions and pending review
+## Approved assumptions
 
-| Decision | Proposed default | Rationale | Confirmation |
+| Decision | Approved default | Rationale | Confirmation |
 | --- | --- | --- | --- |
-| Transport | Native HTTP in existing FGS, independent login/jar | User explicitly permits HTTP; avoids shared WebView cookies and renderer dependency | Review requested |
-| Item identity | Exact normalized name; first usable matching row; one use | Supports replenished consumables; avoids original substring/tune bug | Async selection question pending; default proposed |
-| Credentials | Reuse account/password already saved in Auto Login, bind username per rule | Keeps scope to two actions; prevents silently executing old rules under another account | Review requested |
-| Crew destination | Artist selected at configuration remains fixed by ID | Character may change bands before occurrence | Review requested |
-| Bonus budget | Explicit level from current options and maximum equal to displayed quote | No implicit most-expensive bonus or later cost escalation | Review requested |
-| Unavailable occurrence | No gameplay POST; record unavailable and wait for next slot | Missing form cannot mean success; user controls pause | Review requested |
-| Start-notice failure | Abort gameplay | User requires notice before each execution | Review requested |
-| Deadlines | 120 s total, 20 s/request, 2 MiB response | Existing 5 s unsuitable; bounded real cancellation | Review requested |
+| Transport | Native HTTP in existing FGS, independent login/jar | User explicitly permits HTTP; avoids shared WebView cookies and renderer dependency | Approved by user confirmation |
+| Item identity | Exact normalized name; first usable matching row; one use | Supports replenished consumables; avoids original substring/tune bug | Approved by feature confirmation |
+| Credentials | Reuse account/password already saved in Auto Login, bind username per rule | Keeps scope to two actions; prevents silently executing old rules under another account | Approved by user confirmation |
+| Crew destination | Artist selected at configuration remains fixed by ID | Character may change bands before occurrence | Approved by user confirmation |
+| Bonus budget | Explicit level from current options and maximum equal to displayed quote | No implicit most-expensive bonus or later cost escalation | Approved by user confirmation |
+| Unavailable occurrence | No gameplay POST; record unavailable and wait for next slot | Missing form cannot mean success; user controls pause | Approved by user confirmation |
+| Start-notice failure | Abort gameplay | User requires notice before each execution | Approved by user confirmation |
+| Deadlines | 120 s total, 20 s/request, 2 MiB response | Existing 5 s unsuitable; bounded real cancellation | Approved by user confirmation |
 | Live testing effects | Inspect/login/character selection authorized; no item consumption/bonus delivered yet | Test effect needs a specific item and bonus/amount chosen before submission | No destructive live test executed |
 
-All remaining dimensions are resolved by the ACs below; assumptions are proposed, not silently approved. User review must close transport and item policy before implementation.
+The user confirmed the proposal and character binding. Remaining details follow these ACs and the approved design.
 
 ## Implicit requirement dimension sweep
 
@@ -140,16 +140,16 @@ All remaining dimensions are resolved by the ACs below; assumptions are proposed
 
 | ID | Deliverable | Status |
 | --- | --- | --- |
-| SGA-01 | Backward-compatible action models | Pending review |
-| SGA-02 | Editor, discovery and summaries | Pending review |
-| SGA-03 | Independent login and credentials | Pending review |
-| SGA-04 | Shared ASP.NET helpers and outcome checks | Pending review |
-| SGA-05 | usarItem | Pending review |
-| SGA-06 | pagarEquipe | Pending review |
-| SGA-07 | Start/result native notifications | Pending review |
-| SGA-08 | Truthful durable outcome | Pending review |
-| SGA-09 | Serial cancellation/deadlines | Pending review |
-| SGA-10 | Device proof, verifier and docs | Pending review |
+| SGA-01 | Backward-compatible action models | Implementing |
+| SGA-02 | Editor, discovery and summaries | Implementing |
+| SGA-03 | Independent login and credentials | Implementing |
+| SGA-04 | Shared ASP.NET helpers and outcome checks | Implementing |
+| SGA-05 | usarItem | Implementing |
+| SGA-06 | pagarEquipe | Implementing |
+| SGA-07 | Start/result native notifications | Implementing |
+| SGA-08 | Truthful durable outcome | Implementing |
+| SGA-09 | Serial cancellation/deadlines | Implementing |
+| SGA-10 | Device proof, verifier and docs | Implementing |
 
 Coverage: 10 requirements; task mapping follows approved design. No implementation claim.
 
