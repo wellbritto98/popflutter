@@ -51,7 +51,7 @@ Depends on: T1. Owner: popmundo-utils with domain review. Reuses: AuthSession an
 Requirement: SGA-02/03/04/09.
 Done when: private empty jar, assigned-host routing, char verified, no visible runtime collaborator, fresh-account validation, limits/throttle/abort prevent late request and overlap; discovery exposes non-secret DTOs; forms retain successful repeated controls; neutral preflight/outcome fixtures strict.
 Tests: unit/integration. Gate: Quick. Commit: feat(game-actions): isolate native transactions and discovery.
-Status: pending.
+Status: done; commit3a7e0fb;341 core tests passed, analyze clean; opt-in live probe found routeMismatch, fixF1 pending.
 
 ### T3 — Use item endpoint
 What: one eligible row/button POST adapter and outcomes.
@@ -140,3 +140,7 @@ T1 configuration component; T2 transaction component; T3 one item endpoint; T4 o
 ## Evidence protocol
 
 Per task retain red/green gate logs, exact tests/assertions covering ACs, test counts and commit hash. Final validation includes reverse test->AC mapping and a fresh independent scratch discrimination sensor (at least five gameplay behavior faults). Do not store raw account credentials, cookies, query tokens, form values or authenticated HTML. Synthetic fixtures only.
+
+## Fix F1 — Native login route diagnosis
+
+Found after T2 opt-in live probe: routeMismatch before gameplay; no item/payment POST. First gather sanitized method/host/path/status/form-action route shape, then reproduce actual shape in a red unit test. Implement only evidence-backed auth-route correction, preserve strict gameplay routes, full core gate/analyze and atomic fix commit. Re-run opt-in read-only discovery and check visible Troy ID unchanged. No credentials, cookies, body, query tokens or authenticated HTML in evidence. Execute before T3; routine required fix already authorized by user continue/debug request.

@@ -205,9 +205,9 @@
 ## Handoff
 
 - **Feature**: scheduled-game-actions / .specs/features/scheduled-game-actions.
-- **Phase / Task**: Execute T2; T1 committed09b83bc (298 tests, analyze clean); approved spec/design/tasks; branch codex/scheduled-game-actions.
+- **Phase / Task**: Execute fixF1 native-login diagnosis; T1(09b83bc) and T2(3a7e0fb) committed,341 core tests and analyze clean; approved spec/design/tasks; branch codex/scheduled-game-actions.
 - **Completed**: supplied script/domain/browser mapping; user approval and char binding; AD-023; baseline core277/WebView31/app164 passed. No gameplay POST submitted.
-- **In-progress**: isolated HTTP transaction component; specialists execute T1..T8 sequentially, one SDK job at a time.
+- **In-progress**: native-login routeMismatch before gameplay; emulator5554 reopened with production data preserved; specialists execute T1..T8 sequentially, one SDK job at a time.
 - **Next step**: core T1..T5, shell T6..T7, device fixture T8, fresh independent verifier; update task evidence and handoff after gates.
-- **Blockers**: none. Live independent-login coexistence remains unmeasured; default device fixture uses loopback, no game host. No credentials/cookies/form state retained.
+- **Blockers**: live discovery failed routeMismatch; safe diagnostic wrapper pending. Independent-login coexistence remains unmeasured; default device fixture uses loopback, no game host. No credentials/cookies/form state retained.
 - **Prior feature**: service-scheduler complete; production emulator release/data preserved. Physical handset/overnight unmeasured.

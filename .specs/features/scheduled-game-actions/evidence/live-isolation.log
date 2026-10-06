@@ -1,0 +1,14 @@
+00:00 +0: loading test_live/game_actions_discovery_live_test.dart
+00:00 +0: independent native login selects owned character without gameplay
+00:01 +0 -1: independent native login selects owned character without gameplay [E]
+  game-discovery-live failed code=routeMismatch
+  package:matcher                                       fail
+  test_live\game_actions_discovery_live_test.dart 46:9  main.<fn>
+  
+00:01 +0 -1: Some tests failed.
+
+Failing tests:
+  test_live/game_actions_discovery_live_test.dart: independent native login selects owned character without gameplay
+
+Consider enabling the flag chain-stack-traces to receive more detailed exceptions.
+For example, 'dart test --chain-stack-traces'.
