@@ -192,6 +192,8 @@ class AppWiring {
     _navSub = null;
     _gmValueSub = null;
     _gmCallSub = null;
+    final scheduler = schedulerApi;
+    if (scheduler is SchedulerClient) scheduler.dispose();
     await autoLogin.dispose();
     await menuNotificationsWatcher.dispose();
     await menuNotificationsBridge?.dispose();

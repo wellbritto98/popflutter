@@ -22,7 +22,7 @@ schedulerOptions(enabled) mantém repeat(5000), allowWakeLock true, allowWifiLoc
 
 configureSchedulerBoot atualiza as opções completas após operações autoritativas; mantém cache do último boolean aplicado com sucesso para evitar gravar a cada heartbeat. Falha de configuração retorna bootConfigurationFailed, sem falso ACK. Pausar/excluir a última regra não para o serviço de sessão.
 
-onStart espera a inicialização do scheduler por até 5s. onRepeatEvent sempre envia heartbeat imediatamente e dispara reconciliação sem aguardá-la; comandos usam namespace próprio scheduler.request/response. Falha de leitura do catálogo mantém o runner e pode se recuperar após leitura válida por heartbeat/RPC. onDestroy cancela o Timer do runner.
+onStart espera a inicialização do scheduler por até 5s. onRepeatEvent sempre envia heartbeat imediatamente e dispara reconciliação sem aguardá-la; comandos usam namespace próprio scheduler.request/response. Falha de leitura do catálogo mantém o runner e pode se recuperar após leitura válida por heartbeat/RPC. onDestroy marca o engine como encerrado, cancela o executor de jogo e só retorna depois que o dispose do HTTP termina. Um runner que nasce depois do destroy também é cancelado e esperado, sem start.
 Falha temporária da factory antes de retornar um runner permite nova tentativa no próximo heartbeat/RPC. A Future subjacente mantém ownership após o timeout de 5s: uma tentativa ainda pendente nunca cria um segundo escritor; resultado tardio após destroy é descartado e disposto sem start.
 
 ## Plataforma

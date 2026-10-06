@@ -205,9 +205,9 @@
 ## Handoff
 
 - **Feature**: scheduled-game-actions / .specs/features/scheduled-game-actions.
-- **Phase / Task**: Execute T6 app gateway; T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07), T5(3cb4ecf) committed.405 core and165 app tests/analyzers passed; approved spec/design/tasks; branch codex/scheduled-game-actions.
-- **Completed**: supplied script/domain/browser mapping; user approval and char binding; AD-023; baseline core277/WebView31/app164. F1 live login/discovery passed; fresh visible Troy3327035 stayed authenticated while private HTTP selected Peter3155712 on same host74. No gameplay POST submitted.
-- **In-progress**: shell T6 gateway then T7 editor owns SDK; core disposal race fixed red/green; device T8 prepared and awaits T7. Native ASMX/crew read-only probe passed; emulator5554 online, production data preserved; one SDK job at a time.
-- **Next step**: shell T6..T7 gates/atomic commits, device T8 proof, final global doc sync/release install preserving production, fresh independent verifier.
+- **Phase / Task**: Execute T7 editor next. T6 gateway is implemented: 172 app tests passed and analyze clean. T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07), T5(3cb4ecf) committed. Branch codex/scheduled-game-actions.
+- **Completed**: T6 secondary engine reconstructs the isolated service, reloads Auto Login credentials, discovery RPC returns DTOs only, EN/PT start notices name the saved character, destroy cancels HTTP and waits for cleanup, AppWiring fails pending RPC with serviceUnavailable. Local notification path still passes. No gameplay POST submitted.
+- **In-progress**: none in the working tree after the T6 commit. T7 editor owns the next SDK job. Device T8 waits for T7. Emulator 5554 was online earlier; production data preserved; one SDK job at a time.
+- **Next step**: shell T7 editor gate and atomic commit, device T8 proof, final global doc sync/release install preserving production, fresh independent verifier.
 - **Blockers**: no external blocker. Native gameplay has not been sent; default Android fixture uses loopback. Physical handset/overnight unmeasured. No credentials/cookies/form state retained.
 - **Prior feature**: service-scheduler complete; production emulator release/data preserved. Physical handset/overnight unmeasured.

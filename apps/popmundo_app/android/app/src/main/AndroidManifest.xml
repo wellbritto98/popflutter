@@ -43,7 +43,7 @@
             android:stopWithTask="false">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Maintain the user-enabled Popmundo session with periodic native authentication checks notify the user when automatic login succeeds or fails, and execute user-created recurring local notification schedules." />
+                android:value="Maintain the user-enabled Popmundo session with periodic native authentication checks notify the user when automatic login succeeds or fails, and execute user-created recurring local notification schedules and user-configured item use and crew bonuses through isolated native HTTP sessions." />
         </service>
     </application>
     <!-- Required to query activities that can process text, see:

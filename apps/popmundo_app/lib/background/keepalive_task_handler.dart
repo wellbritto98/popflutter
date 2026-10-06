@@ -60,7 +60,7 @@ class KeepaliveTaskHandler extends TaskHandler {
     try {
       final runner = await _createRunner();
       if (_destroyed) {
-        runner.dispose();
+        await runner.dispose();
         return;
       }
       _runner = runner;
@@ -113,6 +113,6 @@ class KeepaliveTaskHandler extends TaskHandler {
   @override
   Future<void> onDestroy(DateTime timestamp, bool isTimeout) async {
     _destroyed = true;
-    _runner?.dispose();
+    await _runner?.dispose();
   }
 }

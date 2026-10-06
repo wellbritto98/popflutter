@@ -2,7 +2,7 @@
 
 > Documento gerado por análise do código-fonte e dos artefatos de spec em `.specs/features/` e `.specs/STATE.md`. Trechos sem base direta no repositório estão marcados como **Hipótese**.
 >
-> Última atualização: 2026-10-04.
+> Última atualização: 2026-10-06.
 
 Consistente com [ARQUITETURA.md](ARQUITETURA.md).
 
@@ -45,10 +45,11 @@ O propósito central é:
 4. **Reautenticar (Auto Login):** se enabled e (a) a navegação cai em `/` ou `/Default.aspx`, ou (b) o heartbeat 60 s em `{hostSticky}/World/Popmundo.aspx/Character` recebe 302 para `/Default.aspx`, o handshake nativo corre fora da tela; o jogador só vê `{host}/World/Popmundo.aspx`. Personagem pelo **nome completo** (`div.box > h2`). Snackbars EN/PT por fase; sucesso/falha em segundo plano também geram notificação local. Sem restore da última URL.
 5. **UserScripts:** item sempre visível no sidebar → import por URL, toggle, delete → injector recarrega a página. `@require`/`@resource` via HTTP do app. Scripts com `@grant` GM recebem shim.
 6. **GM host:** `GM.xmlHttpRequest` (TimedFetch no jogo / HttpClient fora), `GM.openInTab` (browser do SO), menu commands no sidebar (limpos a cada navegação), notificação in-app, clipboard, `getResourceUrl`.
-7. **Keepalive:** bootstrap sobe o FGS Android; o isolate emite heartbeat e executa serviços locais. Reboot e atualização do pacote retomam o FGS quando há agendamentos ativos. O overlay mostra status, bateria e ciclo de vida.
+7. **Keepalive:** bootstrap sobe o FGS Android; o isolate emite heartbeat e executa serviços locais e as duas ações HTTP aprovadas. Reboot e atualização do pacote retomam o FGS quando há agendamentos ativos. O overlay mostra status, bateria e ciclo de vida.
 8. **Idioma:** item Language no sidebar; EN/PT; locale do dispositivo no primeiro uso; `setLocale` persiste via Easy Localization.
 9. **Observar/depurar:** streams de rede/console/navegação no overlay (debug). Cookies: nome@domínio, sem valor. Eval JS ad-hoc.
-10. **Agendamentos (Android):** sidebar → criar regra de notificação local → escolher intervalo de segundos/minutos/horas/dias ou dias da semana e hora local → salvar com confirmação do serviço. Lista mostra próxima execução, último resultado e permite editar, pausar ou excluir. Regras sobrevivem ao fechamento e reboot; horários perdidos são descartados, aguardando a próxima ocorrência.
+10. **Agendamentos (Android):** sidebar → criar regra de notificação local, uso de item ou bônus de equipe → escolher intervalo de segundos/minutos/horas/dias ou dias da semana e hora local → salvar com confirmação do serviço. Lista mostra próxima execução, último resultado e permite editar, pausar ou excluir. Regras sobrevivem ao fechamento e reboot; horários perdidos são descartados, aguardando a próxima ocorrência.
+11. **Ações do jogo agendadas:** credenciais salvas do Auto Login → escolher personagem próprio por ID/nome → escolher item elegível ou bônus e cotação → salvar resumo do efeito. Cada ocorrência faz claim durável, publica aviso e autentica por HTTP em sessão privada; valida personagem, formulário e custo atuais antes de um único POST. A tela principal conserva a própria sessão. Formulário indisponível não gasta; efeito incerto não é repetido. O bônus do jogo pode ser entregue uma vez a cada sete dias.
 
 ---
 
@@ -83,7 +84,8 @@ Com base nas features em `.specs/features/` e no código vigente:
 | Polyfill GM Core + Host | userscript-manager + gm-host-apis, AD-016 | Sem `validation.md` da feature host no repo |
 | Auto Login silencioso + heartbeat | auto-login, AD-018, AD-019 | HTTP nativo + `CookieSink`/`CookieSource`; senha no cofre |
 | Keepalive em background | background-keepalive, AD-012/013 | FGS Android; iOS suspende a página |
-| Agendamentos de serviços locais | service-scheduler, AD-021 | Android; MVP de notificação local, persistência, intervalos e dias da semana |
+| Agendamentos de serviços locais | service-scheduler, AD-021 | Android; notificação local, persistência, intervalos e dias da semana; ações do jogo ampliadas pelo AD-023 |
+| Ações HTTP agendadas | scheduled-game-actions, AD-023 | Usar um item ou pagar bônus explícito, personagem fixo por regra e sessão privada |
 | i18n EN/PT | app-i18n, AD-014 | Catálogos JSON; DebugOverlay fora |
 | System-back no WebView | webview-back-navigation | `PopScope` no adapter |
 | Patrol device-real | mobile-e2e-tests, AD-015 | Não carrega o jogo |
@@ -98,7 +100,7 @@ O sistema é **fundação observável + shell de qualidade de vida** (login, scr
 
 | Fora de escopo | Motivo no spec |
 | -------------- | -------------- |
-| Mass interact, call friends, autograph e gameplay da extensão | Fundação `common/` + QoL de sessão; gameplay é outro produto |
+| Mass interact, call friends, autograph e demais funções da extensão | Apenas usar item e bônus de equipe foram aprovados no AD-023 |
 | Bloquear/reescrever request/response | Observe-only |
 | Desktop / Flutter Web | AD-008 |
 | Publicação em lojas | Não pedido |
@@ -107,7 +109,7 @@ O sistema é **fundação observável + shell de qualidade de vida** (login, scr
 | Facebook OAuth no Auto Login | Fora do fluxo mapeado |
 | Restore da última URL após relog | Sempre World home (pedido explícito) |
 | Fallback visível (`form.submit`) no login | Removido no AD-018: um caminho só |
-| Outros serviços e automação de gameplay pelo scheduler | MVP executa apenas notificação local |
+| Outros serviços de gameplay pelo scheduler | Escopo aprovado inclui apenas usar item e pagar bônus da equipe, além de notificação local |
 | Agendamentos contínuos em segundos no iOS | Disponíveis apenas no Android; tela informa a limitação |
 | `GM.getResourceText`, XHR abort/progress | gm-host-apis Out of Scope |
 

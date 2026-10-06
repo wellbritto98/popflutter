@@ -1,0 +1,1224 @@
+Waiting for another flutter command to release the startup lock...
+Resolving dependencies in `C:\Users\Wellington\Documents\projetos\popflutter`...
+Downloading packages...
+  _fe_analyzer_shared 103.0.0 (108.0.0 available)
+  analyzer 13.3.0 (14.4.0 available)
+  clock 1.1.2 (1.1.3 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cupertino_icons 1.0.9 (2.0.0 available)
+  dbus 0.7.13 (0.8.0 available)
+  equatable 2.1.0 (3.0.0 available)
+  flutter_foreground_task 11.0.0 (11.0.3 available)
+  flutter_local_notifications 22.3.0 (22.3.1 available)
+  flutter_secure_storage 9.2.4 (11.2.0 available)
+  flutter_secure_storage_linux 1.2.3 (3.0.3 available)
+  flutter_secure_storage_macos 3.1.3 (4.0.0 available)
+  flutter_secure_storage_platform_interface 1.1.2 (2.1.1 available)
+  flutter_secure_storage_web 1.2.1 (2.1.1 available)
+  flutter_secure_storage_windows 3.1.2 (4.2.2 available)
+  frontend_server_client 4.0.0 (4.1.0 available)
+  glob 2.1.3 (2.2.0 available)
+  html 0.15.6 (0.15.7 available)
+  io 1.0.5 (1.1.0 available)
+  jni 1.0.3 (1.1.0 available)
+  jni_flutter 1.0.2 (1.0.3 available)
+  js 0.6.7 (0.7.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  mime 2.0.0 (2.1.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  package_config 2.2.0 (3.0.0 available)
+  patrol 4.9.0 (4.10.0 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  pool 1.5.2 (1.5.3 available)
+  pub_semver 2.2.0 (2.2.1 available)
+  shared_preferences 2.5.5 (2.5.6 available)
+  shared_preferences_android 2.4.27 (2.4.28 available)
+  shared_preferences_foundation 2.5.6 (2.5.7 available)
+  source_maps 0.10.13 (0.10.14 available)
+  stack_trace 1.12.1 (1.12.2 available)
+  test 1.31.1 (1.32.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  test_core 0.6.18 (0.6.20 available)
+  url_launcher 6.3.2 (6.3.3 available)
+  url_launcher_android 6.3.32 (6.3.33 available)
+  url_launcher_ios 6.4.1 (6.4.2 available)
+  url_launcher_linux 3.2.2 (3.2.3 available)
+  url_launcher_macos 3.2.5 (3.2.6 available)
+  url_launcher_windows 3.1.5 (3.1.6 available)
+  vector_math 2.4.2 (2.4.3 available)
+  vm_service 15.2.0 (15.3.0 available)
+  win32 5.15.0 (6.4.0 available)
+  xml 7.0.1 (7.1.0 available)
+  yaml 3.1.3 (3.1.4 available)
+Got dependencies in `C:\Users\Wellington\Documents\projetos\popflutter`!
+50 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_menu_registry_test.dart
+00:00 +0: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_menu_registry_test.dart: preserves the order the caller passed
+00:00 +1: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_menu_registry_test.dart: appends the debug item last when includeDebugItem is true
+00:00 +2: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_menu_registry_test.dart: omits the debug item when includeDebugItem is false
+00:00 +3: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_menu_registry_test.dart: omits the debug entry when no debugItem is supplied
+00:00 +4: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_menu_registry_test.dart: defaults includeDebugItem to kDebugMode when omitted
+00:00 +5: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_menu_registry_test.dart: passes each item through untouched, onTap included
+00:01 +6: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: renders the drawer content and the given body
+00:01 +7: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: renders the drawer content and the given body
+00:01 +8: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: renders the drawer content and the given body
+00:01 +9: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: renders the drawer content and the given body
+00:01 +10: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: renders the drawer content and the given body
+00:01 +11: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: renders the drawer content and the given body
+00:01 +12: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: renders the drawer content and the given body
+00:01 +13: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: renders the drawer content and the given body
+00:01 +14: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: renders the drawer content and the given body
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:02 +15: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: renders the drawer with the Popflutter logo header
+00:02 +15: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: disables the drawer edge-swipe gesture (DBG-01)
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:02 +16: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: renders the drawer with the Popflutter logo header
+00:02 +16: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_menu_item_test.dart: exposes the auto-login id, label and subtitle
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:02 +17: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: renders the drawer with the Popflutter logo header
+00:02 +17: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_menu_item_test.dart: onTap invokes the supplied callback exactly once
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+00:02 +17: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: always renders the FAB when items is empty
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+00:02 +17: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_menu_item_test.dart: onTap invokes the supplied callback exactly once
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:02 +17: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: always renders the FAB when items is empty
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+00:02 +18: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: renders the drawer with the Popflutter logo header
+00:02 +18: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: always renders the FAB when items is empty
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:02 +19: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: renders the drawer with the Popflutter logo header
+00:02 +19: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_menu_item_test.dart: PT locale resolves the label from the catalog
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded pt[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:02 +20: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: renders the drawer with the Popflutter logo header
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+00:02 +20: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: always renders the FAB when items is non-empty
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+00:02 +20: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: renders the drawer with the Popflutter logo header
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+00:02 +20: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: always renders the FAB when items is non-empty
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+00:02 +20: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: renders the drawer with the Popflutter logo header
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+00:02 +20: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: always renders the FAB when items is non-empty
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:02 +21: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: renders the drawer with the Popflutter logo header
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:02 +22: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_messages_test.dart: progress phases resolve to localized text
+00:02 +22: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: renders one ListTile per item with icon and label
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:02 +23: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_messages_test.dart: progress phases resolve to localized text
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+00:03 +23: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: tapping the FAB opens the AppSidebar
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+00:03 +23: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_messages_test.dart: progress phases resolve to localized text
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +23: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: tapping the FAB opens the AppSidebar
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+00:03 +24: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_notifications_test.dart: background login result is localized in en
+00:03 +24: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: tapping the FAB opens the AppSidebar
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +25: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_notifications_test.dart: background login result is localized in en
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +26: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +26: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_messages_test.dart: character name is interpolated into progress text
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +27: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +27: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: renders the subtitle when the item has one
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +28: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +28: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_notifications_test.dart: background login result is localized in pt
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded pt[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +29: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +29: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_messages_test.dart: the not-found message points at the full name
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +30: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +30: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: tapping outside the open drawer closes it (MENU-01 AC4)
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +31: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +31: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_notifications_test.dart: background failure uses the login result tray slot
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +32: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +32: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_messages_test.dart: the ambiguous message names the duplicate
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +33: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +33: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_notifications_test.dart: foreground results and intermediate phases stay in the app
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +34: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +34: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_messages_test.dart: the server message is surfaced verbatim
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +35: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +35: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_notifications_test.dart: notification errors leave feedback listener usable
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[AutoLogin] Could not show the background login result.
+00:03 +36: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +36: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: tapping an item closes the drawer and invokes onTap
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+00:03 +37: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +37: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: tapping an item closes the drawer and invokes onTap
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +38: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +38: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_shell_test.dart: popping the navigator (Android back) closes the open drawer without touching WebView content (MENU-01 AC4)
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +39: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +39: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: shows the empty state and no ListTiles when items is empty
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +40: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +40: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_messages_test.dart: every failure resolves in both catalogs (no raw keys)
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +41: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +41: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/app_sidebar_test.dart: PT locale renders catalog empty-state copy on the real AppSidebar
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded pt[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +42: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:03 +42: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_messages_test.dart: portuguese catalog is used when the locale is pt
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded pt[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:03 +43: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +44: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +45: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +46: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +47: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +48: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +49: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +50: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +51: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +52: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +53: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +54: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +55: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +56: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +57: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +58: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +59: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +60: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +61: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +62: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +63: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +64: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+00:04 +65: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: saves settings to KV and password only to SecretStore
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:04 +66: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_menu_item_test.dart: exposes the debug id, label and subtitle
+00:05 +66: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: empty password on save keeps previous secret
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:05 +67: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_menu_item_test.dart: exposes the debug id, label and subtitle
+00:05 +68: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_menu_item_test.dart: exposes the debug id, label and subtitle
+00:05 +68: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: status dropdown exposes Normal Busy Mobile Away Drunk (UI-02)
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:05 +69: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_menu_item_test.dart: exposes the debug id, label and subtitle
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:05 +70: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_overlay_test.dart: collapsed overlay renders no debug control and no panel
+00:05 +70: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_menu_item_test.dart: onTap invokes the supplied callback exactly once
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:05 +71: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_menu_item_test.dart: exposes the language id and label
+00:05 +71: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_menu_item_test.dart: onTap invokes the supplied callback exactly once
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:05 +72: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_menu_item_test.dart: exposes the language id and label
+00:05 +72: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/auto_login_screen_test.dart: Save is disabled while save is in flight
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:05 +73: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_menu_item_test.dart: exposes the language id and label
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:06 +74: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: dialog lists exactly English and Português and marks the active locale
+00:06 +74: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_menu_item_test.dart: onTap invokes the supplied callback exactly once
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:06 +75: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: dialog lists exactly English and Português and marks the active locale
+00:06 +75: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_menu_item_test.dart: PT locale resolves the label from the catalog
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded pt[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:06 +76: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: dialog lists exactly English and Português and marks the active locale
+00:06 +77: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: dialog lists exactly English and Português and marks the active locale
+00:06 +78: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: dialog lists exactly English and Português and marks the active locale
+00:06 +79: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: dialog lists exactly English and Português and marks the active locale
+00:06 +80: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: dialog lists exactly English and Português and marks the active locale
+00:06 +81: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: dialog lists exactly English and Português and marks the active locale
+00:06 +82: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: dialog lists exactly English and Português and marks the active locale
+00:06 +83: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: dialog lists exactly English and Português and marks the active locale
+00:06 +84: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: dialog lists exactly English and Português and marks the active locale
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:06 +85: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/localization_boot_test.dart: EN locale renders the English catalog
+00:06 +86: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/localization_boot_test.dart: EN locale renders the English catalog
+00:06 +87: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/localization_boot_test.dart: EN locale renders the English catalog
+00:06 +88: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/localization_boot_test.dart: EN locale renders the English catalog
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+00:06 +88: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: selecting Português re-renders shell strings live
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+00:07 +88: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/localization_boot_test.dart: EN locale renders the English catalog
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+00:07 +88: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: selecting Português re-renders shell strings live
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+00:07 +88: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/localization_boot_test.dart: EN locale renders the English catalog
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+00:07 +88: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: selecting Português re-renders shell strings live
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[32m[🌎 Easy Localization] [INFO] Locale pt changed[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+00:07 +89: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/localization_boot_test.dart: EN locale renders the English catalog
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:07 +90: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_overlay_test.dart: send-notification button renders with fixed English label
+00:07 +91: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_overlay_test.dart: send-notification button renders with fixed English label
+00:07 +92: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_overlay_test.dart: send-notification button renders with fixed English label
+00:07 +93: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_overlay_test.dart: send-notification button renders with fixed English label
+00:07 +93: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/localization_boot_test.dart: PT locale renders the Portuguese catalog
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+00:07 +94: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: saved PT locale renders Portuguese on a fresh pump
+00:07 +94: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/localization_boot_test.dart: PT locale renders the Portuguese catalog
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded pt[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:07 +95: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: saved PT locale renders Portuguese on a fresh pump
+00:07 +96: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: saved PT locale renders Portuguese on a fresh pump
+00:07 +97: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: saved PT locale renders Portuguese on a fresh pump
+00:07 +98: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: saved PT locale renders Portuguese on a fresh pump
+00:07 +99: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: saved PT locale renders Portuguese on a fresh pump
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded pt[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:07 +100: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_overlay_test.dart: tapping send-notification requests permission and shows a notification when granted
+00:07 +100: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/localization_boot_test.dart: missing PT key displays the English value and never the raw key
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded pt[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[34m[🌎 Easy Localization] [WARNING] Localization key [menu.empty] not found[0m
+00:07 +101: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_overlay_test.dart: tapping send-notification requests permission and shows a notification when granted
+00:07 +102: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: re-selecting the active locale closes the dialog
+00:07 +103: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: re-selecting the active locale closes the dialog
+00:07 +104: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: re-selecting the active locale closes the dialog
+00:07 +105: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: re-selecting the active locale closes the dialog
+00:07 +106: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: re-selecting the active locale closes the dialog
+00:07 +107: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: re-selecting the active locale closes the dialog
+00:07 +108: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/language_selector_test.dart: re-selecting the active locale closes the dialog
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:07 +109: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_overlay_test.dart: denied permission: no notification shown, no crash, panel stays interactive (NOTIF-05)
+00:07 +110: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_overlay_test.dart: denied permission: no notification shown, no crash, panel stays interactive (NOTIF-05)
+00:07 +111: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_overlay_test.dart: repeat tap while a request is in flight is ignored until it completes (NOTIF-06)
+00:07 +112: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_background_permission_test.dart: secondary engine creates enabled rule using application-context permission without Activity
+00:07 +113: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/debug_overlay_test.dart: showTestNotification throwing is caught and never crashes the panel (NOTIF-08)
+00:07 +114: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_background_zone_test.dart: service composition accepts native GMT alias and persists next weekly local 09:00 as exact UTC
+00:07 +115: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_background_zone_test.dart: service composition accepts native GMT alias and persists next weekly local 09:00 as exact UTC
+00:07 +116: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_background_zone_test.dart: service composition accepts native GMT alias and persists next weekly local 09:00 as exact UTC
+00:07 +117: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_client_test.dart: correlates replies, ignores heartbeat and wrong request, validates snapshot
+00:07 +118: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_client_test.dart: timeouts and typed remote errors are observable
+00:08 +119: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_connection_test.dart: readiness fails within its bound when no Dart heartbeat arrives
+00:08 +120: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_connection_test.dart: readiness fails within its bound when no Dart heartbeat arrives
+00:08 +121: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_edge_test.dart: zone lookup is bounded, never silently UTC, and retains last valid value
+00:08 +122: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_connection_test.dart: first request waits for Dart heartbeat readiness rather than native running flag
+00:08 +123: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_edge_test.dart: nearest timer fires without native heartbeat and stops after delete
+00:08 +124: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:08 +125: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:09 +126: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:09 +127: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:09 +128: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:09 +128: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_game_cleanup_test.dart: destroy waits for HTTP cleanup and cancels before draining
+scheduler.start utc=2026-01-01T00:00:00.000Z starter=developer
+00:09 +129: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:09 +129: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_game_cleanup_test.dart: late factory result is disposed and cleanup awaited without startup
+scheduler.start utc=2026-01-01T00:00:00.000Z starter=developer
+00:09 +130: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:09 +131: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:09 +132: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:09 +133: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:09 +134: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:09 +135: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:09 +136: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:10 +137: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:10 +138: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:10 +138: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_menu_item_test.dart: exposes the schedules id, label and subtitle
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:10 +139: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:10 +139: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_menu_item_test.dart: onTap invokes the supplied callback exactly once
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:10 +140: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:10 +140: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_menu_item_test.dart: PT locale resolves the label from the catalog
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded pt[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:10 +141: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+00:10 +141: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_game_bridge_test.dart: offline text edit preserves saved game character and effect
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:10 +142: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode at trimmed UTF-16 limits saves exact payload
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:10 +143: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_screen_test.dart: visible catalog reads coalesce while pending and pause when app inactive
+00:10 +143: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_task_handler_test.dart: failed factory retries on heartbeat and RPC reads authoritative catalog
+scheduler.start utc=2026-10-04T00:00:00.000Z starter=developer
+00:10 +144: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_screen_test.dart: visible catalog reads coalesce while pending and pause when app inactive
+00:10 +144: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_task_handler_test.dart: RPC retries completed factory failure without waiting for another tick
+scheduler.start utc=2026-10-04T00:00:00.000Z starter=developer
+00:10 +145: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_screen_test.dart: visible catalog reads coalesce while pending and pause when app inactive
+00:10 +145: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_task_handler_test.dart: startup deadline reports unavailable but repeated ticks never overlap pending factory
+scheduler.start utc=2026-10-04T00:00:00.000Z starter=developer
+00:10 +146: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_screen_test.dart: visible catalog reads coalesce while pending and pause when app inactive
+00:10 +146: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_task_handler_test.dart: destroy disposes late factory result without starting or rearming it
+scheduler.start utc=2026-10-04T00:00:00.000Z starter=developer
+00:10 +147: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_screen_test.dart: visible catalog reads coalesce while pending and pause when app inactive
+00:10 +147: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: supplementary Unicode beyond UTF-16 limits shows field errors without saving
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:10 +148: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_screen_test.dart: visible catalog reads coalesce while pending and pause when app inactive
+00:11 +148: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: Portuguese form labels and validation resolve catalog strings
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded pt[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:11 +149: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_screen_test.dart: visible catalog reads coalesce while pending and pause when app inactive
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:11 +150: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_menu_item_test.dart: exposes the userscripts id and label
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:11 +151: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_screen_test.dart: shows empty state when catalog is empty
+00:11 +151: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_menu_item_test.dart: onTap invokes the supplied callback exactly once
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:11 +152: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_screen_test.dart: shows empty state when catalog is empty
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:11 +153: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: days unit persists elapsed 24h quantity and weekly picker uses 24h
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:11 +154: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_screen_test.dart: visible list refreshes authoritative submission/failure/time without manual action
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:12 +155: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_screen_test.dart: lists installed scripts with switch
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:12 +156: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: valid save uses default minute and authoritative response; pending save disabled
+00:12 +156: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_screen_test.dart: empty list, translated PT and iOS unavailable explanation
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded pt[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:12 +157: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: valid save uses default minute and authoritative response; pending save disabled
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:12 +158: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_screen_test.dart: import success shows snackbar and calls onApply
+00:12 +158: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_screen_test.dart: list shows exact recurrence/next/latest; pause and confirmed delete are authoritative
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:12 +159: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_screen_test.dart: import success shows snackbar and calls onApply
+00:12 +159: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_screen_test.dart: permission status is actionable and lookup failure does not hide catalog
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:12 +160: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_screen_test.dart: import success shows snackbar and calls onApply
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:12 +161: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: invalid and overlong fields keep saved catalog untouched
+00:12 +161: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_screen_test.dart: import failure shows error snackbar and leaves list empty
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:12 +162: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: invalid and overlong fields keep saved catalog untouched
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:12 +163: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_screen_test.dart: toggle switch persists and calls onApply
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:12 +164: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: weekly validates selected days and saves intended weekdays/local time
+00:12 +164: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_screen_test.dart: delete cancel leaves catalog unchanged
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:12 +165: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: weekly validates selected days and saves intended weekdays/local time
+00:13 +165: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_screen_test.dart: delete confirm removes script and calls onApply
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:13 +166: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: weekly validates selected days and saves intended weekdays/local time
+00:13 +166: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_screen_test.dart: delete confirm calls onScriptDeleted with the removed id
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:13 +167: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: weekly validates selected days and saves intended weekdays/local time
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:13 +168: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/userscripts_screen_test.dart: disables add while an import is in progress
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:13 +169: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: denial and command errors retain input without activation
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:13 +170: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: lost create reply refreshes and adopts stable id; failed refresh blocks resubmit
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:13 +171: C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/test/scheduler_editor_test.dart: text edit preserves anchor/id and cancel leaves persisted rule unchanged
+[90m[🌎 Easy Localization] [DEBUG] Localization initialized[0m
+[90m[🌎 Easy Localization] [DEBUG] Start[0m
+[90m[🌎 Easy Localization] [DEBUG] Init state[0m
+[32m[🌎 Easy Localization] [INFO] Start locale loaded en[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+[90m[🌎 Easy Localization] [DEBUG] Load Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Build[0m
+[90m[🌎 Easy Localization] [DEBUG] Init Localization Delegate[0m
+[90m[🌎 Easy Localization] [DEBUG] Init provider[0m
+00:13 +172: All tests passed!

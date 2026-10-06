@@ -8,7 +8,7 @@ Documentação oficial: [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md), [`docs/OBJ
 
 | Package | Função | README |
 | ------- | ------ | ------ |
-| `packages/popmundo_utils` | Dart puro: contrato `PopmundoRuntime`, host sticky, TimedFetch, Auto Login, UserScripts/GM, scheduler, storage | [README](packages/popmundo_utils/README.md) |
+| `packages/popmundo_utils` | Dart puro: contrato `PopmundoRuntime`, host sticky, TimedFetch, Auto Login, UserScripts/GM, scheduler, ações HTTP isoladas, storage | [README](packages/popmundo_utils/README.md) |
 | `packages/popmundo_webview` | Adapter InAppWebView 6.x, JS bridge `popmundo`, injector de scripts, cookie sink | [README](packages/popmundo_webview/README.md) |
 | `apps/popmundo_app` | Shell, composition root, sidebar, i18n, keepalive, telas nativas | [README](apps/popmundo_app/README.md) |
 
@@ -37,7 +37,7 @@ cd apps/popmundo_app && patrol test --target integration_test/keepalive_test.dar
 
 URL inicial: `https://www.popmundo.com`. Redirecionamentos `N.popmundo.com` atualizam a origem. `Utils.getServerLink` e `TimedFetch` usam o hostname atual.
 
-Fila serial, delay **750 ms**, cache in-memory `METHOD:URL`. Fetch auxiliar do jogo roda **no contexto da página**. O handshake de Auto Login é a exceção: HTTP nativo `dart:io` com o mesmo cooldown, depois sync de cookies na WebView. Heartbeat de sessão: GET nativo a cada 60 s em `{N.popmundo.com}/World/Popmundo.aspx/Character`.
+Fila serial, delay **750 ms**, cache in-memory `METHOD:URL`. Fetch auxiliar do jogo roda **no contexto da página**. Os caminhos nativos são explícitos: Auto Login usa HTTP nativo `dart:io` com o mesmo cooldown, depois sync de cookies na WebView. Heartbeat de sessão: GET nativo a cada 60 s em `{N.popmundo.com}/World/Popmundo.aspx/Character`.
 
 Android mantém a sessão por FGS specialUse e auto login HTTP nativo, com notificação local de sucesso/falha em segundo plano. Veja [critérios e limites](.specs/features/background-session-reliability/spec.md) e AD-020.
 
@@ -47,7 +47,9 @@ Um FAB (`menu-toggle`) abre o sidebar. Cada feature define o seu próprio `AppMe
 
 ## Agendamentos Android
 
-O menu Agendamentos configura notificações locais por intervalos (segundos, minutos, horas ou dias) ou dias da semana e horário local. As regras ficam persistidas e executam no serviço em segundo plano, com restauração após reboot enquanto houver regras ativas. Ocorrências perdidas são descartadas. Segundos funcionam em melhor esforço; force-stop do Android impede execução até abrir o app novamente. O iOS apresenta a limitação na tela. Ver [spec e critérios](.specs/features/service-scheduler/spec.md).
+O menu Agendamentos configura notificações locais, uso de item e bônus para a equipe por intervalos (segundos, minutos, horas ou dias) ou dias da semana e horário local. As regras ficam persistidas e executam no serviço em segundo plano, com restauração após reboot enquanto houver regras ativas. Ocorrências perdidas são descartadas. Segundos funcionam em melhor esforço; force-stop do Android impede execução até abrir o app novamente. O iOS apresenta a limitação na tela. Ver [spec e critérios](.specs/features/service-scheduler/spec.md).
+
+As ações do jogo guardam conta e personagem (ID e nome) por regra. Usam login HTTP independente, sem tocar a sessão da tela principal. Cada ocorrência avisa antes de iniciar; item e bônus são escolhidos explicitamente. O bônus tem limite de custo igual à cotação aprovada e respeita a disponibilidade do formulário atual. Resultados incertos nunca são reenviados. Ver [spec das ações](.specs/features/scheduled-game-actions/spec.md).
 
 ## Estender
 

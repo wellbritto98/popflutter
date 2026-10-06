@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:popmundo_utils/popmundo_utils.dart';
 
+import 'game_actions_api.dart';
+
 /// A single timer and coalesced ticks share the command queue.
 class SchedulerRunner {
   SchedulerRunner({
     required this.coordinator,
+    this.gameActions,
     required this.refreshZone,
     required this.configureBoot,
     required this.notificationGranted,
@@ -13,6 +16,7 @@ class SchedulerRunner {
     DateTime Function()? now,
   }) : now = now ?? DateTime.now;
   final SchedulerCoordinator coordinator;
+  final GameActionsApi? gameActions;
   final Future<void> Function() refreshZone;
   final Future<void> Function(bool enabled) configureBoot;
   final Future<bool> Function() notificationGranted;
@@ -66,7 +70,25 @@ class SchedulerRunner {
     final requestId = data['requestId'];
     if (requestId is! String) return;
     await _queue(() async {
+      if (_disposed) {
+        send({
+          'type': 'scheduler.response',
+          'requestId': requestId,
+          'error': 'serviceUnavailable',
+        });
+        return;
+      }
       try {
+        if (data['command'] is String &&
+            (data['command'] as String).startsWith('discover')) {
+          final options = await _discover(data);
+          send({
+            'type': 'scheduler.response',
+            'requestId': requestId,
+            'data': options,
+          });
+          return;
+        }
         await refreshZone();
         final command = data['command'];
         final draft = data['draft'] is Map
@@ -121,6 +143,28 @@ class SchedulerRunner {
     });
   }
 
+  Future<Object> _discover(Map data) async {
+    final api = gameActions;
+    if (api == null) throw const SchedulerException('serviceUnavailable');
+    final command = data['command'];
+    if (command == 'discoverCharacters') {
+      return (await api.discoverCharacters()).toJson();
+    }
+    final username = data['boundUsername'] as String;
+    final character = GameCharacter.fromJson(data['character'] as Map);
+    return switch (command) {
+      'discoverItems' => (await api.discoverItems(
+        boundUsername: username,
+        character: character,
+      )).map((v) => v.toJson()).toList(),
+      'discoverCrew' => (await api.discoverCrew(
+        boundUsername: username,
+        character: character,
+      )).toJson(),
+      _ => throw const SchedulerException('invalidCommand'),
+    };
+  }
+
   ScheduleDraft _draft(Map data) => ScheduleDraft(
     name: data['name'] as String,
     enabled: data['enabled'] as bool,
@@ -148,10 +192,11 @@ class SchedulerRunner {
     );
   }
 
-  String _code(Object error) =>
-      error is SchedulerException ? error.code : 'runtimeUnavailable';
-  void dispose() {
+  String _code(Object error) => boundedSchedulerCode(error);
+  Future<void>? _disposal;
+  Future<void> dispose() {
     _disposed = true;
     _timer?.cancel();
+    return _disposal ??= coordinator.dispose();
   }
 }

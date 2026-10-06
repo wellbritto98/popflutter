@@ -20,6 +20,8 @@
     "next": "Próxima: {}", "noNext": "Próxima execução indisponível",
     "never": "Nunca executado", "submitted": "Enviada ao Android", "interrupted": "Ocorrência interrompida descartada", "failed": "Falhou: {}",
     "gameConfirmed": "Ação confirmada pelo jogo", "gameUnavailable": "Ação indisponível; aguardando próxima ocorrência", "gameUncertain": "Resultado do jogo incerto; esta ocorrência não será repetida",
+    "useItem": "Usar item", "payCrew": "Pagar equipe", "gameStartTitle": "Executando {}", "gameCharacterBody": "Personagem: {}", "gameResultTitle": "{}: {}",
+    "gameOutcome_confirmed": "ação confirmada", "gameOutcome_unavailable": "indisponível", "gameOutcome_failed": "falhou", "gameOutcome_uncertain": "resultado incerto",
     "permissionsExplanation": "Permita notificações e uso de bateria sem restrições para os agendamentos em segundo plano. O Android controla o momento da entrega; após forçar a parada, abra o app novamente.",
     "notificationStatus": "Notificações: {}", "batteryStatus": "Segundo plano: {}", "serviceStatus": "Serviço: {}",
     "allowed": "permitidas", "denied": "negadas", "unrestricted": "bateria sem restrições", "optimized": "bateria otimizada",

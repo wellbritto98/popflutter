@@ -30,9 +30,9 @@ class RecordingRunner extends SchedulerRunner {
   }
 
   @override
-  void dispose() {
+  Future<void> dispose() {
     disposals++;
-    super.dispose();
+    return super.dispose();
   }
 }
 
