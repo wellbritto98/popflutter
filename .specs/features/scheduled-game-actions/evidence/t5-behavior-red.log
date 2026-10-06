@@ -1,0 +1,65 @@
+00:00 +0: loading test/scheduler_game_dispatch_test.dart
+00:00 +0: (setUpAll)
+00:00 +0: SGA-07/08 GameActionStatus.confirmed persists exact outcome and same start/result card
+00:00 +0 -1: SGA-07/08 GameActionStatus.confirmed persists exact outcome and same start/result card [E]
+  Expected: 'confirmed'
+    Actual: 'failed'
+     Which: is different.
+            Expected: confirmed
+              Actual: failed
+                      ^
+             Differ at offset 0
+
+  package:matcher                              expect
+  test\scheduler_game_dispatch_test.dart 82:7  main.<fn>
+
+00:00 +0 -1: SGA-07/08 GameActionStatus.unavailable persists exact outcome and same start/result card
+00:00 +0 -2: SGA-07/08 GameActionStatus.unavailable persists exact outcome and same start/result card [E]
+  Expected: 'unavailable'
+    Actual: 'failed'
+     Which: is different.
+            Expected: unavailabl ...
+              Actual: failed
+                      ^
+             Differ at offset 0
+
+  package:matcher                              expect
+  test\scheduler_game_dispatch_test.dart 82:7  main.<fn>
+
+00:00 +0 -2: SGA-07/08 GameActionStatus.failed persists exact outcome and same start/result card
+00:00 +0 -3: SGA-07/08 GameActionStatus.failed persists exact outcome and same start/result card [E]
+  Expected: 'boundedCode'
+    Actual: 'actionFailed'
+     Which: is different.
+            Expected: boundedCod ...
+              Actual: actionFail ...
+                      ^
+             Differ at offset 0
+
+  package:matcher                              expect
+  test\scheduler_game_dispatch_test.dart 83:7  main.<fn>
+
+00:00 +0 -3: SGA-07/08 GameActionStatus.uncertain persists exact outcome and same start/result card
+00:00 +0 -4: SGA-07/08 GameActionStatus.uncertain persists exact outcome and same start/result card [E]
+  Expected: 'uncertain'
+    Actual: 'failed'
+     Which: is different.
+            Expected: uncertain
+              Actual: failed
+                      ^
+             Differ at offset 0
+
+  package:matcher                              expect
+  test\scheduler_game_dispatch_test.dart 82:7  main.<fn>
+
+00:00 +0 -4: (tearDownAll)
+00:00 +0 -4: Some tests failed.
+
+Failing tests:
+  test/scheduler_game_dispatch_test.dart: SGA-07/08 GameActionStatus.confirmed persists exact outcome and same start/result card
+  test/scheduler_game_dispatch_test.dart: SGA-07/08 GameActionStatus.failed persists exact outcome and same start/result card
+  test/scheduler_game_dispatch_test.dart: SGA-07/08 GameActionStatus.unavailable persists exact outcome and same start/result card
+  test/scheduler_game_dispatch_test.dart: SGA-07/08 GameActionStatus.uncertain persists exact outcome and same start/result card
+
+Consider enabling the flag chain-stack-traces to receive more detailed exceptions.
+For example, 'dart test --chain-stack-traces'.

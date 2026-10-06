@@ -1,6 +1,6 @@
-# Núcleo de agendamentos locais
+# Núcleo de agendamentos
 
-Este submódulo implementa os modelos, o calendário e a autoridade de persistência do scheduler em Dart puro. O import público é package:popmundo_utils/popmundo_utils.dart. Não depende de Flutter, WebView, plugins, HTTP do jogo, credenciais ou avaliação JS. A dependência timezone ^0.11.1 fornece o calendário IANA; o adapter inicializa sua base e informa o identificador atual do dispositivo.
+Este submódulo implementa os modelos, o calendário e a autoridade de persistência do scheduler em Dart puro. O import público é package:popmundo_utils/popmundo_utils.dart. Não depende de Flutter, WebView, plugins ou avaliação JS. O coordenador delega ações de jogo por portas para GameActionsService; não autentica nem envia HTTP diretamente. A dependência timezone ^0.11.1 fornece o calendário IANA; o adapter inicializa sua base e informa o identificador atual do dispositivo.
 
 ## Arquivos e API pública
 
@@ -8,11 +8,11 @@ Este submódulo implementa os modelos, o calendário e a autoridade de persistê
 | --- | --- |
 | scheduler_models.dart | ScheduleDraft, ScheduledRule, ScheduleRecurrence, IntervalRecurrence, IntervalUnit, WeeklyRecurrence, LocalNotificationAction, ScheduleClaim, ScheduleResult, ScheduleResultStatus, SchedulerSnapshot e SchedulerException |
 | recurrence_calculator.dart | RecurrenceCalculator.nextAfter, isEligible e localSlot |
-| scheduler_ports.dart | SchedulerStore e ScheduledActionExecutor, implementados pelo adapter |
+| scheduler_ports.dart | SchedulerStore, ScheduledActionExecutor, ScheduledGameActionExecutor e ScheduledGameNotifications |
 | scheduler_coordinator.dart | SchedulerCoordinator: load, list, reconcile, fila e tentativa de execução |
 | scheduler_commands.dart | Parte da biblioteca do coordenador; extensão pública SchedulerCommands com create, update, toggle e delete |
 
-ScheduleDraft recebe name, recurrence, action e enabled (true por padrão). Os modelos removem espaços nas extremidades do nome, título e mensagem; os limites são 1–80, 1–120 e 1–1000 unidades UTF-16 (Dart String.length), sem truncamento silencioso. LocalNotificationAction é a única ação atual, com title e body. IntervalRecurrence recebe quantity (1 por padrão), unit (minutes por padrão) e anchorUtc obrigatório. A quantidade inteira aceita 1–9999; unidades são seconds, minutes, hours e days. WeeklyRecurrence exige weekdays como conjunto ISO não vazio de 1–7, hour de 0–23 e minute de 0–59. Campos públicos são finais; listas/conjuntos expostos pelo modelo são imutáveis.
+ScheduleDraft recebe name, recurrence, action e enabled (true por padrão). Os modelos removem espaços nas extremidades do nome, título e mensagem; os limites são 1–80, 1–120 e 1–1000 unidades UTF-16 (Dart String.length), sem truncamento silencioso. A união selada ScheduledAction inclui LocalNotificationAction (title e body), UseItemAction e PayCrewAction; ações de jogo retêm conta e personagem por ID e nome. IntervalRecurrence recebe quantity (1 por padrão), unit (minutes por padrão) e anchorUtc obrigatório. A quantidade inteira aceita 1–9999; unidades são seconds, minutes, hours e days. WeeklyRecurrence exige weekdays como conjunto ISO não vazio de 1–7, hour de 0–23 e minute de 0–59. Campos públicos são finais; listas/conjuntos expostos pelo modelo são imutáveis.
 
 ## Snapshot e identidade
 
@@ -36,9 +36,9 @@ A decodificação de JSON corrupto ou versão desconhecida falha com SchedulerEx
       });
     }
 
-O store deve ler estado atual e lançar erro quando não puder confirmar uma gravação. Apenas o engine dono do coordenador escreve o snapshot. O executor recebe os campos salvos da ação e o ID estável; erros devem usar categorias sem dados secretos. O registro atual usa a chave localNotification. Concluir o Future significa que a plataforma aceitou a solicitação, sem afirmar que alguém viu a notificação.
+O store deve ler estado atual e lançar erro quando não puder confirmar uma gravação. Apenas o engine dono do coordenador escreve o snapshot. O executor recebe os campos salvos da ação e o ID estável; erros devem usar categorias sem dados secretos. O registro local usa a chave localNotification; gameExecutor e gameNotifications são colaboradores opcionais separados. Concluir o Future significa que a plataforma aceitou a solicitação, sem afirmar que alguém viu a notificação.
 
-SchedulerCoordinator recebe store, executors (mapa de tipo para executor), now (DateTime Function()), zoneId (String Function()) e calculator opcional. Todos os métodos retornam Future<SchedulerSnapshot>:
+SchedulerCoordinator recebe store, executors (mapa local), gameExecutor e gameNotifications opcionais, now (DateTime Function()), zoneId (String Function()) e calculator opcional. Todos os métodos retornam Future<SchedulerSnapshot>:
 
 - load() faz uma leitura nova e aplica a política de inicialização.
 - list() retorna o catálogo da autoridade, carregando-o se necessário.
@@ -58,11 +58,11 @@ Na inicialização, load pula todos os slots em ou antes de now, rearma o próxi
 
 Durante operação, isEligible aceita somente o slot atualmente armado, nunca antecipado, com atraso inclusivo de min(30 segundos, duração do intervalo) ou 30 segundos para semanal. Um slot mais antigo é pulado. Cada avaliação executa no máximo uma ocorrência por regra, sem loop de recuperação.
 
-Antes de chamar o executor, o coordenador grava claim, lastAttemptUtc, próxima ocorrência futura e resultado ainda sem timestamp. A garantia é uma tentativa no máximo por slot: se o processo morrer após o claim, uma notificação pode ser perdida. O core não promete uma transação entre persistência e notificação nativa. SchedulerCoordinator.actionTimeout limita a espera da ação a cinco segundos; o Future subjacente pode concluir depois, mas o slot não é reenviado.
+Antes de chamar o executor, o coordenador grava claim, lastAttemptUtc, próxima ocorrência futura e resultado ainda sem timestamp. A garantia é uma tentativa no máximo por slot: se o processo morrer após o claim, uma notificação pode ser perdida. O core não promete uma transação entre persistência e notificação nativa. SchedulerCoordinator.actionTimeout limita somente a notificação local a cinco segundos; o Future subjacente pode concluir depois, mas o slot não é reenviado.
 
 ## Falhas e resultados
 
-ScheduleResultStatus contém neverExecuted, submitted, failed e skippedInterrupted. ScheduleResult guarda atUtc e errorCode opcionais. O sucesso registra submitted; erro do executor ou timeout registra failed, permite continuar outras regras e mantém o próximo futuro sem retry imediato. Timeout usa actionTimeout; exceções SchedulerException do executor preservam sua categoria e outros erros usam actionFailed. Um executor ausente usa executorUnavailable.
+ScheduleResultStatus contém neverExecuted, submitted, confirmed, unavailable, failed, uncertain e skippedInterrupted. ScheduleResult guarda atUtc e errorCode opcionais. O sucesso registra submitted; erro do executor ou timeout registra failed, permite continuar outras regras e mantém o próximo futuro sem retry imediato. Timeout usa actionTimeout; exceções SchedulerException do executor preservam sua categoria e outros erros usam actionFailed. Um executor ausente usa executorUnavailable.
 
 Falhas de leitura/gravação usam readFailed/writeFailed. A falha de claim impede a chamada ao executor. Se a gravação do resultado falhar após a ação, o comando lança resultUncertain; o catálogo em memória é invalidado e a próxima operação relê o store sob a política de inicialização. Isso também trata uma gravação que chegou ao store antes de lançar erro, sem assumir rollback nem reenviar um slot incerto.
 
@@ -74,4 +74,12 @@ Os testes ficam em packages/popmundo_utils/test/scheduler_models_test.dart, recu
 
 ## Configuração das ações de jogo (SGA-01)
 
-ScheduledAction é uma união selada de LocalNotificationAction, UseItemAction e PayCrewAction. As ações de jogo vinculam boundUsername e GameCharacter(id positivo, name), sem credenciais/cookies/estado de formulário. UseItemAction normaliza itemName por whitespace e limita a 120 unidades UTF-16. PayCrewAction guarda artistId/name, bonusLevel de 14 a 20 e maxCostMinor positivo em centésimos de M$. Os codecs emitem somente campos públicos e rejeitam tipos malformados com invalidAction. GameCharacterCatalog, GameItemChoice, GameBonusChoice e GameCrewOptions são DTOs de descoberta com coleções imutáveis. A integração de Draft/Rule e execução acontece nas tarefas seguintes; não implica que as novas ações já executem nesta etapa.
+ScheduledAction é uma união selada de LocalNotificationAction, UseItemAction e PayCrewAction. As ações de jogo vinculam boundUsername e GameCharacter(id positivo, name), sem credenciais/cookies/estado de formulário. UseItemAction normaliza itemName por whitespace e limita a 120 unidades UTF-16. PayCrewAction guarda artistId/name, bonusLevel de 14 a 20 e maxCostMinor positivo em centésimos de M$. Os codecs emitem somente campos públicos e rejeitam tipos malformados com invalidAction. GameCharacterCatalog, GameItemChoice, GameBonusChoice e GameCrewOptions são DTOs de descoberta com coleções imutáveis. ScheduleDraft e ScheduledRule aceitam a união ScheduledAction e codecs genéricos, preservando schemaVersion1 e configurações locais anteriores. O dispatcher já executa gameExecutor através de sua fila isolada.
+
+## Execução de jogo e ciclo de vida (SGA-07/08/09)
+
+ScheduledGameActionExecutor.execute(action, isEligible:, beforeHttp:) devolve GameActionOutcome e oferece cancel/dispose. GameActionsService implementa essa porta: revalida isEligible dentro da fila compartilhada com discovery antes de aviso/credenciais/HTTP, aguarda beforeHttp sob deadline/cancelamento real, e só então lê credenciais frescas. ScheduledGameNotifications.showStart/showResult recebem a ação salva e o notificationId estável; o adapter cuida das traduções e submissão Android estrita.
+
+O claim é persistido antes da admissão. Um slot expirado enquanto aguarda discovery registra occurrenceExpired, não cria novo transporte nem aviso, e arma o próximo futuro. Uma tentativa admitida avisa antes de ler credenciais, inclusive se depois falhar por senha ausente. Falha de início impede HTTP; falha de publicação final mantém o resultado já persistido e não repete a ação. Um POST possivelmente recebido fica uncertain; uma rejeição inequívoca failed; alvo/form/opção ausente unavailable; sucesso fresco confirmed. A regra continua habilitada para futuras ocorrências.
+
+A conclusão de jogo rearma o próximo slot estritamente futuro, sem mudar a âncora e sem recuperar perdas. O dispatcher de jogo não aplica Future.timeout de cinco segundos: o serviço possui deadline total120s, request20s e fechamento real. dispose marca o coordenador indisponível, cancela e inicia imediatamente o dispose do executor para barrar também discovery enfileirada, então aguarda em conjunto a fila do coordenador e o shutdown do serviço. Comandos posteriores falham serviceUnavailable. Claim/resultado incertos preservam a política anterior de skippedInterrupted e resultUncertain.

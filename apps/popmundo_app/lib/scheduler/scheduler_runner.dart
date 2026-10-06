@@ -127,7 +127,7 @@ class SchedulerRunner {
     recurrence: ScheduleRecurrence.fromJson(
       Map<String, dynamic>.from(data['recurrence'] as Map),
     ),
-    action: LocalNotificationAction.fromJson(
+    action: ScheduledAction.fromJson(
       Map<String, dynamic>.from(data['action'] as Map),
     ),
   );

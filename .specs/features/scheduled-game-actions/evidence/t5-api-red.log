@@ -1,0 +1,61 @@
+00:00 +0: loading test/scheduler_game_dispatch_test.dart
+00:00 +0 -1: loading test/scheduler_game_dispatch_test.dart [E]
+  Failed to load "test/scheduler_game_dispatch_test.dart":
+  test/scheduler_game_dispatch_test.dart:11:31: Error: Type 'ScheduledGameActionExecutor' not found.
+  class GameExecutor implements ScheduledGameActionExecutor {
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  test/scheduler_game_dispatch_test.dart:30:26: Error: Type 'ScheduledGameNotifications' not found.
+  class Notices implements ScheduledGameNotifications {
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  test/scheduler_game_dispatch_test.dart:61:31: Error: 'ScheduledGameActionExecutor' isn't a type.
+    SchedulerCoordinator fresh({ScheduledGameActionExecutor? executor, ScheduledGameNotifications? notifications}) => SchedulerCoordinator(store: store, executors: {'localNotification': TestExecutor()}, gameExecutor: executor ?? game, gameNotifications: notifications ?? notices, now: () => time, zoneId: () => 'UTC');
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  test/scheduler_game_dispatch_test.dart:61:70: Error: 'ScheduledGameNotifications' isn't a type.
+    SchedulerCoordinator fresh({ScheduledGameActionExecutor? executor, ScheduledGameNotifications? notifications}) => SchedulerCoordinator(store: store, executors: {'localNotification': TestExecutor()}, gameExecutor: executor ?? game, gameNotifications: notifications ?? notices, now: () => time, zoneId: () => 'UTC');
+                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  test/scheduler_game_dispatch_test.dart:61:202: Error: No named parameter with the name 'gameExecutor'.
+    SchedulerCoordinator fresh({ScheduledGameActionExecutor? executor, ScheduledGameNotifications? notifications}) => SchedulerCoordinator(store: store, executors: {'localNotification': TestExecutor()}, gameExecutor: executor ?? game, gameNotifications: notifications ?? notices, now: () => time, zoneId: () => 'UTC');
+                                                                                                                                                                                                           ^^^^^^^^^^^^
+  lib/src/scheduler/scheduler_coordinator.dart:13:3: Context: Found this candidate, but the arguments don't match.
+    SchedulerCoordinator({
+    ^^^^^^^^^^^^^^^^^^^^
+  test/scheduler_game_dispatch_test.dart:117:57: Error: Member not found: 'confirmed'.
+      expect(rule.lastResult.status, ScheduleResultStatus.confirmed);
+                                                          ^^^^^^^^^
+  test/scheduler_game_dispatch_test.dart:119:102: Error: Member not found: 'confirmed'.
+      expect(SchedulerSnapshot.decode(store.raw!).rules.single.lastResult.status, ScheduleResultStatus.confirmed);
+                                                                                                       ^^^^^^^^^
+  test/scheduler_game_dispatch_test.dart:138:57: Error: Member not found: 'confirmed'.
+      expect(rule.lastResult.status, ScheduleResultStatus.confirmed);
+                                                          ^^^^^^^^^
+  test/scheduler_game_dispatch_test.dart:60:157: Error: The argument type 'UseItemAction' can't be assigned to the parameter type 'LocalNotificationAction'.
+   - 'UseItemAction' is from 'package:popmundo_utils/src/scheduler/scheduler_models.dart' ('lib/src/scheduler/scheduler_models.dart').
+   - 'LocalNotificationAction' is from 'package:popmundo_utils/src/scheduler/scheduler_models.dart' ('lib/src/scheduler/scheduler_models.dart').
+    ScheduleDraft draft() => ScheduleDraft(name: 'Item', recurrence: IntervalRecurrence(quantity: 10, unit: IntervalUnit.seconds, anchorUtc: anchor), action: itemAction());
+                                                                                                                                                              ^
+  test/scheduler_game_dispatch_test.dart:69:125: Error: The argument type 'UseItemAction' can't be assigned to the parameter type 'LocalNotificationAction'.
+   - 'UseItemAction' is from 'package:popmundo_utils/src/scheduler/scheduler_models.dart' ('lib/src/scheduler/scheduler_models.dart').
+   - 'LocalNotificationAction' is from 'package:popmundo_utils/src/scheduler/scheduler_models.dart' ('lib/src/scheduler/scheduler_models.dart').
+      final changed = await coordinator.update('one', ScheduleDraft(name: 'Changed', recurrence: original.recurrence, action: itemAction('Other item')), expectedRevision: 1);
+                                                                                                                              ^
+  test/scheduler_game_dispatch_test.dart:148:23: Error: The method 'dispose' isn't defined for the type 'SchedulerCoordinator'.
+   - 'SchedulerCoordinator' is from 'package:popmundo_utils/src/scheduler/scheduler_coordinator.dart' ('lib/src/scheduler/scheduler_coordinator.dart').
+  Try correcting the name to the name of an existing method, or defining a method named 'dispose'.
+      await coordinator.dispose();
+                        ^^^^^^^
+  test/scheduler_game_dispatch_test.dart:185:56: Error: No named parameter with the name 'beforeHttp'.
+      final result = await service.execute(itemAction(), beforeHttp: () async { order.add('start'); });
+                                                         ^^^^^^^^^^
+  test/scheduler_game_dispatch_test.dart:194:56: Error: No named parameter with the name 'beforeHttp'.
+      final result = await service.execute(itemAction(), beforeHttp: () async { started = true; });
+                                                         ^^^^^^^^^^
+  test/scheduler_game_dispatch_test.dart:204:56: Error: No named parameter with the name 'beforeHttp'.
+      final result = await service.execute(itemAction(), beforeHttp: () async { throw StateError('synthetic-secret'); });
+                                                         ^^^^^^^^^^
+  test/scheduler_game_dispatch_test.dart:216:56: Error: No named parameter with the name 'beforeHttp'.
+      final result = await service.execute(itemAction(), beforeHttp: () => notifier.future);
+                                                         ^^^^^^^^^^
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  test/scheduler_game_dispatch_test.dart: loading test/scheduler_game_dispatch_test.dart

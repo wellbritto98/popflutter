@@ -142,7 +142,7 @@ class ScheduleDraft {
   final String name;
   final bool enabled;
   final ScheduleRecurrence recurrence;
-  final LocalNotificationAction action;
+  final ScheduledAction action;
 }
 
 class ScheduleClaim {
@@ -171,6 +171,9 @@ class ScheduleClaim {
 enum ScheduleResultStatus {
   neverExecuted,
   submitted,
+  confirmed,
+  unavailable,
+  uncertain,
   failed,
   skippedInterrupted,
 }
@@ -227,7 +230,7 @@ class ScheduledRule {
   final String name;
   final bool enabled;
   final ScheduleRecurrence recurrence;
-  final LocalNotificationAction action;
+  final ScheduledAction action;
   final DateTime? nextDueUtc;
   final DateTime? lastAttemptUtc;
   final String? zoneId;
@@ -239,7 +242,7 @@ class ScheduledRule {
     String? name,
     bool? enabled,
     ScheduleRecurrence? recurrence,
-    LocalNotificationAction? action,
+    ScheduledAction? action,
     DateTime? nextDueUtc,
     DateTime? lastAttemptUtc,
     bool clearDue = false,
@@ -272,7 +275,7 @@ class ScheduledRule {
     recurrence: ScheduleRecurrence.fromJson(
       Map<String, dynamic>.from(json['recurrence'] as Map),
     ),
-    action: LocalNotificationAction.fromJson(
+    action: ScheduledAction.fromJson(
       Map<String, dynamic>.from(json['action'] as Map),
     ),
     nextDueUtc: json['nextDueUtc'] == null ? null : _utc(json['nextDueUtc']),

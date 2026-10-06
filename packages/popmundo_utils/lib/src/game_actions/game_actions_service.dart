@@ -7,15 +7,17 @@ import '../autologin/aspnet_form.dart';
 import '../autologin/auto_login_requests.dart';
 import '../autologin/auth_http.dart';
 import '../scheduler/scheduler_models.dart';
+import '../scheduler/scheduler_ports.dart';
 import 'game_action_contracts.dart';
 import 'game_forms.dart';
 import 'game_crew_action.dart';
 import 'game_item_action.dart';
 import 'game_transaction.dart';
+part 'game_execution.dart';
 
 /// Sole independent-session gateway for discovery and scheduled game actions.
 /// No renderer, visible cookie ports or HostTracker can enter this boundary.
-class GameActionsService {
+class GameActionsService implements ScheduledGameActionExecutor {
   GameActionsService({
     required this.readCredentials,
     GameHttpTransport Function()? createTransport,
@@ -45,10 +47,15 @@ class GameActionsService {
 
   Future<T> _transaction<T>(
     String? account,
-    Future<T> Function(GameTransaction, GameCredentials) operation,
-  ) {
+    Future<T> Function(GameTransaction, GameCredentials) operation, {
+    bool Function()? isEligible,
+    Future<void> Function()? beforeHttp,
+  }) {
     final result = _tail.then((_) async {
       if (_disposed) throw const GameActionException('serviceUnavailable');
+      if (isEligible != null && !isEligible()) {
+        throw const GameActionException("occurrenceExpired");
+      }
       final context = GameTransaction(
         transport: _transport(),
         lastFinished: _lastFinished,
@@ -59,6 +66,24 @@ class GameActionsService {
       );
       _active = context;
       try {
+        if (beforeHttp != null) {
+          try {
+            await context.wait(beforeHttp());
+          } on GameActionException {
+            rethrow;
+          } catch (error) {
+            final code =
+                error is SchedulerException &&
+                    [
+                      "permissionDenied",
+                      "notificationInitializationFailed",
+                    ].contains(error.code)
+                ? error.code
+                : "notificationFailed";
+            throw GameActionException(code);
+          }
+          context.check();
+        }
         GameCredentials credentials;
         try {
           credentials = await context.wait(readCredentials());
@@ -206,64 +231,21 @@ class GameActionsService {
     return parse(parser.parse(page.body));
   });
 
-  Future<GameActionOutcome> execute(GameScheduledAction action) async {
-    try {
-      return await _transaction(action.boundUsername, (
-        context,
-        credentials,
-      ) async {
-        try {
-          final login = await _login(context, credentials);
-          final origin = await _select(context, login, action.character);
-          final path = switch (action) {
-            UseItemAction() => "/World/Popmundo.aspx/Character/Items/",
-            PayCrewAction() => "/World/Popmundo.aspx/Artist/Crew/",
-          };
-          final url = origin.replace(path: path);
-          final page = await context.session.get(url);
-          _requirePage(page, url.path, expectedOrigin: origin);
-          final document = parser.parse(page.body);
-          final form = switch (action) {
-            UseItemAction() => itemPost(document, page.finalUrl, action),
-            PayCrewAction() => crewPost(document, page.finalUrl, action),
-          };
-          await context.establishNeutralBaseline(origin);
-          context.check();
-          context.gameplayUrl = url;
-          final posted = await context.session.postForm(url, form.encode());
-          _requirePage(posted, url.path, expectedOrigin: origin);
-          return await context.readOutcome(origin);
-        } on GameActionException catch (error) {
-          if (context.gameplaySent) {
-            return const GameActionOutcome(
-              status: GameActionStatus.uncertain,
-              errorCode: "outcomeUncertain",
-            );
-          }
-          return GameActionOutcome(
-            status:
-                [
-                  "itemUnavailable",
-                  "formUnavailable",
-                  "artistUnavailable",
-                  "artistMismatch",
-                  "bonusUnavailable",
-                ].contains(error.code)
-                ? GameActionStatus.unavailable
-                : GameActionStatus.failed,
-            errorCode: error.code,
-          );
-        }
-      });
-    } on GameActionException catch (error) {
-      return GameActionOutcome(
-        status: GameActionStatus.failed,
-        errorCode: error.code,
-      );
-    }
-  }
+  @override
+  Future<GameActionOutcome> execute(
+    GameScheduledAction action, {
+    bool Function()? isEligible,
+    Future<void> Function()? beforeHttp,
+  }) => _executeScheduledGame(
+    this,
+    action,
+    isEligible: isEligible,
+    beforeHttp: beforeHttp,
+  );
 
+  @override
   void cancel() => _active?.cancel("serviceUnavailable");
+  @override
   Future<void> dispose() async {
     _disposed = true;
     cancel();

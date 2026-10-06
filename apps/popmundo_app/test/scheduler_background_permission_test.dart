@@ -71,8 +71,8 @@ void main() {
     expect(saved.id, 'stable');
     expect(saved.notificationId, -1);
     expect(saved.enabled, true);
-    expect(saved.action.title, 'Exact title');
-    expect(saved.action.body, 'Exact body');
+    expect((saved.action as LocalNotificationAction).title, 'Exact title');
+    expect((saved.action as LocalNotificationAction).body, 'Exact body');
     expect(notificationCalls, ['areNotificationsEnabled']);
     expect(foregroundCalls, isNot(contains('checkNotificationPermission')));
     expect(foregroundCalls, isNot(contains('requestNotificationPermission')));

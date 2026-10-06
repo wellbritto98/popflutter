@@ -42,8 +42,11 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
     final rule = _rule;
     if (rule == null) return;
     _name.text = rule.name;
-    _title.text = rule.action.title;
-    _body.text = rule.action.body;
+    final action = rule.action;
+    if (action is LocalNotificationAction) {
+      _title.text = action.title;
+      _body.text = action.body;
+    }
     _enabled = rule.enabled;
     final recurrence = rule.recurrence;
     if (recurrence is IntervalRecurrence) {
@@ -119,7 +122,9 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
                 unit: _unit,
                 anchorUtc: DateTime.now().toUtc(),
               ),
-        action: LocalNotificationAction(title: _title.text, body: _body.text),
+        action: _rule?.action is GameScheduledAction
+            ? _rule!.action
+            : LocalNotificationAction(title: _title.text, body: _body.text),
       );
       final snapshot = _rule == null
           ? await widget.api.create(draft, id: _id)
@@ -278,13 +283,23 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
               'scheduler.action'.tr(),
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.notifications_outlined),
-              title: Text('scheduler.localNotification'.tr()),
-            ),
-            _field('schedule-title', 'notificationTitle', _title, 120),
-            _field('schedule-body', 'notificationBody', _body, 1000, lines: 3),
+            if (_rule?.action is GameScheduledAction)
+              Text((_rule!.action as GameScheduledAction).character.name)
+            else ...[
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.notifications_outlined),
+                title: Text('scheduler.localNotification'.tr()),
+              ),
+              _field('schedule-title', 'notificationTitle', _title, 120),
+              _field(
+                'schedule-body',
+                'notificationBody',
+                _body,
+                1000,
+                lines: 3,
+              ),
+            ],
           ],
         ),
       ),

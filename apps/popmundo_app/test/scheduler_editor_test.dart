@@ -53,15 +53,21 @@ void main() {
       final authoritative = saved!.rules.single;
       expect(authoritative.name, name);
       expect(authoritative.name.length, 80);
-      expect(authoritative.action.title, title);
-      expect(authoritative.action.title.length, 120);
-      expect(authoritative.action.body, body);
-      expect(authoritative.action.body.length, 1000);
+      expect((authoritative.action as LocalNotificationAction).title, title);
+      expect(
+        (authoritative.action as LocalNotificationAction).title.length,
+        120,
+      );
+      expect((authoritative.action as LocalNotificationAction).body, body);
+      expect(
+        (authoritative.action as LocalNotificationAction).body.length,
+        1000,
+      );
       expect(api.store.raw, saved!.encode());
       final persisted = SchedulerSnapshot.decode(api.store.raw!).rules.single;
       expect(persisted.name, name);
-      expect(persisted.action.title, title);
-      expect(persisted.action.body, body);
+      expect((persisted.action as LocalNotificationAction).title, title);
+      expect((persisted.action as LocalNotificationAction).body, body);
     },
   );
   testWidgets(
@@ -221,8 +227,8 @@ void main() {
       await tester.pumpAndSettle();
       final rule = saved!.rules.single;
       expect(rule.name, 'Reminder');
-      expect(rule.action.title, 'Saved title');
-      expect(rule.action.body, 'Saved body');
+      expect((rule.action as LocalNotificationAction).title, 'Saved title');
+      expect((rule.action as LocalNotificationAction).body, 'Saved body');
       expect((rule.recurrence as IntervalRecurrence).quantity, 1);
       expect(
         (rule.recurrence as IntervalRecurrence).unit,

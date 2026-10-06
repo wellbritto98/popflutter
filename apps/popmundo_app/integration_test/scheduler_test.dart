@@ -149,12 +149,12 @@ void main() {
       reason: 'SCHED-03: real form persisted name',
     );
     expect(
-      ui.action.title,
+      (ui.action as LocalNotificationAction).title,
       'Título salvo pela tela',
       reason: 'SCHED-02/03: exact title',
     );
     expect(
-      ui.action.body,
+      (ui.action as LocalNotificationAction).body,
       'Mensagem nativa persistida',
       reason: 'SCHED-02/03: exact body',
     );
@@ -193,12 +193,12 @@ void main() {
       reason: 'SCHED-07: rule IDs differ',
     );
     expect(
-      a.action.title,
+      (a.action as LocalNotificationAction).title,
       'Scheduler Home A',
       reason: 'SCHED-07: persisted exact title',
     );
     expect(
-      a.action.body,
+      (a.action as LocalNotificationAction).body,
       'Home first body',
       reason: 'SCHED-07: persisted exact body',
     );

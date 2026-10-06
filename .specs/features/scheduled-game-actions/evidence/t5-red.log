@@ -1,0 +1,164 @@
+00:00 +0: loading test/scheduler_game_dispatch_test.dart
+00:00 +0: (setUpAll)
+00:00 +0: SGA-01 game snapshot/action-only edit keeps character and cadence
+00:00 +1: SGA-07/08 GameActionStatus.confirmed persists exact outcome and same start/result card
+00:00 +1 -1: SGA-07/08 GameActionStatus.confirmed persists exact outcome and same start/result card [E]
+  Expected: 'confirmed'
+    Actual: 'failed'
+     Which: is different.
+            Expected: confirmed
+              Actual: failed
+                      ^
+             Differ at offset 0
+
+  package:matcher                              expect
+  test\scheduler_game_dispatch_test.dart 82:7  main.<fn>
+
+00:00 +1 -1: SGA-07/08 GameActionStatus.unavailable persists exact outcome and same start/result card
+00:00 +1 -2: SGA-07/08 GameActionStatus.unavailable persists exact outcome and same start/result card [E]
+  Expected: 'unavailable'
+    Actual: 'failed'
+     Which: is different.
+            Expected: unavailabl ...
+              Actual: failed
+                      ^
+             Differ at offset 0
+
+  package:matcher                              expect
+  test\scheduler_game_dispatch_test.dart 82:7  main.<fn>
+
+00:00 +1 -2: SGA-07/08 GameActionStatus.failed persists exact outcome and same start/result card
+00:00 +1 -3: SGA-07/08 GameActionStatus.failed persists exact outcome and same start/result card [E]
+  Expected: 'boundedCode'
+    Actual: 'actionFailed'
+     Which: is different.
+            Expected: boundedCod ...
+              Actual: actionFail ...
+                      ^
+             Differ at offset 0
+
+  package:matcher                              expect
+  test\scheduler_game_dispatch_test.dart 83:7  main.<fn>
+
+00:00 +1 -3: SGA-07/08 GameActionStatus.uncertain persists exact outcome and same start/result card
+00:00 +1 -4: SGA-07/08 GameActionStatus.uncertain persists exact outcome and same start/result card [E]
+  Expected: 'uncertain'
+    Actual: 'failed'
+     Which: is different.
+            Expected: uncertain
+              Actual: failed
+                      ^
+             Differ at offset 0
+
+  package:matcher                              expect
+  test\scheduler_game_dispatch_test.dart 82:7  main.<fn>
+
+00:00 +1 -4: SGA-07 claim failure stops all notices/gameplay
+00:00 +2 -4: SGA-07 start permission failure keeps claim and stops gameplay
+00:00 +2 -5: SGA-07 start permission failure keeps claim and stops gameplay [E]
+  Expected: 'permissionDenied'
+    Actual: 'actionFailed'
+     Which: is different.
+            Expected: permission ...
+              Actual: actionFail ...
+                      ^
+             Differ at offset 0
+
+  package:matcher                               expect
+  test\scheduler_game_dispatch_test.dart 107:5  main.<fn>
+
+00:00 +2 -5: SGA-07 final card failure preserves confirmed effect without retry
+00:00 +2 -6: SGA-07 final card failure preserves confirmed effect without retry [E]
+  Expected: ScheduleResultStatus:<ScheduleResultStatus.confirmed>
+    Actual: ScheduleResultStatus:<ScheduleResultStatus.failed>
+
+  package:matcher                               expect
+  test\scheduler_game_dispatch_test.dart 117:5  main.<fn>
+
+00:00 +2 -6: SGA-08 result-write failure preserves interrupted claim and no replay
+00:00 +2 -7: SGA-08 result-write failure preserves interrupted claim and no replay [E]
+  Expected: <1>
+    Actual: <0>
+
+  package:matcher                               expect
+  test\scheduler_game_dispatch_test.dart 127:5  main.<fn>
+
+00:00 +2 -7: SGA-09 game completion longer than five seconds is awaited
+00:00 +2 -8: SGA-09 game completion longer than five seconds is awaited [E]
+  Expected: ScheduleResultStatus:<ScheduleResultStatus.confirmed>
+    Actual: ScheduleResultStatus:<ScheduleResultStatus.failed>
+
+  package:matcher                               expect
+  test\scheduler_game_dispatch_test.dart 138:5  main.<fn>
+
+00:00 +2 -8: SGA-09 dispose aborts active executor and blocks later commands
+00:00 +2 -9: SGA-09 dispose aborts active executor and blocks later commands [E]
+  Expected: <true>
+    Actual: <false>
+
+  package:matcher                               expect
+  test\scheduler_game_dispatch_test.dart 150:5  main.<fn>
+
+00:00 +2 -9: SGA-09 shared discovery queue rechecks slot eligibility before notice/HTTP
+00:00 +2 -10: SGA-09 shared discovery queue rechecks slot eligibility before notice/HTTP [E]
+  Expected: 'occurrenceExpired'
+    Actual: 'actionFailed'
+     Which: is different.
+            Expected: occurrence ...
+              Actual: actionFail ...
+                      ^
+             Differ at offset 0
+
+  package:matcher                               expect
+  test\scheduler_game_dispatch_test.dart 171:5  main.<fn>
+
+00:00 +2 -10: SGA-07 start callback precedes fresh credentials and every HTTP send
+00:00 +2 -11: SGA-07 start callback precedes fresh credentials and every HTTP send [E]
+  Expected: ['start', 'credentials', 'HTTP']
+    Actual: ['credentials', 'HTTP', 'HTTP']
+     Which: at location [0] is 'credentials' instead of 'start'
+
+  package:matcher                               expect
+  test\scheduler_game_dispatch_test.dart 187:5  serviceAdmissionTests.<fn>
+
+00:00 +2 -11: SGA-07 missing credentials still sends start before failed outcome
+00:00 +2 -12: SGA-07 missing credentials still sends start before failed outcome [E]
+  Expected: 'credentialsMissing'
+    Actual: 'credentialsUnavailable'
+     Which: is different.
+            Expected: ... redentialsMissing
+              Actual: ... redentialsUnavailabl ...
+                                    ^
+             Differ at offset 11
+
+  package:matcher                               expect
+  test\scheduler_game_dispatch_test.dart 196:5  serviceAdmissionTests.<fn>
+
+00:00 +2 -12: SGA-07 failed start callback stops credentials and HTTP
+00:07 +2 -13: SGA-07 failed start callback stops credentials and HTTP [E]
+  Expected: GameActionStatus:<GameActionStatus.failed>
+    Actual: GameActionStatus:<GameActionStatus.confirmed>
+
+  package:matcher                               expect
+  test\scheduler_game_dispatch_test.dart 205:5  serviceAdmissionTests.<fn>
+
+00:07 +2 -13: SGA-09 cancellation while notifying prevents late credentials/HTTP
+00:07 +2 -14: SGA-09 cancellation while notifying prevents late credentials/HTTP [E]
+  Expected: <0>
+    Actual: <1>
+
+  package:matcher                               expect
+  test\scheduler_game_dispatch_test.dart 222:5  serviceAdmissionTests.<fn>
+
+00:07 +2 -14: (tearDownAll)
+00:07 +2 -14: Some tests failed.
+
+Failing tests:
+  test/scheduler_game_dispatch_test.dart: SGA-07 failed start callback stops credentials and HTTP
+  test/scheduler_game_dispatch_test.dart: SGA-07 final card failure preserves confirmed effect without retry
+  test/scheduler_game_dispatch_test.dart: SGA-07 missing credentials still sends start before failed outcome
+  test/scheduler_game_dispatch_test.dart: SGA-07 start callback precedes fresh credentials and every HTTP send
+  ... and 10 more
+
+Consider enabling the flag chain-stack-traces to receive more detailed exceptions.
+For example, 'dart test --chain-stack-traces'.

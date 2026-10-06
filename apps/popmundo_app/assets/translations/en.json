@@ -19,6 +19,7 @@
     "days": {"1": "Mon", "2": "Tue", "3": "Wed", "4": "Thu", "5": "Fri", "6": "Sat", "7": "Sun"},
     "next": "Next: {}", "noNext": "Next execution unavailable",
     "never": "Never executed", "submitted": "Submitted to Android", "interrupted": "Interrupted occurrence skipped", "failed": "Failed: {}",
+    "gameConfirmed": "Game action confirmed", "gameUnavailable": "Action unavailable; waiting for the next occurrence", "gameUncertain": "Game result uncertain; this occurrence will not be retried",
     "permissionsExplanation": "Allow notifications and unrestricted battery use for background schedules. Android controls delivery timing; force-stop requires opening the app again.",
     "notificationStatus": "Notifications: {}", "batteryStatus": "Background: {}", "serviceStatus": "Service: {}",
     "allowed": "allowed", "denied": "denied", "unrestricted": "battery unrestricted", "optimized": "battery optimized",

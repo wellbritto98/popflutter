@@ -4,8 +4,10 @@ import 'dart:convert';
 import 'recurrence_calculator.dart';
 import 'scheduler_models.dart';
 import 'scheduler_ports.dart';
+import '../game_actions/game_action_contracts.dart';
 
 part 'scheduler_commands.dart';
+part 'scheduler_game_execution.dart';
 
 /// Single writer and at-most-once attempt coordinator. All commands and ticks
 /// share the same queue, including durable claims and bounded action waits.
@@ -13,6 +15,8 @@ class SchedulerCoordinator {
   SchedulerCoordinator({
     required this.store,
     required Map<String, ScheduledActionExecutor> executors,
+    this.gameExecutor,
+    this.gameNotifications,
     required this.now,
     required this.zoneId,
     RecurrenceCalculator? calculator,
@@ -20,18 +24,31 @@ class SchedulerCoordinator {
        _calculator = calculator ?? RecurrenceCalculator();
   static const actionTimeout = Duration(seconds: 5);
   final SchedulerStore store;
+  final ScheduledGameActionExecutor? gameExecutor;
+  final ScheduledGameNotifications? gameNotifications;
   final Map<String, ScheduledActionExecutor> _executors;
   final DateTime Function() now;
   final String Function() zoneId;
   final RecurrenceCalculator _calculator;
   Future<void> _tail = Future.value();
   SchedulerSnapshot? _snapshot;
+  bool _disposed = false;
+
+  Future<void> dispose() async {
+    _disposed = true;
+    gameExecutor?.cancel();
+    final shuttingDown = gameExecutor?.dispose() ?? Future<void>.value();
+    await Future.wait<void>([_tail, shuttingDown]);
+  }
 
   Future<SchedulerSnapshot> load() => _serialized(_load);
   Future<SchedulerSnapshot> list() => _serialized(_ensureLoaded);
 
   Future<T> _serialized<T>(Future<T> Function() operation) {
-    final result = _tail.then((_) => operation());
+    final result = _tail.then((_) {
+      if (_disposed) throw const SchedulerException("serviceUnavailable");
+      return operation();
+    });
     _tail = result.then<void>(
       (_) {},
       onError: (Object error, StackTrace stack) {},
@@ -187,37 +204,49 @@ class SchedulerCoordinator {
       );
       await _replace(rule); // No platform action occurs before this succeeds.
       ScheduleResult result;
-      try {
-        final executor = _executors['localNotification'];
-        if (executor == null) {
-          throw const SchedulerException('executorUnavailable');
+      GameActionOutcome? gameOutcome;
+      if (rule.action is GameScheduledAction) {
+        gameOutcome = await _runGame(rule, due, zone);
+        result = ScheduleResult(
+          status: ScheduleResultStatus.values.byName(gameOutcome.status.name),
+          atUtc: this.now(),
+          errorCode: gameOutcome.errorCode,
+        );
+        rule = _arm(rule, this.now().toUtc());
+      } else {
+        try {
+          final executor = _executors['localNotification'];
+          if (executor == null) {
+            throw const SchedulerException('executorUnavailable');
+          }
+          await Future<void>.sync(
+            () => executor.execute(
+              action: rule.action as LocalNotificationAction,
+              notificationId: rule.notificationId,
+            ),
+          ).timeout(actionTimeout);
+          result = ScheduleResult(
+            status: ScheduleResultStatus.submitted,
+            atUtc: this.now(),
+          );
+        } catch (error) {
+          result = ScheduleResult(
+            status: ScheduleResultStatus.failed,
+            atUtc: this.now(),
+            errorCode: error is TimeoutException
+                ? 'actionTimeout'
+                : error is SchedulerException
+                ? error.code
+                : 'actionFailed',
+          );
         }
-        await Future<void>.sync(
-          () => executor.execute(
-            action: rule.action,
-            notificationId: rule.notificationId,
-          ),
-        ).timeout(actionTimeout);
-        result = ScheduleResult(
-          status: ScheduleResultStatus.submitted,
-          atUtc: this.now(),
-        );
-      } catch (error) {
-        result = ScheduleResult(
-          status: ScheduleResultStatus.failed,
-          atUtc: this.now(),
-          errorCode: error is TimeoutException
-              ? 'actionTimeout'
-              : error is SchedulerException
-              ? error.code
-              : 'actionFailed',
-        );
       }
       try {
         await _replace(rule.copyWith(lastResult: result));
       } on SchedulerException {
         throw const SchedulerException('resultUncertain');
       }
+      if (gameOutcome != null) await _publishGameResult(rule, gameOutcome);
     }
     return _snapshot!;
   });

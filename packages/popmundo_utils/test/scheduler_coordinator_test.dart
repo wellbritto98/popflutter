@@ -184,7 +184,7 @@ void main() {
           edited.notificationId,
           edited.revision,
           edited.name,
-          edited.action.title,
+          (edited.action as LocalNotificationAction).title,
         ],
         ['one', -1, 2, 'Edited', 'New'],
       );

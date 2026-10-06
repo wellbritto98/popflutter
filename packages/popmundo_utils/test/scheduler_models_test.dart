@@ -19,8 +19,8 @@ void main() {
   );
   test('SCHED-02 trims valid text and default is one minute', () {
     expect(draft().name, 'Reminder');
-    expect(draft().action.title, 'Title');
-    expect(draft().action.body, 'Message');
+    expect((draft().action as LocalNotificationAction).title, 'Title');
+    expect((draft().action as LocalNotificationAction).body, 'Message');
     expect(interval().duration, const Duration(minutes: 1));
   });
   for (final count in [0, 10000]) {
@@ -71,8 +71,14 @@ void main() {
       draft(name: 'a' * 80, title: 'a' * 120, body: 'a' * 1000).name.length,
       80,
     );
-    expect(draft(title: 'a' * 120).action.title.length, 120);
-    expect(draft(body: 'a' * 1000).action.body.length, 1000);
+    expect(
+      (draft(title: 'a' * 120).action as LocalNotificationAction).title.length,
+      120,
+    );
+    expect(
+      (draft(body: 'a' * 1000).action as LocalNotificationAction).body.length,
+      1000,
+    );
   });
   test('SCHED-02 trimmed UTF-16 maxima preserve exact snapshot payload', () {
     final name = '\u{1f600}' * 40; // 80 UTF-16 code units.

@@ -46,3 +46,7 @@ scheduler_runtime_test, scheduler_client_test, scheduler_platform_test e schedul
 A verificação de ativação usa LocalNotificationsService.isScheduledNotificationGranted(), que consulta NotificationManagerCompat/applicationContext por flutter_local_notifications. A API checkNotificationPermission do FGT requer Activity e não é usada no engine de serviço. Pedidos de permissão continuam no shell principal. scheduler_background_permission_test cobre a composição real com Activity ausente, payload persistido e denial sem gravação.
 
 scheduler_environment inicializa timezone/data/latest_all.dart: banco IANA completo, incluindo aliases válidos GMT/UTC retornados pelo Android. DeviceZone conserva o identificador nativo literal validado, sem fallback arbitrário. scheduler_background_zone_test exercita createSchedulerRunner com o map nativo GMT e confere regra semanal habilitada, zoneId GMT e próxima execução exata amanhã às 09:00 UTC.
+
+## Configuração tipada de ações (AD-023)
+
+O RPC valida ScheduledAction: localNotification, useItem ou payCrew. Cada ação de jogo preserva conta vinculada, personagem por ID/nome e parâmetros do efeito. Edição de nome/recorrência de uma regra de jogo salva funciona offline e conserva seu payload; os campos de título/mensagem pertencem apenas à notificação local. Os resultados confirmados, indisponíveis e incertos do core possuem labels EN/PT próprios, distintos de submitted local. A composição HTTP e a seleção de novas ações são entregas subsequentes da feature scheduled-game-actions.

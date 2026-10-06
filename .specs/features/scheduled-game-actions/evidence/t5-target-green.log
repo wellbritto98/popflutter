@@ -1,0 +1,22 @@
+00:00 +0: loading test/scheduler_game_dispatch_test.dart
+00:00 +0: test/scheduler_game_dispatch_test.dart: (setUpAll)
+00:00 +0: test/game_actions_admission_test.dart: SGA-09 cancellation during gameplay cooldown is failed before actual transmission
+00:00 +1: test/game_actions_admission_test.dart: SGA-09 cancellation during gameplay cooldown is failed before actual transmission
+00:00 +2: test/game_actions_admission_test.dart: SGA-09 cancellation during gameplay cooldown is failed before actual transmission
+00:00 +3: test/game_actions_admission_test.dart: SGA-09 cancellation during gameplay cooldown is failed before actual transmission
+00:00 +4: test/game_actions_admission_test.dart: SGA-09 cancellation during gameplay cooldown is failed before actual transmission
+00:00 +5: test/game_actions_admission_test.dart: SGA-09 cancellation during gameplay cooldown is failed before actual transmission
+00:00 +6: test/game_actions_admission_test.dart: SGA-09 cancellation during gameplay cooldown is failed before actual transmission
+00:00 +7: test/game_actions_admission_test.dart: SGA-09 cancellation during gameplay cooldown is failed before actual transmission
+00:00 +8: test/game_actions_admission_test.dart: SGA-09 cancellation during gameplay cooldown is failed before actual transmission
+00:00 +9: test/game_actions_admission_test.dart: SGA-09 cancellation during gameplay cooldown is failed before actual transmission
+00:00 +10: test/scheduler_game_dispatch_test.dart: SGA-09 game completion longer than five seconds is awaited
+00:00 +11: test/scheduler_game_dispatch_test.dart: SGA-09 game completion longer than five seconds is awaited
+00:00 +12: test/scheduler_game_dispatch_test.dart: SGA-09 game completion longer than five seconds is awaited
+00:00 +13: test/scheduler_game_dispatch_test.dart: SGA-09 game completion longer than five seconds is awaited
+00:00 +14: test/scheduler_game_dispatch_test.dart: SGA-09 game completion longer than five seconds is awaited
+00:05 +15: test/scheduler_game_dispatch_test.dart: SGA-09 dispose aborts active executor and blocks later commands
+00:05 +16: test/scheduler_game_dispatch_test.dart: SGA-09 shared discovery queue rechecks slot eligibility before notice/HTTP
+00:05 +17: test/scheduler_game_dispatch_test.dart: SGA-09 delayed game completion arms future slot without cadence drift or replay
+00:05 +18: test/scheduler_game_dispatch_test.dart: (tearDownAll)
+00:05 +18: All tests passed!

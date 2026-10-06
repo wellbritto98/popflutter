@@ -53,6 +53,9 @@ String _executionError(String? code) => switch (code) {
 String resultLabel(ScheduleResult result) => switch (result.status) {
   ScheduleResultStatus.neverExecuted => 'scheduler.never'.tr(),
   ScheduleResultStatus.submitted => 'scheduler.submitted'.tr(),
+  ScheduleResultStatus.confirmed => 'scheduler.gameConfirmed'.tr(),
+  ScheduleResultStatus.unavailable => 'scheduler.gameUnavailable'.tr(),
+  ScheduleResultStatus.uncertain => 'scheduler.gameUncertain'.tr(),
   ScheduleResultStatus.skippedInterrupted => 'scheduler.interrupted'.tr(),
   ScheduleResultStatus.failed => 'scheduler.failed'.tr(
     args: [_executionError(result.errorCode)],
