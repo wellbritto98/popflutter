@@ -67,7 +67,7 @@ What: selected artist/bonus/price guarded single POST adapter.
 Where: utils game_actions crew endpoint and tests.
 Depends on: T3. Owner: popmundo-utils with domain review.
 Requirement: SGA-04/06/08/09.
-Done when: positive scoped artist guard, offered explicit14..20, integer-cent cap, fresh complete form, no substitute, missing/changed/weekly form zero POST; strict outcome.
+Done when: positive scoped artist guard, offered selected14..20, optional integer-cent cap, fresh complete form, no substitute, missing/changed/weekly form zero POST; strict outcome.
 Tests: unit/integration. Gate: Quick. Commit: feat(game-actions): execute guarded crew bonuses.
 Status: done; commit25ded07;383 core tests passed, analyze clean, domain review passed (evidence/t4-*).
 
@@ -94,7 +94,7 @@ What: service/character/item/bonus selection, effect summaries, translated statu
 Where: app scheduler editor/presentation/translations and tests/docs.
 Depends on: T6. Owner: popmundo-app-shell.
 Requirement: SGA-01/02/06/07/08.
-Done when: explicit owned char ID/name persists; valid discovered choices required; no automatic20; quote cap saved; offline existing edit; action-only change retains cadence; cancellation/errors retain input; weekly/item effect stated; cards show char/action/outcome in EN/PT.
+Done when: explicit owned char ID/name persists; verified character/artist required; default20; quote cap saved when available, otherwise null permits future scheduling; offline existing edit; action-only change retains cadence; cancellation/errors retain input; weekly/item effect and future-price disclosure stated; discovery progress visible; cards show char/action/outcome in EN/PT.
 Tests: widget. Gate: Full. Commit: feat(scheduler): configure scheduled game actions.
 Status: done; commit 11f43ef; 179 app tests passed, analyze clean (evidence/t7-green.log).
 
@@ -150,3 +150,5 @@ Found after T2 opt-in live probe: routeMismatch before gameplay; no item/payment
 User clarified the reported save problem occurs after a weekly crew bonus; that state must not prevent scheduling the next week. User requests maximum bonus as the default and visible feedback while requests run. This supersedes the original no-default20/current-quote-required configuration rule, not execution-time guards.
 
 Core: optional cost cap with backwards-compatible capped rules; null cap uses the selected level at the fresh parsed game price. Editor: default20, verified character/artist required, save without available bonus form, disclose unavailable-now/future price, visible loading and recoverable validation. Tests: empty bonus list saves bound crew20; pending discovery feedback; uncapped codec and guarded execution; legacy cap remains enforced. Owners: utils and app-shell; gate/commit separately before T8. No live payment authorized or submitted.
+
+F2 status: done; core b1160ee (419 tests, analyze clean), shell aabe4b3 (186 tests, full app analyze clean). Evidence crew-future-core-*, crew-save-* and t8-app-analysis.log. No real payment or item use submitted.

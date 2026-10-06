@@ -49,7 +49,7 @@ Um FAB (`menu-toggle`) abre o sidebar. Cada feature define o seu próprio `AppMe
 
 O menu Agendamentos configura notificações locais, uso de item e bônus para a equipe por intervalos (segundos, minutos, horas ou dias) ou dias da semana e horário local. As regras ficam persistidas e executam no serviço em segundo plano, com restauração após reboot enquanto houver regras ativas. Ocorrências perdidas são descartadas. Segundos funcionam em melhor esforço; force-stop do Android impede execução até abrir o app novamente. O iOS apresenta a limitação na tela. Ver [spec e critérios](.specs/features/service-scheduler/spec.md).
 
-As ações do jogo guardam conta e personagem (ID e nome) por regra. Usam login HTTP independente, sem tocar a sessão da tela principal. Cada ocorrência avisa antes de iniciar; O item é escolhido e o bônus usa nível máximo por padrão. A banda pode ser agendada durante o bloqueio semanal; com cotação disponível, ela vira teto de custo; sem cotação, o preço é definido pelo jogo na execução. A execução respeita a disponibilidade do formulário atual. Resultados incertos nunca são reenviados. Ver [spec das ações](.specs/features/scheduled-game-actions/spec.md).
+As ações do jogo guardam conta e personagem (ID e nome) por regra. Usam login HTTP independente, sem tocar a sessão da tela principal. Cada ocorrência avisa antes de iniciar; o item é escolhido e o bônus usa nível máximo por padrão. A banda pode ser agendada durante o bloqueio semanal; com cotação disponível, ela vira teto de custo; sem cotação, o preço é definido pelo jogo na execução. A execução respeita a disponibilidade do formulário atual. Resultados incertos nunca são reenviados. Ver [spec das ações](.specs/features/scheduled-game-actions/spec.md).
 
 ## Estender
 

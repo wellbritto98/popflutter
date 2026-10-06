@@ -23,7 +23,7 @@ Approaches considered in research: shared headless WebView (cookie and lifecycle
 
 ### Typed action configuration
 
-A sealed ScheduledAction hierarchy in scheduler models (part file permitted): LocalNotificationAction; GameScheduledAction with boundUsername and GameCharacter(id,name); UseItemAction with itemName; PayCrewAction with artistId/name, bonusLevel and maxCostMinor. IDs are positive integers; bonus14..20; costs are integer cents of M$. Whitelisted codecs reject malformed/unknown actions without overwriting the catalog. No legacy title/body getters on game actions.
+A sealed ScheduledAction hierarchy in scheduler models (part file permitted): LocalNotificationAction; GameScheduledAction with boundUsername and GameCharacter(id,name); UseItemAction with itemName; PayCrewAction with artistId/name, bonusLevel and maxCostMinor. IDs are positive integers; bonus14..20; optional maxCostMinor is positive integer cents of M$ when a quote exists. Whitelisted codecs reject malformed/unknown actions without overwriting the catalog. No legacy title/body getters on game actions.
 
 DTOs GameCharacterCatalog, GameItemChoice and GameCrewOptions expose account/character/item/artist/bonus choices only. Character ID governs execution; stored name is the notification/editor label. Renaming does not select a different character.
 
@@ -39,7 +39,7 @@ Total deadline120s; per-request20s; decoded-body2MiB; cooldown750ms after succes
 
 Use item: exact case/whitespace-normalized name; first eligible direct inventory row in DOM order; enabled image button pathname /Item_Use.png only; row-local hidItemIDstring preserved; button.x=1/button.y=1. No tuning/wearing/drop or persisted item form state.
 
-Crew bonus: verify current scoped artist ID; explicit selected offered enabled level14..20; parse quoted currency with exact observed PT grouping/decimal grammar into cents (2.250,00 M$ =225000); reject ambiguous unsupported formats. When maxCostMinor is present the current quote must not exceed it; a null cap authorizes the saved level at its freshly parsed game price. Existing non-null caps retain their guard. Full fresh form includes selected bonus and actual button value. Missing form/option => unavailable; no substitute or fabricated reason.
+Crew bonus: verify current scoped artist ID; selected enabled level14..20 offered at execution; parse quoted currency with exact observed PT grouping/decimal grammar into cents (2.250,00 M$ =225000); reject ambiguous unsupported formats. When maxCostMinor is present the current quote must not exceed it; a null cap authorizes the saved level at its freshly parsed game price. Existing non-null caps retain their guard. Full fresh form includes selected bonus and actual button value. Missing form/option => unavailable; no substitute or fabricated reason.
 
 Before gameplay, obtain a neutral notification baseline with at most two bounded ASMX reads; do not assume reads clear state merely from endpoint naming. Failure/non-neutral baseline prevents gameplay. After gameplay, strictly decode GetPageNotifications response; only unequivocal fresh success confirms, explicit error fails, mixed/empty/malformed/unknown signals are uncertain. HTTP200 alone never confirms.
 
