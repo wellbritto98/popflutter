@@ -105,7 +105,7 @@ Depends on: T7. Owner: popmundo-e2e; module fixes routed to owners.
 Requirement: SGA-10 plus device boundaries SGA-01/03/07/08/09.
 Done when: analyze clean and Patrol run on observed device; real Keystore/HTTP/notification plus background/recents/reboot retaining target ID; default fixture cannot load Popmundo; release install preserves production data; final all tests/analyzers green; official docs consistent. Report physical/overnight limits truthfully.
 Tests: device e2e + regression. Gate: Build. Commit: test(game-actions): prove Android engine execution.
-Status: done; device proof in evidence/t8-device-gates.md; release gate in evidence/final-gates.md. Core 419, WebView 31 and app 186 passed with clean analyzers. Release install on emulator-5554 is a fresh install because production was already absent; historical 2026-08-20 inodes were not on this AVD.
+Status: done; commit dfc6d27. Device proof in evidence/t8-device-gates.md; release gate in evidence/final-gates.md. Core 419, WebView 31 and app 186 passed with clean analyzers. Release install on emulator-5554 is a fresh install because production was already absent; historical 2026-08-20 inodes were not on this AVD.
 
 ## Task Granularity Check
 

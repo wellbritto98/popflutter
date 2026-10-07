@@ -205,10 +205,10 @@
 ## Handoff
 
 - **Feature**: scheduled-game-actions / .specs/features/scheduled-game-actions.
-- **Phase / Task**: Execute T8 closed its author gates. T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07), T5(3cb4ecf), T6(23360af), T7(11f43ef), F2 core b1160ee, F2 shell aabe4b3. Branch codex/scheduled-game-actions.
-- **Completed**: Device proof in evidence/t8-device-gates.md (Home, Recents removal, reboot while POST held, skippedInterrupted, next future slot confirmed, saved character). Final suites 419/31/186 passed, analyzers clean. Release APK built and installed on emulator-5554 as a fresh install; production package was already absent, so 2026-08-20 inodes were not preserved. FGS isForeground=true after the normal notification and battery prompts. Evidence: evidence/final-gates.md.
-- **In-progress**: fresh independent verifier not yet run.
-- **Next step**: independent verifier over the feature diff; write validation.md. Do not claim physical handset, overnight execution, or preservation of the August production data directory.
+- **Phase / Task**: scheduled-game-actions complete. T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07), T5(3cb4ecf), T6(23360af), T7(11f43ef), F2 core b1160ee, F2 shell aabe4b3, T8 dfc6d27, locale assertions 857466b. Branch codex/scheduled-game-actions.
+- **Completed**: Independent validation PASS, 45/45 ACs, five scratch mutations killed. Device proof: interrupted POST became skippedInterrupted and only the next future slot confirmed with the saved character. Suites 419/31/186. Release APK installed on emulator-5554 as a fresh install; the 2026-08-20 data directory was already absent. Report: validation.md.
+- **In-progress**: none.
+- **Next step**: none for this feature. Do not claim a physical handset, overnight execution, or preservation of the August production data.
 - **Blockers**: none. No credentials, cookies or authenticated HTML in evidence. Live gameplay POST was not submitted.
-- **Uncommitted files**: none after the T8 evidence commit; validation.md still absent until the verifier.
+- **Uncommitted files**: none. Untracked docs/firebase-popmund-scrap-functions.js is unrelated and stays unstaged.
 - **Branch**: codex/scheduled-game-actions.

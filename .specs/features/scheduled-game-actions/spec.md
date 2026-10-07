@@ -1,6 +1,6 @@
 # Scheduled Game Actions — Specification
 
-Status: Approved; implementation in progress. User confirmed isolated HTTP and character binding on 2026-10-05.
+Status: Approved; implementation verified 2026-10-07 (validation.md, commit 857466b). User confirmed isolated HTTP and character binding on 2026-10-05.
 Date: 2026-10-05 (America/Sao_Paulo).
 Scope: Complex; Android scheduler, isolated authentication, game forms and native UI.
 Baseline: 5ce2153; AD-021 scheduler and AD-022 AppWiring.
@@ -141,16 +141,16 @@ The user confirmed the proposal and character binding. Remaining details follow 
 
 | ID | Deliverable | Status |
 | --- | --- | --- |
-| SGA-01 | Backward-compatible action models | Implementing |
-| SGA-02 | Editor, discovery and summaries | Implementing |
-| SGA-03 | Independent login and credentials | Implementing |
-| SGA-04 | Shared ASP.NET helpers and outcome checks | Implementing |
-| SGA-05 | usarItem | Implementing |
-| SGA-06 | pagarEquipe | Implementing |
-| SGA-07 | Start/result native notifications | Implementing |
-| SGA-08 | Truthful durable outcome | Implementing |
-| SGA-09 | Serial cancellation/deadlines | Implementing |
-| SGA-10 | Device proof, verifier and docs | Implementing |
+| SGA-01 | Backward-compatible action models | Verified |
+| SGA-02 | Editor, discovery and summaries | Verified |
+| SGA-03 | Independent login and credentials | Verified |
+| SGA-04 | Shared ASP.NET helpers and outcome checks | Verified |
+| SGA-05 | usarItem | Verified |
+| SGA-06 | pagarEquipe | Verified |
+| SGA-07 | Start/result native notifications | Verified |
+| SGA-08 | Truthful durable outcome | Verified |
+| SGA-09 | Serial cancellation/deadlines | Verified |
+| SGA-10 | Device proof, verifier and docs | Verified |
 
 Coverage: 10 requirements; task mapping follows approved design. No implementation claim.
 
