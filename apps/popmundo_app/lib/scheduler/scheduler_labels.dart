@@ -52,9 +52,10 @@ String _executionError(String? code) => switch (code) {
 };
 String actionSummary(ScheduledAction action) {
   if (action is UseItemAction) {
-    return 'scheduler.cardItem'.tr(
-      args: [action.character.name, action.itemName],
-    );
+    return (action.operation == GameItemOperation.tune
+            ? 'scheduler.cardTune'
+            : 'scheduler.cardItem')
+        .tr(args: [action.character.name, action.itemName]);
   }
   if (action is PayCrewAction) {
     return 'scheduler.cardCrew'.tr(

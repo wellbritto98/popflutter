@@ -44,7 +44,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
   GameCharacter? _character;
   List<GameItemChoice> _items = const [];
   GameCrewOptions? _crew;
-  String? _itemName;
+  GameItemChoice? _item;
   int? _bonusLevel;
   int _ticket = 0;
   IntervalUnit _unit = IntervalUnit.minutes;
@@ -120,7 +120,9 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
     _targetLocked = true;
     _character = action.character;
     _service = action is PayCrewAction ? _Service.crew : _Service.item;
-    _itemName = action is UseItemAction ? action.itemName : null;
+    _item = action is UseItemAction
+        ? GameItemChoice(name: action.itemName, operation: action.operation)
+        : null;
     _bonusLevel = action is PayCrewAction ? action.bonusLevel : null;
   }
 
@@ -137,7 +139,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
       } else if (service != _Service.notification) {
         _targetLocked = false;
         _character = null;
-        _itemName = null;
+        _item = null;
         _bonusLevel = service == _Service.crew ? 20 : null;
         _items = const [];
         _crew = null;
@@ -180,7 +182,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
     if (discovery == null || catalog == null) return;
     setState(() {
       _character = character;
-      _itemName = null;
+      _item = null;
       _bonusLevel = _service == _Service.crew ? 20 : null;
       _items = const [];
       _crew = null;
@@ -227,8 +229,11 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
   }
 
   String? get _effect {
-    if (_service == _Service.item && _character != null && _itemName != null) {
-      return 'scheduler.effectItem'.tr(args: [_itemName!, _character!.name]);
+    if (_service == _Service.item && _character != null && _item != null) {
+      return (_item!.operation == GameItemOperation.tune
+              ? 'scheduler.effectTune'
+              : 'scheduler.effectItem')
+          .tr(args: [_item!.name, _character!.name]);
     }
     if (_service != _Service.crew || _bonusLevel == null) return null;
     final saved = _rule?.action;
@@ -261,14 +266,19 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
     final catalog = _catalog;
     if (character == null || catalog == null) return null;
     if (_service == _Service.item) {
-      final item = _itemName;
-      if (item == null || !_items.any((choice) => choice.name == item)) {
+      final item = _item;
+      if (item == null ||
+          !_items.any(
+            (choice) =>
+                choice.name == item.name && choice.operation == item.operation,
+          )) {
         return null;
       }
       return UseItemAction(
         boundUsername: catalog.username,
         character: character,
-        itemName: item,
+        itemName: item.name,
+        operation: item.operation,
       );
     }
     final crew = _crew;
@@ -538,18 +548,18 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
                 catalog: _catalog,
                 character: _character,
                 items: _items,
-                itemName: _itemName,
+                item: _item,
                 crewOptions: _crew,
                 bonusLevel: _bonusLevel,
                 effect: _effect,
                 onCharacter: (value) => unawaited(_selectCharacter(value)),
-                onItem: (value) => setState(() => _itemName = value),
+                onItem: (value) => setState(() => _item = value),
                 onBonus: (value) => setState(() => _bonusLevel = value),
                 onChangeTarget: () {
                   setState(() {
                     _targetLocked = false;
                     _character = null;
-                    _itemName = null;
+                    _item = null;
                     _bonusLevel = _service == _Service.crew ? 20 : null;
                     _items = const [];
                     _crew = null;

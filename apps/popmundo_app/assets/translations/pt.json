@@ -21,6 +21,8 @@
     "never": "Nunca executado", "submitted": "Enviada ao Android", "interrupted": "Ocorrência interrompida descartada", "failed": "Falhou: {}",
     "gameConfirmed": "Ação confirmada pelo jogo", "gameUnavailable": "Ação indisponível; aguardando próxima ocorrência", "gameUncertain": "Resultado do jogo incerto; esta ocorrência não será repetida",
     "useItem": "Usar item", "payCrew": "Pagar equipe", "gameStartTitle": "Executando {}", "gameCharacterBody": "Personagem: {}", "gameResultTitle": "{}: {}",
+    "tuneInstrument": "Afinar instrumento", "tuneOption": "Afinar instrumento: {}", "cardTune": "Afinar instrumento para {}: {}",
+    "effectTune": "Cada ocorrência elegível afina o instrumento {} para {}.",
     "cardItem": "Usar item para {}: {}", "cardCrew": "Pagar equipe para {}: {} bônus {}",
     "effectItem": "Cada ocorrência elegível usa um {} para {}.",
     "effectCrew": "Cada ocorrência elegível distribui o bônus {} ({}) para {}.",

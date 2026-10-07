@@ -21,6 +21,8 @@
     "never": "Never executed", "submitted": "Submitted to Android", "interrupted": "Interrupted occurrence skipped", "failed": "Failed: {}",
     "gameConfirmed": "Game action confirmed", "gameUnavailable": "Action unavailable; waiting for the next occurrence", "gameUncertain": "Game result uncertain; this occurrence will not be retried",
     "useItem": "Use item", "payCrew": "Pay crew", "gameStartTitle": "Executing {}", "gameCharacterBody": "Character: {}", "gameResultTitle": "{}: {}",
+    "tuneInstrument": "Tune instrument", "tuneOption": "Tune instrument: {}", "cardTune": "Tune instrument for {}: {}",
+    "effectTune": "Each eligible occurrence tunes the instrument {} for {}.",
     "cardItem": "Use item for {}: {}", "cardCrew": "Pay crew for {}: {} bonus {}",
     "effectItem": "Each eligible occurrence uses one {} for {}.",
     "effectCrew": "Each eligible occurrence distributes cash bonus {} ({}) to {}.",

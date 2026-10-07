@@ -5,6 +5,67 @@ import 'package:popmundo_utils/popmundo_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  for (final locale in ["en", "pt"]) {
+    test(
+      [
+        locale,
+        " tuning start and result notices name the authorized operation",
+      ].join(),
+      () async {
+        SharedPreferences.setMockInitialValues({"locale": locale});
+        final prefs = await SharedPreferences.getInstance();
+        final action = UseItemAction(
+          boundUsername: "bound",
+          character: GameCharacter(id: 42, name: "Saved Character"),
+          itemName: "Violino",
+          operation: GameItemOperation.tune,
+        );
+        final titles = <String>[], bodies = <String>[];
+        final ids = <int>[];
+        final notices = NativeScheduledGameNotifications(
+          loadMessages: () => GameNotificationMessages.load(prefs),
+          show:
+              ({
+                required int id,
+                required String title,
+                required String body,
+              }) async {
+                ids.add(id);
+                titles.add(title);
+                bodies.add(body);
+              },
+        );
+        await notices.showStart(action: action, notificationId: -42);
+        await notices.showResult(
+          action: action,
+          notificationId: -42,
+          outcome: const GameActionOutcome(status: GameActionStatus.confirmed),
+        );
+        expect(ids, [-42, -42]);
+        expect(
+          titles,
+          locale == "pt"
+              ? [
+                  "Executando Afinar instrumento",
+                  "Afinar instrumento: ação confirmada",
+                ]
+              : [
+                  "Executing Tune instrument",
+                  "Tune instrument: action confirmed",
+                ],
+        );
+        expect(
+          bodies,
+          List.filled(
+            2,
+            locale == "pt"
+                ? "Personagem: Saved Character"
+                : "Character: Saved Character",
+          ),
+        );
+      },
+    );
+  }
   TestWidgetsFlutterBinding.ensureInitialized();
   test('service engine loads fresh EN/PT assets and retains saved character in notice', () async {
     SharedPreferences.setMockInitialValues({'locale': 'pt'});

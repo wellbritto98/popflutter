@@ -14,7 +14,7 @@ class SchedulerGameFields extends StatelessWidget {
     this.catalog,
     this.character,
     this.items = const [],
-    this.itemName,
+    this.item,
     this.crewOptions,
     this.bonusLevel,
     this.effect,
@@ -28,12 +28,12 @@ class SchedulerGameFields extends StatelessWidget {
   final GameCharacterCatalog? catalog;
   final GameCharacter? character;
   final List<GameItemChoice> items;
-  final String? itemName;
+  final GameItemChoice? item;
   final GameCrewOptions? crewOptions;
   final int? bonusLevel;
   final String? effect;
   final ValueChanged<GameCharacter>? onCharacter;
-  final ValueChanged<String>? onItem;
+  final ValueChanged<GameItemChoice>? onItem;
   final ValueChanged<int>? onBonus;
   final VoidCallback? onChangeTarget;
 
@@ -105,12 +105,24 @@ class SchedulerGameFields extends StatelessWidget {
             children: [
               for (final option in items)
                 ChoiceChip(
-                  key: Key('schedule-item-${option.name}'),
-                  label: Text(option.name),
-                  selected: itemName == option.name,
+                  key: Key(
+                    [
+                      'schedule-item-',
+                      if (option.operation == GameItemOperation.tune) 'tune-',
+                      option.name,
+                    ].join(),
+                  ),
+                  label: Text(
+                    option.operation == GameItemOperation.tune
+                        ? 'scheduler.tuneOption'.tr(args: [option.name])
+                        : option.name,
+                  ),
+                  selected:
+                      item?.name == option.name &&
+                      item?.operation == option.operation,
                   onSelected: pending || onItem == null
                       ? null
-                      : (_) => onItem!(option.name),
+                      : (_) => onItem!(option),
                 ),
             ],
           ),

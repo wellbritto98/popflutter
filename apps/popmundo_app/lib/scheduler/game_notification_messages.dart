@@ -39,7 +39,11 @@ class GameNotificationMessages {
     return value;
   }
 
-  String _service(GameScheduledAction action) => _text(action.type);
+  String _service(GameScheduledAction action) => _text(
+    action is UseItemAction && action.operation == GameItemOperation.tune
+        ? 'tuneInstrument'
+        : action.type,
+  );
   GameNotificationText start(GameScheduledAction action) =>
       GameNotificationText(
         title: _text('gameStartTitle', [_service(action)]),
