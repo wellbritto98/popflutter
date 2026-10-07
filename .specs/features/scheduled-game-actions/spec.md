@@ -64,7 +64,7 @@ SGA-05 — usarItem
 
 1. WHEN an eligible occurrence executes, THEN it SHALL GET /World/Popmundo.aspx/Character/Items/ on its authenticated host and match only item links inside #checkedlist rows by exact case/whitespace-normalized name, never substring matching.
 2. WHEN multiple eligible rows have that exact name, THEN it SHALL use the first eligible row with the configured operation in document order. User confirmation accepted this proposed default; each occurrence uses only one item.
-3. WHEN the row contains input[type=image], THEN enabled buttons whose src pathname ends in /Item_Use.png SHALL map to use and /Item_Tune.png SHALL map to tune. Execution SHALL require the saved operation and exact normalized name. Wearable buttons, unrelated images and missing buttons SHALL NOT be executed, even if named btnUse. A changed icon SHALL NOT silently change the authorized operation.
+3. WHEN the row contains input[type=image], THEN enabled buttons whose src pathname basename is Item_Use.png SHALL map to use and Item_Tune.png SHALL map to tune. Execution SHALL require the saved operation and exact normalized name. Wearable buttons, unrelated images and missing buttons SHALL NOT be executed, even if named btnUse. A changed icon SHALL NOT silently change the authorized operation.
 4. WHEN submitting use, THEN the entire fresh form plus <use-button-name>.x=1 and <use-button-name>.y=1 SHALL be posted once. All hidItemIDstring values remain those returned in the current document; none are persisted for later reuse.
 5. WHEN the named item is absent or no eligible use row exists, THEN the occurrence SHALL be marked unavailable with zero gameplay POSTs; future recurrence remains enabled unless the user pauses it.
 
