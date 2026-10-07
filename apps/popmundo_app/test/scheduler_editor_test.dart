@@ -154,6 +154,8 @@ void main() {
     );
     expect(find.text('Criar agendamento'), findsOneWidget);
     expect(find.text('Notificação local'), findsOneWidget);
+    expect(find.text('Usar item'), findsOneWidget);
+    expect(find.text('Pagar equipe'), findsOneWidget);
     expect(find.text('Salvar'), findsOneWidget);
     await save(tester);
     expect(find.text('Obrigatório: 1–80 caracteres'), findsOneWidget);

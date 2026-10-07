@@ -91,6 +91,7 @@ void main() {
         ensurePermission: () async => true,
       ),
     );
+    expect(find.text('Local notification'), findsOneWidget);
     expect(find.text('Use item'), findsOneWidget);
     expect(find.text('Pay crew'), findsOneWidget);
     await field(tester, 'schedule-name', 'Morning item');
