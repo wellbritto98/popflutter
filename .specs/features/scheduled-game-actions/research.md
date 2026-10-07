@@ -32,7 +32,7 @@ Each row links to /World/Popmundo.aspx/Character/ItemDetails/<id>, carries a run
 
 For the Cubo mágico sample the button name is ctl00$cphLeftColumn$ctl00$repItemGroups$ctl02$repItems$ctl00$btnUse. The user-provided image-submit mapping is the full fresh form plus this name's .x=1/.y=1. It must preserve that row's fresh hidItemIDstring and the rest of the form; no persisted token or hardcoded repeating index.
 
-Instrument tuning, wearing, dropping or discarding are outside this action. The inventory has several same-name Analgésicos rows, making the exact-name versus instance policy a real product decision.
+The 2026-10-07 user amendment includes instrument tuning as a distinct persisted operation. Wearing, dropping and discarding remain outside this action. The inventory has several same-name Analgésicos rows, making the exact-name versus instance policy a real product decision.
 
 ## pagarEquipe contract
 
@@ -112,3 +112,9 @@ No source proves GetPageNotifications drains old entries. Existing notifications
 Fresh browser renewal on 2026-10-06 assigned host75. Crew option14.textContent was exactly "notável 2.250,00 M$"; option20 exactly "sobrenatural 123.000,00 M$"; no parentheses/hyphen. Generic artist link text is "Informações gerais"; entityLogo has only its ID. Artist display label is available in document.title "(2) Popmundo - black panties" (optional notification count). Title supplies label only; scoped ID supplies identity. Browser session had redirected to Default.aspx?logout=true before renewal; cause unmeasured and no new native authentication had run yet.
 
 Native follow-up on 2026-10-06: opt-in discovery plus read-only ASMX probe PASS29s (evidence/t4-live-discovery-signals.log). Both ASMX reads returned HTTP200 and a valid neutral empty list. Native crew DTO: Troy3327035, artist2774797, levels14..20, costsMinor[225000,800000,1850000,3450000,5675000,8600000,12300000], agreeing with DOM. Browser fresh reload still authenticated as Troy. This checks the actual envelope/available form, not the signal after real gameplay; post-effect semantics remain covered by synthetic fixtures.
+
+## Deon inventory inspection — 2026-10-07
+
+Read-only inventory inspection in an independently logged-in embedded browser: assigned host75, Deon Drinkwater ID212517. Mesa de DJ and Violino each offer one enabled input[type=image], relative src ../../../../Static/Icons/Item_Tune.png, title Afinar, alt OK, row-local name ending btnUse and hidden control ending hidItemIDstring. Vira-Tempo and Fotografia dos avós offer Item_Use.png/title Usar. Wearable items offer Item_WornOn.png or Item_WornOff.png. No item action was clicked and no gameplay POST submitted. Hidden values, cookies, account credentials and authenticated HTML are not retained.
+
+The control name alone cannot identify the operation. Map only the observed icon path basenames to use/tune; persist operation alongside item name so future DOM changes cannot switch the configured effect. Localized title is evidence, not a parser requirement.

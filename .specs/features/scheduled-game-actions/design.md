@@ -23,7 +23,7 @@ Approaches considered in research: shared headless WebView (cookie and lifecycle
 
 ### Typed action configuration
 
-A sealed ScheduledAction hierarchy in scheduler models (part file permitted): LocalNotificationAction; GameScheduledAction with boundUsername and GameCharacter(id,name); UseItemAction with itemName; PayCrewAction with artistId/name, bonusLevel and maxCostMinor. IDs are positive integers; bonus14..20; optional maxCostMinor is positive integer cents of M$ when a quote exists. Whitelisted codecs reject malformed/unknown actions without overwriting the catalog. No legacy title/body getters on game actions.
+A sealed ScheduledAction hierarchy in scheduler models (part file permitted): LocalNotificationAction; GameScheduledAction with boundUsername and GameCharacter(id,name); UseItemAction with itemName and operation (use or tune; legacy absent value means use); PayCrewAction with artistId/name, bonusLevel and maxCostMinor. IDs are positive integers; bonus14..20; optional maxCostMinor is positive integer cents of M$ when a quote exists. Whitelisted codecs reject malformed/unknown actions without overwriting the catalog. No legacy title/body getters on game actions.
 
 DTOs GameCharacterCatalog, GameItemChoice and GameCrewOptions expose account/character/item/artist/bonus choices only. Character ID governs execution; stored name is the notification/editor label. Renaming does not select a different character.
 
@@ -37,7 +37,7 @@ Total deadline120s; per-request20s; decoded-body2MiB; cooldown750ms after succes
 
 ### Endpoint adapters
 
-Use item: exact case/whitespace-normalized name; first eligible direct inventory row in DOM order; enabled image button pathname /Item_Use.png only; row-local hidItemIDstring preserved; button.x=1/button.y=1. No tuning/wearing/drop or persisted item form state.
+Use item: exact case/whitespace-normalized name; first eligible direct inventory row in DOM order; enabled image button pathname /Item_Use.png for use or /Item_Tune.png for tune, matched against the persisted operation; row-local hidItemIDstring preserved; button.x=1/button.y=1. No wearing/drop or persisted item form state.
 
 Crew bonus: verify current scoped artist ID; selected enabled level14..20 offered at execution; parse quoted currency with exact observed PT grouping/decimal grammar into cents (2.250,00 M$ =225000); reject ambiguous unsupported formats. When maxCostMinor is present the current quote must not exceed it; a null cap authorizes the saved level at its freshly parsed game price. Existing non-null caps retain their guard. Full fresh form includes selected bonus and actual button value. Missing form/option => unavailable; no substitute or fabricated reason.
 
@@ -57,7 +57,7 @@ Editor keeps current recurrence fields, adds service selection and independently
 
 - Shared cookie singleton and suspended renderer: mitigate with native independent jar; no WebView dependencies in service.
 - Global idHolder selector can read an unrelated entity: scope identity to verified profile/choose-box/artist markers and reject ambiguity.
-- Same-name btnUse can tune: inspect image pathname, direct row pairing, reject tune even when control name matches.
+- Same-name btnUse can tune: inspect image pathname, direct row pairing, require the saved use or tune operation even when control names match.
 - Old notifications can fabricate success: bounded neutral preflight, strict outcome decoding, ambiguity => uncertain.
 - Dart timeout alone permits late destructive requests: close transport plus generation guards and serial ownership.
 - Secondary engine Keystore/localization differs from UI: actual Android loopback/Keystore/notification proof required.
@@ -67,3 +67,7 @@ Editor keeps current recurrence fields, adds service selection and independently
 ## Validation boundary
 
 Default tests never contact Popmundo. Device fixture uses explicit loopback transport reconstruction and isolated application ID. Live browser mapping is read-only; no item use or bonus has been submitted. Final verifier independently checks every AC and kills at least five behavior mutants in scratch state. No script edits of machine-owned lessons; retain grounded candidates in validation report if tooling conflicts with user restriction.
+
+### F3 item operation
+
+GameItemOperation is use or tune. UseItemAction and GameItemChoice carry operation; absent legacy JSON means use, invalid explicit values reject. Existing use JSON can omit the default to preserve compatibility. Discovery and execution share exact icon mapping; deduplicate/select by normalized name plus operation. Changing operation alone does not change rule identity or cadence. Editor choices, offline restore, cards and native messages retain and describe tuning explicitly in EN/PT. No renderer or platform lifecycle changes.

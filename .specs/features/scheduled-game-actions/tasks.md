@@ -152,3 +152,13 @@ User clarified the reported save problem occurs after a weekly crew bonus; that 
 Core: optional cost cap with backwards-compatible capped rules; null cap uses the selected level at the fresh parsed game price. Editor: default20, verified character/artist required, save without available bonus form, disclose unavailable-now/future price, visible loading and recoverable validation. Tests: empty bonus list saves bound crew20; pending discovery feedback; uncapped codec and guarded execution; legacy cap remains enforced. Owners: utils and app-shell; gate/commit separately before T8. No live payment authorized or submitted.
 
 F2 status: done; core b1160ee (419 tests, analyze clean), shell aabe4b3 (186 tests, full app analyze clean). Evidence crew-future-core-*, crew-save-* and t8-app-analysis.log. No real payment or item use submitted.
+
+## F3 — Map instrument tuning (2026-10-07)
+
+Current request expands item support to observed Item_Tune.png/Afinar instruments. SGA-11 is the amendment source of truth; historical T3 default-use exclusions remain valid for use rules.
+
+1. F3-core: typed use/tune operation in action and choice codecs; absent legacy field means use, invalid explicit field rejects; discovery dedup and fresh POST selection by exact name+operation. Retain all current guards. Owner utils with domain review. Gate full core tests/analyze; atomic commit.
+2. F3-shell: show tuning choices/effects EN/PT; retain operation through create/edit/offline/RPC/cards/native notices. Owner app-shell. Gate full app tests/analyze; atomic commit.
+3. F3-validation: independent fresh verifier checks SGA-11 and affected existing requirements, behavior mutants for operation swap/legacy fallback; rebuild release APK and install on observed connected Android. Existing loopback device lifecycle proof remains applicable; no new lifecycle/platform code requested.
+
+Status: F3-core and F3-shell in progress; SDK jobs serialized. No live gameplay POST.

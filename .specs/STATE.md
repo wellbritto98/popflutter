@@ -204,11 +204,11 @@
 
 ## Handoff
 
-- **Feature**: scheduled-game-actions / .specs/features/scheduled-game-actions.
-- **Phase / Task**: scheduled-game-actions complete. T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07), T5(3cb4ecf), T6(23360af), T7(11f43ef), F2 core b1160ee, F2 shell aabe4b3, T8 dfc6d27, locale assertions 857466b. Branch codex/scheduled-game-actions.
-- **Completed**: Independent validation PASS, 45/45 ACs, five scratch mutations killed. Device proof: interrupted POST became skippedInterrupted and only the next future slot confirmed with the saved character. Suites 419/31/186. Release APK installed on emulator-5554 as a fresh install; the 2026-08-20 data directory was already absent. Report: validation.md.
-- **In-progress**: none.
-- **Next step**: none for this feature. Do not claim a physical handset, overnight execution, or preservation of the August production data.
-- **Blockers**: none. No credentials, cookies or authenticated HTML in evidence. Live gameplay POST was not submitted.
-- **Uncommitted files**: none. Untracked docs/firebase-popmund-scrap-functions.js is unrelated and stays unstaged.
+- **Feature**: scheduled-game-actions F3 instrument mapping amendment, 2026-10-07.
+- **Phase / Task**: F3-core and F3-shell executing; branch codex/scheduled-game-actions; previous release verified a330677.
+- **Completed**: browser inspection confirms Deon Mesa de DJ and Violino offer Item_Tune.png/Afinar; domain review approves persisted use/tune operation with legacy absent=use. Previous full feature passed 419/31/186 tests and Android loopback lifecycle evidence.
+- **In-progress**: utils specialist owns codecs/candidates/POST; shell specialist owns choices/effects/RPC/notifications. Root owns matching specs and official docs. SDK core first, shell second.
+- **Next step**: full owned gates/atomic commits, fresh independent amendment verification, normal release build and install on observed Android.
+- **Blockers**: none; no live gameplay POST performed. No credentials, cookies or authenticated HTML retained.
+- **Uncommitted files**: F3 specs/docs and specialist-owned code; unrelated docs/firebase-popmund-scrap-functions.js remains unstaged.
 - **Branch**: codex/scheduled-game-actions.

@@ -20,3 +20,7 @@ Private native sender/login and empty jar per transaction. Saved Auto Login cred
 ## Execution
 
 Scope/design approval received; tools already requested: tlc-spec-driven, embedded browser and Android/code debugging. Routine implementation choices delegated to specialists as required by CLAUDE.md. Eight atomic tasks; independent verifier automatic after implementation. Remaining supplied functions and multi-account profiles stay future scope.
+
+## User instrument amendment — 2026-10-07
+
+The user requests instruments missing from Deon's scheduled item choices. Inspection identifies Mesa de DJ and Violino as Afinar (Item_Tune.png), distinct from Usar (Item_Use.png). Support both with persisted use/tune operation, legacy absent operation = use, and explicit tuning text. No silent operation fallback and no live gameplay test performed.

@@ -1,8 +1,8 @@
 # Scheduled Game Actions — Specification
 
-Status: Approved; implementation verified 2026-10-07 (validation.md, commit 857466b). User confirmed isolated HTTP and character binding on 2026-10-05.
+Status: Implementing instrument amendment F3 (2026-10-07); previous release verified in validation.md at commit 857466b. User confirmed isolated HTTP and character binding on 2026-10-05.
 Date: 2026-10-05 (America/Sao_Paulo).
-Scope: Complex; Android scheduler, isolated authentication, game forms and native UI.
+Scope: Complex; Android scheduler, isolated authentication, game forms and native UI, including instrument tuning amendment.
 Baseline: 5ce2153; AD-021 scheduler and AD-022 AppWiring.
 Research: research.md; user decisions/defaults: context.md.
 
@@ -14,9 +14,9 @@ The first release adds precisely these two game actions, preserves local reminde
 
 ## Scope
 
-Included: service selection in the existing scheduler; discovery of owned characters and action options through an independent HTTP session; use one eligible item per occurrence; one chosen crew cash bonus per occurrence; native start/result notifications; persistent rules; serial, cancellable HTTP execution; Android secondary-engine evidence.
+Included: service selection in the existing scheduler; discovery of owned characters and action options through an independent HTTP session; use or tune one eligible item per occurrence; one chosen crew cash bonus per occurrence; native start/result notifications; persistent rules; serial, cancellable HTTP execution; Android secondary-engine evidence.
 
-Excluded: all other gameplay functions in the supplied script; arbitrary URLs/JS; multiple accounts/profiles; bulk item use; instrument tuning; a hidden WebView or a new Android process; changes to the visible Auto Login behavior; iOS continuous scheduling; recovery/replay of missed or uncertain effects.
+Excluded: all other gameplay functions in the supplied script; arbitrary URLs/JS; multiple accounts/profiles; bulk item use; a hidden WebView or a new Android process; changes to the visible Auto Login behavior; iOS continuous scheduling; recovery/replay of missed or uncertain effects.
 
 The user request explicitly expands the historical gameplay exclusion for these two actions. Broader gameplay exclusions remain in place. AD-023 explicitly amends AD-021's auth/game-HTTP exclusion; it must preserve its single writer, claims, notification IDs and recurrence semantics.
 
@@ -34,11 +34,11 @@ SGA-02 — Editor and discovery
 
 1. WHEN opening create/edit on Android, THEN the existing editor SHALL offer Notificação local, Usar item and Pagar equipe in EN/PT, preserving the existing name/recurrence/enabled fields and save/cancel/error behavior.
 2. WHEN loading game choices, THEN discovery SHALL use the saved Auto Login credentials in an isolated session, list owned characters by ID/name, and obtain usable item names or current crew bonus options for the selected character. It SHALL NOT read/evaluate/navigate the visible WebView.
-3. WHEN selecting Usar item, THEN the rule SHALL require one owned character and a nonempty normalized exact item name of at most 120 UTF-16 units; only rows with an eligible use button SHALL be offered. One use per occurrence is the MVP quantity.
+3. WHEN selecting Usar item, THEN the rule SHALL require one owned character and a nonempty normalized exact item name of at most 120 UTF-16 units; only rows with an eligible use or tune button SHALL be offered, with the operation shown and retained. One use per occurrence is the MVP quantity.
 4. WHEN selecting Pagar equipe, THEN discovery SHALL display the current artist name and available quoted bonus levels. The default SHALL be maximum level 20, as requested by the user on 2026-10-06. A verified owned character and current artist ID/name SHALL permit saving even when the weekly restriction hides the bonus form. An available selected quote SHALL be saved as the cost cap; with no quote the cap SHALL be absent and the summary SHALL state that the game determines the price at execution. No invented quote or substitute level.
 5. WHEN no credentials/options are available, discovery fails or inputs are invalid, THEN the form SHALL retain its input, show a specific translated error and SHALL NOT report a saved game rule. Previously saved rules SHALL remain readable/editable without automatic live discovery; changing a game target requires fresh valid choices.
 6. WHEN discovery is pending, THEN a visible progress indicator and translated loading text SHALL explain the fetch; completion or failure SHALL clear loading and retain all entered data.
-7. WHEN saving a game rule, THEN the editor SHALL show its effect summary and the fact that it will consume an item or distribute a cash bonus on each eligible occurrence. Save/enable is the user's authorization for that configured recurring effect.
+7. WHEN saving a game rule, THEN the editor SHALL show its effect summary and the configured item use, instrument tuning or cash bonus effect on each eligible occurrence. Save/enable is the user's authorization for that configured recurring effect.
 8. WHEN listing a game rule, THEN its card SHALL show service, target character, selected item or artist/bonus, next due time and latest truthful result. Editing action configuration alone SHALL preserve the rule identity and cadence like existing text-only edits.
 
 ### Isolated reusable HTTP execution
@@ -63,8 +63,8 @@ SGA-04 — Common form and outcome helpers
 SGA-05 — usarItem
 
 1. WHEN an eligible occurrence executes, THEN it SHALL GET /World/Popmundo.aspx/Character/Items/ on its authenticated host and match only item links inside #checkedlist rows by exact case/whitespace-normalized name, never substring matching.
-2. WHEN multiple eligible rows have that exact name, THEN it SHALL use the first eligible row in document order. User confirmation accepted this proposed default; each occurrence uses only one item.
-3. WHEN the row contains input[type=image], THEN only an enabled button whose src pathname ends in /Item_Use.png SHALL be usable. Item_Tune.png, wearable buttons, unrelated images and missing buttons SHALL NOT be executed, even if named btnUse.
+2. WHEN multiple eligible rows have that exact name, THEN it SHALL use the first eligible row with the configured operation in document order. User confirmation accepted this proposed default; each occurrence uses only one item.
+3. WHEN the row contains input[type=image], THEN enabled buttons whose src pathname ends in /Item_Use.png SHALL map to use and /Item_Tune.png SHALL map to tune. Execution SHALL require the saved operation and exact normalized name. Wearable buttons, unrelated images and missing buttons SHALL NOT be executed, even if named btnUse. A changed icon SHALL NOT silently change the authorized operation.
 4. WHEN submitting use, THEN the entire fresh form plus <use-button-name>.x=1 and <use-button-name>.y=1 SHALL be posted once. All hidItemIDstring values remain those returned in the current document; none are persisted for later reuse.
 5. WHEN the named item is absent or no eligible use row exists, THEN the occurrence SHALL be marked unavailable with zero gameplay POSTs; future recurrence remains enabled unless the user pauses it.
 
@@ -112,7 +112,7 @@ SGA-10 — Android evidence and maintenance
 | Decision | Approved default | Rationale | Confirmation |
 | --- | --- | --- | --- |
 | Transport | Native HTTP in existing FGS, independent login/jar | User explicitly permits HTTP; avoids shared WebView cookies and renderer dependency | Approved by user confirmation |
-| Item identity | Exact normalized name; first usable matching row; one use | Supports replenished consumables; avoids original substring/tune bug | Approved by feature confirmation |
+| Item identity | Exact normalized name; first usable matching row; one use | Supports replenished consumables; avoid substring matching and implicit operation switching | Approved by feature confirmation |
 | Credentials | Reuse account/password already saved in Auto Login, bind username per rule | Keeps scope to two actions; prevents silently executing old rules under another account | Approved by user confirmation |
 | Crew destination | Artist selected at configuration remains fixed by ID | Character may change bands before occurrence | Approved by user confirmation |
 | Bonus policy | Default maximum level20; save even without a currently available form; preserve a quote cap when available, otherwise use fresh game price | User requires future scheduling after weekly payment and maximum default | User clarification 2026-10-06 supersedes initial explicit-choice-only default |
@@ -151,8 +151,9 @@ The user confirmed the proposal and character binding. Remaining details follow 
 | SGA-08 | Truthful durable outcome | Verified |
 | SGA-09 | Serial cancellation/deadlines | Verified |
 | SGA-10 | Device proof, verifier and docs | Verified |
+| SGA-11 | Persisted item use/tune operation and labels | Implementing |
 
-Coverage: 10 requirements; task mapping follows approved design. No implementation claim.
+Coverage: 11 requirements; task mapping follows approved design. No implementation claim.
 
 ## Success criteria
 
@@ -168,3 +169,16 @@ Coverage: 10 requirements; task mapping follows approved design. No implementati
 - Character ID is authoritative; saved display name labels the action. Owned selection must be unique in its character box, then verified against a fresh scoped profile marker before gameplay.
 - Minor currency units are cents of M$: observed 2.250,00 M$ = 225000. Reject ambiguous unsupported numeric grammar.
 - Notification preflight must establish a neutral baseline in at most two reads, without assuming the endpoint drains previous notifications. Failed/non-neutral preflight prevents gameplay. Empty/malformed/unknown or mixed success/error outcome after a possibly sent POST is uncertain and never retried.
+
+## F3 — Instrument mapping amendment (2026-10-07)
+
+User reports missing instruments in Deon Drinkwater's item choices and requests their support. Authorized browser inspection found Mesa de DJ and Violino with enabled Item_Tune.png, title Afinar, alt OK and row-local btnUse. Item_Use.png remains Usar. No gameplay POST was submitted.
+
+SGA-11 — Persist the item operation
+
+1. WHEN discovering inventory, THEN names SHALL be distinguished by (normalized name, operation), with only use and tune operations mapped from the two observed icons. The editor SHALL visibly identify Afinar/Tune for tune choices.
+2. WHEN saving, editing offline or crossing RPC, THEN UseItemAction and GameItemChoice SHALL retain operation use or tune with character ID/name. Legacy payloads without operation SHALL mean use; an explicitly invalid, null or unknown operation SHALL reject without overwriting stored rules.
+3. WHEN executing a configured operation, THEN only the first eligible exact-name row with that same operation SHALL be submitted. A use rule SHALL never tune and a tune rule SHALL never use, even when both controls are named btnUse. Missing matching operation SHALL produce unavailable with zero gameplay POSTs.
+4. WHEN showing an effect, rule summary or start/result notification for tune, THEN EN/PT text SHALL identify instrument tuning without claiming item consumption. Existing use/local/crew behavior SHALL remain unchanged.
+
+The same fresh-form, identity, notification, cancellation and no-replay requirements apply to tuning. This amendment supersedes the original tuning exclusion; wearing, dropping and discarding remain excluded.
