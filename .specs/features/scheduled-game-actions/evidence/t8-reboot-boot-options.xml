@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <boolean name="allowWifiLock" value="false" />
+    <string name="taskEventAction">{&quot;taskEventInterval&quot;:5000,&quot;taskEventType&quot;:3}</string>
+    <boolean name="autoRunOnBoot" value="true" />
+    <boolean name="allowAutoRestart" value="true" />
+    <boolean name="stopWithTask" value="false" />
+    <long name="callbackHandle" value="8766635257292078046" />
+    <boolean name="autoRunOnMyPackageReplaced" value="true" />
+    <boolean name="allowWakeLock" value="true" />
+</map>

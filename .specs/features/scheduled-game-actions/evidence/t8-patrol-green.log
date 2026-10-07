@@ -1,0 +1,74 @@
+
+Update available! 4.7.0 → 4.8.0
+
+Check the compatibility table at: https://patrol.leancode.co/documentation/compatibility-table
+
+
+• Building apk with entrypoint test_bundle.dart...
+	Picked up JAVA_TOOL_OPTIONS: -Djdk.net.unixdomain.tmpdir=C:\popflutter-java-afunix-disabled\not-created
+	WARNING: Your app uses the following plugins that apply Kotlin Gradle Plugin (KGP): patrol
+	Future versions of Flutter will fail to build if your app uses plugins that apply KGP.
+	
+	Please check the changelogs of these plugins and upgrade to a version that supports Built-in Kotlin.
+	If no such version exists, report the issue to the plugin. If necessary, here is a guide on filing
+	an issue against a plugin: https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers#report-incompatible-kotlin-gradle-plugin-usage-to-plugin-authors
+	
+	If you are a plugin author, please migrate your plugin to Built-in Kotlin using this guide: https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-plugin-authors
+	Picked up JAVA_TOOL_OPTIONS: -Djdk.net.unixdomain.tmpdir=C:\popflutter-java-afunix-disabled\not-created
+	WARNING: Your app uses the following plugins that apply Kotlin Gradle Plugin (KGP): patrol
+	Future versions of Flutter will fail to build if your app uses plugins that apply KGP.
+	
+	Please check the changelogs of these plugins and upgrade to a version that supports Built-in Kotlin.
+	If no such version exists, report the issue to the plugin. If necessary, here is a guide on filing
+	an issue against a plugin: https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers#report-incompatible-kotlin-gradle-plugin-usage-to-plugin-authors
+	
+	If you are a plugin author, please migrate your plugin to Built-in Kotlin using this guide: https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-plugin-authors
+✓ Completed building apk with entrypoint test_bundle.dart (43.7s)
+• Executing tests of apk with entrypoint test_bundle.dart on emulator-5554...
+: [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+: Patrol (native): Android NativeAutomatorClient created, port: 8081
+: Patrol (native): initialize() started
+: Patrol (native): initialize() succeeded
+: PatrolBinding: Register Patrol service extensions
+: Patrol (native): Android NativeAutomatorClient created, port: 8081
+: 00:00 +0: patrol_test_explorer
+: patrol_test_explorer: obtained Dart-side test hierarchy:
+: -- group: ''
+:      -- test: 'secondary game engine: exact item and crew POSTs after Home'
+: 00:00 +1: integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home
+: PatrolAppService started, address: 127.0.0.1, host: 127.0.0.1, port: 8082
+: Patrol (native): MobileAutomatorClient created, port: 8081
+: Patrol (native): markPatrolAppServiceReady() started
+: PatrolAppService: registered "integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home"
+: Patrol (native): markPatrolAppServiceReady() succeeded
+: PatrolAppService.listDartTests() called
+: 2026-10-07T00:00:19.232688  0:00:00.000187 GET     [200] /listDartTests
+: PatrolAppService.runDartTest(integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home) called
+: PatrolAppService: requested execution of test "integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home"
+: Patrol (native): configure() started
+: Patrol (native): MobileAutomatorClient created, port: 8081
+: Patrol (native): configure() succeeded
+🧪 integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home
+: [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+: scheduler.start utc=2026-10-07T00:00:20.268578Z starter=developer
+: Patrol (native): pressHome() started
+        ⏳   1. [94mpressHome[0m [90m(native)[0m
+: Patrol (native): pressHome() succeeded
+[A[K        ✅   1. [94mpressHome[0m [90m(native)[0m
+: PatrolBinding: tearDown(): count: 1, results: {secondary game engine: exact item and crew POSTs after Home: success}
+: PatrolBinding: finished test integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home. Will report its status back to the native side
+: PatrolBinding: tearDown(): test "secondary game engine: exact item and crew POSTs after Home" in group "integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home", passed: true
+: PatrolAppService.markDartTestAsCompleted(): integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home
+: 2026-10-07T00:00:19.399573  0:01:15.880692 POST    [200] /runDartTest
+: 01:16 +2: All tests passed!
+✅ secondary game engine: exact item and crew POSTs after Home [90m(/integration_test/game_actions_engine_test.dart)[0m [90m(75s)[0m
+
+[1mTest summary:[0m
+📝 Total: 1
+✅ Successful: 1
+❌ Failed: 0
+⏩ Skipped: 0
+📊 Report: file://C:/Users/Wellington/Documents/projetos/popflutter/apps/popmundo_app/build/app/reports/androidTests/connected/profile/index.html
+⏱️  Duration: 1m 50s
+
+✓ Completed executing apk with entrypoint test_bundle.dart on emulator-5554 (110.5s)

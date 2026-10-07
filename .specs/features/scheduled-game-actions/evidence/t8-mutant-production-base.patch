@@ -1,0 +1,289 @@
+diff --git a/apps/popmundo_app/lib/scheduler/README.md b/apps/popmundo_app/lib/scheduler/README.md
+index cb70221..a44e626 100644
+--- a/apps/popmundo_app/lib/scheduler/README.md
++++ b/apps/popmundo_app/lib/scheduler/README.md
+@@ -1,6 +1,6 @@
+ # scheduler (popmundo_app)
+ 
+-Adapter Android e UI nativa para regras recorrentes de notificação local. Spec: service-scheduler; decisão AD-021. Modelos, cálculo de recorrência e coordenador são do pacote puro popmundo_utils.
++Adapter Android e UI nativa para regras recorrentes de notificação local, uso de item e bônus de equipe. Specs: service-scheduler e scheduled-game-actions; decisões AD-021/023. Modelos, recorrência, coordenador e HTTP isolado são do pacote puro popmundo_utils.
+ 
+ ## Responsabilidades
+ 
+@@ -23,19 +23,19 @@ O engine do Foreground Service é o único escritor do JSON service_scheduler.v1
+ 
+ ## Transporte e execução
+ 
+-A comunicação usa FlutterForegroundTask.sendDataToTask/sendDataToMain. Requests têm type scheduler.request, requestId e command list/create/update/toggle/delete. Mutação inclui id estável, draft e revision quando aplicável. Replies type scheduler.response devolvem requestId e snapshot ou error tipado; heartbeat continua no envelope independente heartbeat.
++A comunicação usa FlutterForegroundTask.sendDataToTask/sendDataToMain. Requests têm type scheduler.request, requestId e command list/create/update/toggle/delete e discoverCharacters/discoverItems/discoverCrew. Mutação inclui id estável, draft e revision quando aplicável. Replies type scheduler.response devolvem requestId e snapshot ou error tipado; heartbeat continua no envelope independente heartbeat.
+ 
+ SchedulerApi oferece list(), create(draft, id), update(rule, draft), toggle(rule, enabled) e delete(rule). SchedulerClient espera prontidão e limita o RPC a 15s; nunca reenvia uma mutação automaticamente. Timeout de resposta não prova que a gravação falhou.
+ 
+-O editor oferece notificação local, usar item e pagar equipe. Item e bônus exigem personagem e opção descobertos; o bônus 20 não é escolhido sozinho, e o teto salvo é a cotação escolhida. Uma regra de jogo já salva abre sem nova descoberta. Trocar o alvo exige opções novas. O cartão mostra serviço, personagem, item ou artista/bônus e o último resultado. O editor guarda o mesmo ID durante a tentativa. Após falha, relê o catálogo antes de liberar novo save: se a criação foi persistida, adota a regra/revisão e uma nova submissão é update. Releitura falha mantém a edição e bloqueia ressubmissão. A UI só confirma após snapshot autoritativo; cancel não salva. Campos aceitam o conteúdo completo e validam limites UTF-16 após trim (nome 80, título 120, corpo 1000); quantidade inteira 1–9999.
++O editor oferece notificação local, usar item e pagar equipe. Item exige personagem e opção descobertos. Pagar equipe começa no bônus máximo 20: com cotação disponível, salva o teto daquele valor; sem bônus disponível agora, salva personagem e banda com nível 20 e custo a ser definido pelo jogo na execução. Uma escolha explícita de outro nível mantém sua cotação como teto. A restrição semanal não impede criar uma regra futura. Descoberta mostra progresso perto dos controles e no botão Salvar. Campos inválidos ficam visíveis ao salvar. Uma regra de jogo já salva abre sem nova descoberta. Trocar o alvo exige descobrir personagem e banda novos. O cartão mostra serviço, personagem, item ou artista/bônus e o último resultado. O editor guarda o mesmo ID durante a tentativa. Após falha, relê o catálogo antes de liberar novo save: se a criação foi persistida, adota a regra/revisão e uma nova submissão é update. Releitura falha mantém a edição e bloqueia ressubmissão. A UI só confirma após snapshot autoritativo; cancel não salva. Campos validam limites UTF-16 após trim (nome 80, título 120, corpo 1000); quantidade inteira 1–9999.
+ 
+-O runner rearma um único Timer no vencimento mais próximo após comandos/reconciliação. Heartbeat nativo de 5s reconcilia interrupções e mudanças de zona; ticks simultâneos compartilham a mesma Future. DeviceZone conserva a última zona válida após falha transitória; primeira falha permanece indisponível, sem UTC silencioso. Intervalos continuam independentes da zona. O core define claim persistido antes do efeito, sem replay de slots perdidos e timeout da ação de 5s.
++O runner rearma um único Timer no vencimento mais próximo após comandos/reconciliação. Heartbeat nativo de 5s reconcilia interrupções e mudanças de zona; ticks simultâneos compartilham a mesma Future. DeviceZone conserva a última zona válida após falha transitória; primeira falha permanece indisponível, sem UTC silencioso. Intervalos continuam independentes da zona. O core define claim persistido antes do efeito, sem replay de slots perdidos e timeout local de 5s. A transação de jogo tem prazo total de 120s, 20s por request e cancelamento real do transporte.
+ 
+ A lista aberta consulta snapshots a cada 5s, coalescendo leituras; pausa essas consultas quando o app está inativo ou o editor aberto e cancela ao destruir a rota. Resultado submitted significa que Android aceitou a chamada de notificação, não que o usuário a viu.
+ 
+ ## Plataforma e limites
+ 
+-Agendamentos contínuos são Android-only. iOS mostra explicação localizada e não oferece criação. Não há AlarmManager, WorkManager, backend, WebView, autenticação ou gameplay dentro do scheduler. O serviço mantém sua notificação de sessão separada dos cards dos agendamentos.
++Agendamentos contínuos são Android-only. iOS mostra explicação localizada e não oferece criação. Não há AlarmManager, WorkManager, backend ou WebView dentro do scheduler. Autenticação e gameplay usam somente o gateway HTTP isolado de AD-023. O serviço mantém sua notificação de sessão separada dos cards dos agendamentos.
+ 
+ Boot/package replacement são configurados pela presença de qualquer regra enabled. Nenhuma regra ativa desliga esses flags, sem parar o keepalive existente. Após morte/reinício, o core pula vencimentos perdidos e arma o próximo futuro. Force-stop, permissão revogada e políticas do OS/fabricante impedem garantias de continuidade; a implementação não promete entrega em horário real rígido.
+ 
+diff --git a/apps/popmundo_app/lib/scheduler/scheduler_editor.dart b/apps/popmundo_app/lib/scheduler/scheduler_editor.dart
+index dc7025d..16bcbc8 100644
+--- a/apps/popmundo_app/lib/scheduler/scheduler_editor.dart
++++ b/apps/popmundo_app/lib/scheduler/scheduler_editor.dart
+@@ -138,7 +138,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
+         _targetLocked = false;
+         _character = null;
+         _itemName = null;
+-        _bonusLevel = null;
++        _bonusLevel = service == _Service.crew ? 20 : null;
+         _items = const [];
+         _crew = null;
+         _catalog = null;
+@@ -181,7 +181,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
+     setState(() {
+       _character = character;
+       _itemName = null;
+-      _bonusLevel = null;
++      _bonusLevel = _service == _Service.crew ? 20 : null;
+       _items = const [];
+       _crew = null;
+       _loadingChoices = true;
+@@ -233,15 +233,19 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
+     if (_service != _Service.crew || _bonusLevel == null) return null;
+     final saved = _rule?.action;
+     final artist =
+-        _crew?.artistName ??
+-        (saved is PayCrewAction ? saved.artistName : null);
++        _crew?.artistName ?? (saved is PayCrewAction ? saved.artistName : null);
+     final quoted = _crew?.bonuses.where((bonus) => bonus.level == _bonusLevel);
+     final cost = quoted != null && quoted.isNotEmpty
+         ? quoted.single.costMinor
+         : saved is PayCrewAction && saved.bonusLevel == _bonusLevel
+         ? saved.maxCostMinor
+         : null;
+-    if (artist == null || cost == null) return null;
++    if (artist == null) return null;
++    if (cost == null) {
++      return 'scheduler.effectCrewFuture'.tr(
++        args: [_bonusLevel.toString(), artist],
++      );
++    }
+     return 'scheduler.effectCrew'.tr(
+       args: [_bonusLevel.toString(), cost.toString(), artist],
+     );
+@@ -271,22 +275,27 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
+     final level = _bonusLevel;
+     if (crew == null || level == null) return null;
+     final matches = crew.bonuses.where((bonus) => bonus.level == level);
+-    if (matches.length != 1) return null;
++    if (matches.length > 1 || (matches.isEmpty && level != 20)) return null;
+     return PayCrewAction(
+       boundUsername: catalog.username,
+       character: character,
+       artistId: crew.artistId,
+       artistName: crew.artistName,
+       bonusLevel: level,
+-      maxCostMinor: matches.single.costMinor,
++      maxCostMinor: matches.isEmpty ? null : matches.single.costMinor,
+     );
+   }
+ 
+   Future<void> _save() async {
+-    if (_pending ||
+-        _needsRead ||
+-        _loadingChoices ||
+-        !_form.currentState!.validate()) {
++    if (_pending || _needsRead || _loadingChoices) return;
++    final invalid = _form.currentState!.validateGranularly();
++    if (invalid.isNotEmpty) {
++      await WidgetsBinding.instance.endOfFrame;
++      if (!mounted) return;
++      await Scrollable.ensureVisible(
++        invalid.first.context,
++        duration: const Duration(milliseconds: 200),
++      );
+       return;
+     }
+     final action = _action();
+@@ -409,7 +418,12 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
+                         ? null
+                         : _save,
+                     child: Text(
+-                      (_pending ? 'scheduler.saving' : 'scheduler.save').tr(),
++                      (_loadingChoices
++                              ? 'scheduler.loadingChoices'
++                              : _pending
++                              ? 'scheduler.saving'
++                              : 'scheduler.save')
++                          .tr(),
+                     ),
+                   ),
+                 ),
+@@ -518,6 +532,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
+             ] else
+               SchedulerGameFields(
+                 crew: _service == _Service.crew,
++                loading: _loadingChoices,
+                 pending: _pending || _loadingChoices,
+                 locked: _targetLocked,
+                 catalog: _catalog,
+@@ -535,7 +550,7 @@ class _SchedulerEditorState extends State<SchedulerEditor> {
+                     _targetLocked = false;
+                     _character = null;
+                     _itemName = null;
+-                    _bonusLevel = null;
++                    _bonusLevel = _service == _Service.crew ? 20 : null;
+                     _items = const [];
+                     _crew = null;
+                     _catalog = null;
+diff --git a/apps/popmundo_app/lib/scheduler/scheduler_game_fields.dart b/apps/popmundo_app/lib/scheduler/scheduler_game_fields.dart
+index 8383314..c818a23 100644
+--- a/apps/popmundo_app/lib/scheduler/scheduler_game_fields.dart
++++ b/apps/popmundo_app/lib/scheduler/scheduler_game_fields.dart
+@@ -10,6 +10,7 @@ class SchedulerGameFields extends StatelessWidget {
+     required this.crew,
+     required this.pending,
+     required this.locked,
++    this.loading = false,
+     this.catalog,
+     this.character,
+     this.items = const [],
+@@ -23,7 +24,7 @@ class SchedulerGameFields extends StatelessWidget {
+     this.onChangeTarget,
+   });
+ 
+-  final bool crew, pending, locked;
++  final bool crew, pending, locked, loading;
+   final GameCharacterCatalog? catalog;
+   final GameCharacter? character;
+   final List<GameItemChoice> items;
+@@ -40,6 +41,22 @@ class SchedulerGameFields extends StatelessWidget {
+   Widget build(BuildContext context) => Column(
+     crossAxisAlignment: CrossAxisAlignment.stretch,
+     children: [
++      if (loading)
++        Padding(
++          key: const Key('schedule-options-loading'),
++          padding: const EdgeInsets.only(top: 12),
++          child: Row(
++            children: [
++              const SizedBox(
++                width: 20,
++                height: 20,
++                child: CircularProgressIndicator(strokeWidth: 2),
++              ),
++              const SizedBox(width: 12),
++              Expanded(child: Text('scheduler.loadingChoices'.tr())),
++            ],
++          ),
++        ),
+       if (crew)
+         Padding(
+           padding: const EdgeInsets.only(top: 12),
+@@ -98,6 +115,14 @@ class SchedulerGameFields extends StatelessWidget {
+             ],
+           ),
+         if (crew && crewOptions != null) ...[
++          if (crewOptions!.bonuses.isEmpty)
++            Padding(
++              padding: const EdgeInsets.only(top: 12),
++              child: Text(
++                'scheduler.crewUnavailableNow'.tr(),
++                key: const Key('schedule-crew-unavailable'),
++              ),
++            ),
+           Padding(
+             padding: const EdgeInsets.only(top: 12),
+             child: Text(
+diff --git a/packages/popmundo_utils/lib/src/game_actions/README.md b/packages/popmundo_utils/lib/src/game_actions/README.md
+index f449f57..9a1c8f6 100644
+--- a/packages/popmundo_utils/lib/src/game_actions/README.md
++++ b/packages/popmundo_utils/lib/src/game_actions/README.md
+@@ -18,6 +18,7 @@ Login GET explicitly permits the actual login controls on /Default.aspx; every p
+ 
+ After character selection establishes an origin, profile/target discovery/gameplay response must retain that origin; a cross-host same-path redirect is rejected before the effect, or uncertain after a possible POST. Missing/empty item form is unavailable. Authentication handover redirects remain allowed before origin establishment.
+ 
+-PayCrewAction now executes through the same serial gateway: verifies current artist ID, selected enabled level14..20, integer-cent current quote<=maxCostMinor, exactly one enabled actual submit button and fresh full form. Missing artist/form/options/button or higher/ambiguous cost returns unavailable, with no payment; no replacement bonus is selected. A fresh explicit server rejection fails; unconfirmed possible payment is uncertain and never resubmitted.
++PayCrewAction now executes through the same serial gateway: verifies current artist ID, selected enabled level14..20, positive integer-cent current quote and, when present, quote<=maxCostMinor, exactly one enabled actual submit button and fresh full form. Missing artist/form/options/button, ambiguous or nonpositive price, or quote above a saved cap returns unavailable, with no payment; no replacement bonus is selected. A fresh explicit server rejection fails; unconfirmed possible payment is uncertain and never resubmitted.
++A null or omitted maxCostMinor represents authorization for the configured level at the fresh valid future price. Positive caps on existing rules retain their exact behavior. Configuration may retain the verified band and maximum level20 while current bonuses are absent; execution still requires that exact enabled option, fresh positive price, matching artist and real submit button. No fallback level is paid.
+ 
+ GameActionsService implements ScheduledGameActionExecutor. Optional isEligible is evaluated inside the transaction queue before any transport/notice/credential read; stale occurrences fail occurrenceExpired without traffic. Optional beforeHttp is awaited under the same total deadline before fresh credentials, so admitted missing-credential attempts still issue their start notice. Notice failure is sanitized and stops credential/HTTP work; cancellation after a late notice completion cannot continue. scheduler_game_execution.dart owns coordinator routing; game_execution.dart holds endpoint transaction execution as a part of the service library.
+diff --git a/packages/popmundo_utils/lib/src/game_actions/game_crew_action.dart b/packages/popmundo_utils/lib/src/game_actions/game_crew_action.dart
+index 0f3185b..ab48254 100644
+--- a/packages/popmundo_utils/lib/src/game_actions/game_crew_action.dart
++++ b/packages/popmundo_utils/lib/src/game_actions/game_crew_action.dart
+@@ -5,7 +5,7 @@ import '../scheduler/scheduler_models.dart';
+ import 'game_action_contracts.dart';
+ import 'game_forms.dart';
+ 
+-/// Revalidates the artist, offered level and exact integer-cent spending cap.
++/// Revalidates the artist, offered level and optional integer-cent spending cap.
+ AspNetFormData crewPost(Document document, Uri url, PayCrewAction action) {
+   final form = freshForm(document, url);
+   final options = crewOptions(document);
+@@ -13,7 +13,8 @@ AspNetFormData crewPost(Document document, Uri url, PayCrewAction action) {
+     throw const GameActionException('artistMismatch');
+   }
+   final bonuses = options.bonuses.where((b) => b.level == action.bonusLevel);
+-  if (bonuses.length != 1 || bonuses.single.costMinor > action.maxCostMinor) {
++  final cap = action.maxCostMinor;
++  if (bonuses.length != 1 || (cap != null && bonuses.single.costMinor > cap)) {
+     throw const GameActionException('bonusUnavailable');
+   }
+   final element = document.getElementById('aspnetForm')!;
+diff --git a/packages/popmundo_utils/lib/src/scheduler/README.md b/packages/popmundo_utils/lib/src/scheduler/README.md
+index 2342efe..dea7ce2 100644
+--- a/packages/popmundo_utils/lib/src/scheduler/README.md
++++ b/packages/popmundo_utils/lib/src/scheduler/README.md
+@@ -74,7 +74,7 @@ Os testes ficam em packages/popmundo_utils/test/scheduler_models_test.dart, recu
+ 
+ ## Configuração das ações de jogo (SGA-01)
+ 
+-ScheduledAction é uma união selada de LocalNotificationAction, UseItemAction e PayCrewAction. As ações de jogo vinculam boundUsername e GameCharacter(id positivo, name), sem credenciais/cookies/estado de formulário. UseItemAction normaliza itemName por whitespace e limita a 120 unidades UTF-16. PayCrewAction guarda artistId/name, bonusLevel de 14 a 20 e maxCostMinor positivo em centésimos de M$. Os codecs emitem somente campos públicos e rejeitam tipos malformados com invalidAction. GameCharacterCatalog, GameItemChoice, GameBonusChoice e GameCrewOptions são DTOs de descoberta com coleções imutáveis. ScheduleDraft e ScheduledRule aceitam a união ScheduledAction e codecs genéricos, preservando schemaVersion1 e configurações locais anteriores. O dispatcher já executa gameExecutor através de sua fila isolada.
++ScheduledAction é uma união selada de LocalNotificationAction, UseItemAction e PayCrewAction. As ações de jogo vinculam boundUsername e GameCharacter(id positivo, name), sem credenciais/cookies/estado de formulário. UseItemAction normaliza itemName por whitespace e limita a 120 unidades UTF-16. PayCrewAction guarda artistId/name, bonusLevel de 14 a 20 e maxCostMinor opcional em centésimos de M$. Um teto inteiro positivo preserva a aprovação anterior e bloqueia cotação maior; null ou campo omitido autoriza o nível salvo pelo preço válido fresco da ocorrência. Isso permite cadastrar bônus futuro quando o formulário semanal estiver indisponível, sem fabricar um custo. Valores não nulos malformados continuam rejeitados. Os codecs emitem somente campos públicos e rejeitam tipos malformados com invalidAction. GameCharacterCatalog, GameItemChoice, GameBonusChoice e GameCrewOptions são DTOs de descoberta com coleções imutáveis. ScheduleDraft e ScheduledRule aceitam a união ScheduledAction e codecs genéricos, preservando schemaVersion1 e configurações locais anteriores. O dispatcher já executa gameExecutor através de sua fila isolada.
+ 
+ ## Execução de jogo e ciclo de vida (SGA-07/08/09)
+ 
+diff --git a/packages/popmundo_utils/lib/src/scheduler/scheduler_actions.dart b/packages/popmundo_utils/lib/src/scheduler/scheduler_actions.dart
+index f32da18..90c059f 100644
+--- a/packages/popmundo_utils/lib/src/scheduler/scheduler_actions.dart
++++ b/packages/popmundo_utils/lib/src/scheduler/scheduler_actions.dart
+@@ -31,7 +31,7 @@ sealed class ScheduledAction {
+           artistId: json['artistId'] as int,
+           artistName: json['artistName'] as String,
+           bonusLevel: json['bonusLevel'] as int,
+-          maxCostMinor: json['maxCostMinor'] as int,
++          maxCostMinor: json['maxCostMinor'] as int?,
+         ),
+         _ => throw const SchedulerException('invalidAction'),
+       };
+@@ -73,10 +73,10 @@ class PayCrewAction extends GameScheduledAction {
+     required int artistId,
+     required String artistName,
+     required this.bonusLevel,
+-    required int maxCostMinor,
++    int? maxCostMinor,
+   }) : artistId = _positive(artistId),
+        artistName = _actionText(artistName),
+-       maxCostMinor = _positive(maxCostMinor) {
++       maxCostMinor = maxCostMinor == null ? null : _positive(maxCostMinor) {
+     if (bonusLevel < 14 || bonusLevel > 20) {
+       throw const SchedulerException('invalidAction');
+     }
+@@ -84,7 +84,7 @@ class PayCrewAction extends GameScheduledAction {
+   final int artistId;
+   final String artistName;
+   final int bonusLevel;
+-  final int maxCostMinor;
++  final int? maxCostMinor;
+   @override
+   String get type => 'payCrew';
+   @override

@@ -1,0 +1,5 @@
+--------- beginning of main
+10-07 00:03:24.850  5902  5985 I flutter : [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+10-07 00:03:36.150  5902  6044 I flutter : [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+10-07 00:03:36.170  5902  5902 I flutter : scheduler.start utc=2026-10-07T00:03:36.170139Z starter=developer
+10-07 00:03:36.695  5902  5902 I flutter : game.fixture ready=recents

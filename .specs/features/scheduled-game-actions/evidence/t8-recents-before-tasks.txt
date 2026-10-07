@@ -1,0 +1,17 @@
+  * Recent #1: Task{f66f2f #30 type=standard I=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}
+    intent={act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}
+    mActivityComponent=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity
+    Activities=[ActivityRecord{127939337 u0 com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity t30}]
+    mRootProcess=ProcessRecord{7d54359 5902:com.popmundo.popmundo_app.backgrounddebug/u0a264}
+  * Recent #2: Task{3480a7b #29 type=standard I=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}
+    userId=0 effectiveUid=u0a264 mCallingUid=u0a264 mUserSetupComplete=true mCallingPackage=com.popmundo.popmundo_app.backgrounddebug mCallingFeatureId=null
+    intent={act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 xflg=0x4 pkg=com.popmundo.popmundo_app.backgrounddebug cmp=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}
+    mActivityComponent=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity
+    baseIntent=Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity }
+    baseActivity={com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}
+    topActivity={com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}
+    realActivity={com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}
+    taskDescription { colorBackground=#ffffffff colorPrimary=#ff2196f3 iconRes=com.popmundo.popmundo_app.backgrounddebug/0 iconBitmap=false resizeMode=RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION minWidth=-1 minHeight=-1 colorBackgroundFloating=#ffffffff }
+    baseIntent=Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 pkg=com.popmundo.popmundo_app.backgrounddebug cmp=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity }
+    realActivity={com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}
+    taskDescription { colorBackground=#ffffffff colorPrimary=#ff2196f3 iconRes=com.popmundo.popmundo_app.backgrounddebug/0 iconBitmap=false resizeMode=RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION minWidth=-1 minHeight=-1 colorBackgroundFloating=#ffffffff }

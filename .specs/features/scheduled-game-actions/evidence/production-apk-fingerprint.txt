@@ -1,0 +1,5 @@
+﻿SIZE_BYTES=24709446
+SHA256=03C4FAEE42D5387B4A9BBFF03697E51D64E17B3342D76251F0A05BBA324EB8CD
+package=com.popmundo.popmundo_app versionCode=1 versionName=1.0.0
+flutter_native=lib/x86_64/libapp.so lib/x86_64/libflutter.so
+native-code=arm64-v8a armeabi-v7a x86_64

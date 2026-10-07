@@ -205,9 +205,10 @@
 ## Handoff
 
 - **Feature**: scheduled-game-actions / .specs/features/scheduled-game-actions.
-- **Phase / Task**: Execute T8 Android proof. F2 core b1160ee and shell aabe4b3 committed; 419 core and186 app tests pass, full analyses clean. T7 editor committed 11f43ef; 179 app tests passed and analyze clean. T6 gateway 23360af. T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07), T5(3cb4ecf) committed. Branch codex/scheduled-game-actions.
-- **Completed**: T7 editor offers local notification, use item and pay crew. Item requires a discovered choice; crew retains verified owned character and artist. Initial T7 required a chosen quote; user 2026-10-06 supersedes this with default20 and scheduling during weekly unavailability. F2 completed: default20, future scheduling without current quote, existing caps preserved, progress and visible validation. Existing game rules edit offline. Changing the target requires fresh choices. Cards show service, character, item or artist/bonus and the truthful result in EN/PT. No gameplay POST submitted.
-- **In-progress**: F2 gates complete; T8 specialist running isolated device proof. Emulator-5554 reopened with Medium_Phone_API_36.1 (boot completed); currently only backgrounddebug and test packages installed, production package absent. Prior production-before evidence describes an earlier device state, not current preservation proof. One SDK job at a time.
-- **Next step**: device T8 loopback proof on the observed device, final docs/release install preserving production, fresh independent verifier.
-- **Blockers**: no external blocker. Native gameplay has not been sent; default Android fixture uses loopback. Physical handset/overnight unmeasured. No credentials/cookies/form state retained.
-- **Prior feature**: service-scheduler complete; production emulator release/data preserved. Physical handset/overnight unmeasured.
+- **Phase / Task**: Execute T8 closed its author gates. T1(09b83bc), T2(3a7e0fb), fixF1(1e5535d), T3(18e26aa), T4(25ded07), T5(3cb4ecf), T6(23360af), T7(11f43ef), F2 core b1160ee, F2 shell aabe4b3. Branch codex/scheduled-game-actions.
+- **Completed**: Device proof in evidence/t8-device-gates.md (Home, Recents removal, reboot while POST held, skippedInterrupted, next future slot confirmed, saved character). Final suites 419/31/186 passed, analyzers clean. Release APK built and installed on emulator-5554 as a fresh install; production package was already absent, so 2026-08-20 inodes were not preserved. FGS isForeground=true after the normal notification and battery prompts. Evidence: evidence/final-gates.md.
+- **In-progress**: fresh independent verifier not yet run.
+- **Next step**: independent verifier over the feature diff; write validation.md. Do not claim physical handset, overnight execution, or preservation of the August production data directory.
+- **Blockers**: none. No credentials, cookies or authenticated HTML in evidence. Live gameplay POST was not submitted.
+- **Uncommitted files**: none after the T8 evidence commit; validation.md still absent until the verifier.
+- **Branch**: codex/scheduled-game-actions.

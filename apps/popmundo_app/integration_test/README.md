@@ -21,6 +21,7 @@ Exercitar APIs de plataforma que fakes não alcançam: Foreground Service, Keyst
 | `userscripts_test.dart` | superfície mobile do catálogo sem WebView de jogo |
 | `smoke_test.dart` | fumaça do harness |
 | [scheduler_test.dart](scheduler_test.dart) | Um Patrol test: formulário/prefs reais, FGS após Home, IDs/payload e substituição de cartões Android, pausa sem parar keepalive |
+| [game_actions_engine_test.dart](game_actions_engine_test.dart) | Um Patrol test: Keystore real, engine/servidor loopback no FGS, duas ocorrências de item após Home, bônus explícito e cartões Android. Não abre Popmundo; pacote backgrounddebug |
 | [support/scheduler_reboot_harness.dart](support/scheduler_reboot_harness.dart) | Entrypoint standalone sem jogo: prepara reboot real e regra semanal GMT para inspeção ADB de prefs, serviço e notificações |
 
 **Exatamente um `patrolTest` por arquivo** (bug upstream Patrol 2005/2380). Agrupe asserts num teste sequencial com `reason`.
@@ -77,3 +78,15 @@ Referências e oráculos reproduzíveis:
 - [Patrol verde](../../../.specs/features/service-scheduler/evidence/patrol-final-green.xml), [mutante vermelho](../../../.specs/features/service-scheduler/evidence/patrol-native-mutant.xml) e [patch scratch descartado](../../../.specs/features/service-scheduler/evidence/native-suppression-mutant.patch).
 - [Snapshot após reboot](../../../.specs/features/service-scheduler/evidence/android-reboot-future.json) e [cartões Android](../../../.specs/features/service-scheduler/evidence/android-reboot-future-cards.txt).
 - [Snapshot semanal GMT](../../../.specs/features/service-scheduler/evidence/android-weekly-delivered.json), [cartão semanal](../../../.specs/features/service-scheduler/evidence/android-weekly-delivered-cards.txt) e [atribuição de fonte/APK](../../../.specs/features/service-scheduler/evidence/weekly-source-attribution.txt).
+
+## Ações de jogo: fronteira do engine Android
+
+support/game_actions_fixture.dart reconstrói um HttpServer na engine secundária e injeta somente o transporte em createSchedulerRunner. Credenciais, Keystore, coordenador, persistência e notificações são os componentes de produção. O socket usa exclusivamente 127.0.0.1; URLs lógicas de autenticação não são discadas. Os personagens 91002/91003 e banda 92002 são sintéticos.
+
+Na primeira requisição de cada ocorrência, o servidor confere o claim já persistido, jar inicialmente vazio e cartão Android com ID da regra, serviço e personagem salvo. Verifica também o POST inteiro: controles repetidos, estado fresco, primeiro item elegível depois de uma linha homônima de afinação, ou bônus 20 com botão atual e preço obtido no formulário fresco. A evidência persistida guarda apenas IDs, slots UTC, contagens e códigos de violação; senhas e formulários permanecem em memória.
+
+support/game_actions_reboot_harness.dart existe porque reboot encerra a instrumentação. Seus botões preparam remoção efetiva da própria tarefa de Recents ou um POST sintético interrompido por reboot. O servidor é reconstruído pelo callback persistido; a ocorrência interrompida deve receber skippedInterrupted, sem repetir o slot, e somente uma ocorrência futura pode produzir novo POST. A prova usa ADB para inspecionar oracle/prefs, ausência de Activity, serviço e cartões antes de abrir novamente o app. A limpeza remove somente chaves, segredo e notificações do pacote sintético.
+
+Esses entrypoints cobrem a fronteira Android de SGA-10; os casos de parser, orçamento, cancelamento e resultados ambíguos continuam no tier core. Resultados observados e limites ficam em .specs/features/scheduled-game-actions/evidence/. A existência dos fixtures não constitui evidência de execução: somente XML/logs e inspeções registradas contam.
+
+A prova registrada para essas ações está em [T8 Android secondary-engine proof](../../../.specs/features/scheduled-game-actions/evidence/t8-device-gates.md): XML Patrol verde, sensor nativo vermelho/restaurado, duas ocorrências após Home, POSTs com tarefas efetivamente removidas e reconstrução pelo sistema após reboot. O reboot interrompido preserva skippedInterrupted e executa somente o próximo slot futuro. O primeiro ensaio, que atingiu timeout antes do reboot, fica identificado separadamente como evidência de uncertain sem replay.

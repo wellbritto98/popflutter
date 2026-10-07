@@ -1,0 +1,17 @@
+      topResumedActivity=ActivityRecord{27158733 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}
+  * Task{3480a7b #29 type=standard I=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}
+    mLastPausedActivity: ActivityRecord{107328010 u0 com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity t29}
+    * Hist  #0: ActivityRecord{107328010 u0 com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity t29}
+      packageName=com.popmundo.popmundo_app.backgrounddebug processName=com.popmundo.popmundo_app.backgrounddebug
+      launchedFromUid=10264 launchedFromPackage=com.popmundo.popmundo_app.backgrounddebug launchedFromFeature=null userId=0
+      app=ProcessRecord{eaa8267 5623:com.popmundo.popmundo_app.backgrounddebug/u0a264}
+      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 xflg=0x4 pkg=com.popmundo.popmundo_app.backgrounddebug cmp=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity }
+      rootOfTask=true task=Task{3480a7b #29 type=standard I=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}
+      mActivityComponent=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity
+      baseDir=/data/app/~~mUgRy6Qzi4kycmIhjdfX1w==/com.popmundo.popmundo_app.backgrounddebug-mhi8bSVAaV4SwaKEpE3USA==/base.apk
+      dataDir=/data/user/0/com.popmundo.popmundo_app.backgrounddebug
+      taskDescription: label="" icon=null iconResource=com.popmundo.popmundo_app.backgrounddebug/0 iconFilename=null primaryColor=ff2196f3
+      windows=[Window{55dcfc2 u0 com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}]
+      * Task{3480a7b #29 type=standard I=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}
+        * ActivityRecord{107328010 u0 com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity t29}
+        (fullscreen) Task{3480a7b #29 type=standard I=com.popmundo.popmundo_app.backgrounddebug/com.popmundo.popmundo_app.MainActivity}

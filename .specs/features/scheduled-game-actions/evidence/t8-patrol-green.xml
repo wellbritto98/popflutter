@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuites tests="1" failures="0" errors="0" skipped="0" time="76.527" timestamp="2026-10-07T00:01:59" hostname="localhost">
+  <testsuite name="com.popmundo.popmundo_app.MainActivityTest" tests="1" failures="0" errors="0" skipped="0" time="75.989" timestamp="2026-10-07T00:01:59" hostname="localhost">
+    <properties>
+      <property name="device" value="Medium_Phone_API_36.1(AVD) - 16" />
+      <property name="flavor" value="" />
+      <property name="project" value=":app" />
+    </properties>
+    <testcase name="runDartTest[integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home]" classname="com.popmundo.popmundo_app.MainActivityTest" time="75.989" />
+  </testsuite>
+</testsuites>

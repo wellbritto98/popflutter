@@ -1,0 +1,39 @@
+--------- beginning of main
+10-07 00:00:18.050  5623  5653 I flutter : [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+10-07 00:00:18.452  5623  5623 I flutter : Patrol (native): Android NativeAutomatorClient created, port: 8081
+10-07 00:00:18.452  5623  5623 I flutter : Patrol (native): initialize() started
+10-07 00:00:19.017  5623  5623 I flutter : Patrol (native): initialize() succeeded
+10-07 00:00:19.021  5623  5623 I flutter : PatrolBinding: Register Patrol service extensions
+10-07 00:00:19.022  5623  5623 I flutter : Patrol (native): Android NativeAutomatorClient created, port: 8081
+10-07 00:00:19.023  5623  5623 I flutter : PATROL_LOG {"timestamp":"2026-10-07T00:00:19.022331","type":"config","config":{"printLogs":true}}
+10-07 00:00:19.029  5623  5623 I flutter : 00:00 +0: patrol_test_explorer
+10-07 00:00:19.034  5623  5623 I flutter : patrol_test_explorer: obtained Dart-side test hierarchy:
+10-07 00:00:19.034  5623  5623 I flutter : -- group: ''
+10-07 00:00:19.034  5623  5623 I flutter :      -- test: 'secondary game engine: exact item and crew POSTs after Home'
+10-07 00:00:19.034  5623  5623 I flutter : 00:00 +1: integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home
+10-07 00:00:19.053  5623  5623 I flutter : PatrolAppService started, address: 127.0.0.1, host: 127.0.0.1, port: 8082
+10-07 00:00:19.053  5623  5623 I flutter : Patrol (native): MobileAutomatorClient created, port: 8081
+10-07 00:00:19.053  5623  5623 I flutter : Patrol (native): markPatrolAppServiceReady() started
+10-07 00:00:19.064  5623  5623 I flutter : PatrolAppService: registered "integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home"
+10-07 00:00:19.120  5623  5623 I flutter : Patrol (native): markPatrolAppServiceReady() succeeded
+10-07 00:00:19.232  5623  5623 I flutter : PatrolAppService.listDartTests() called
+10-07 00:00:19.232  5623  5623 I flutter : 2026-10-07T00:00:19.232688  0:00:00.000187 GET     [200] /listDartTests
+10-07 00:00:19.399  5623  5623 I flutter : PatrolAppService.runDartTest(integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home) called
+10-07 00:00:19.399  5623  5623 I flutter : PatrolAppService: requested execution of test "integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home"
+10-07 00:00:19.399  5623  5623 I flutter : Patrol (native): configure() started
+10-07 00:00:19.399  5623  5623 I flutter : Patrol (native): MobileAutomatorClient created, port: 8081
+10-07 00:00:19.558  5623  5623 I flutter : Patrol (native): configure() succeeded
+10-07 00:00:19.559  5623  5623 I flutter : PATROL_LOG {"timestamp":"2026-10-07T00:00:19.558667","type":"test","name":"integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home","status":"start","error":null}
+10-07 00:00:20.261  5623  5698 I flutter : [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+10-07 00:00:20.268  5623  5623 I flutter : scheduler.start utc=2026-10-07T00:00:20.268578Z starter=developer
+10-07 00:00:20.805  5623  5623 I flutter : Patrol (native): pressHome() started
+10-07 00:00:20.806  5623  5623 I flutter : PATROL_LOG {"timestamp":"2026-10-07T00:00:20.805972","type":"step","action":"\u001b[94mpressHome\u001b[0m \u001b[90m(native)\u001b[0m","status":"start","data":null}
+10-07 00:00:21.996  5623  5623 I flutter : Patrol (native): pressHome() succeeded
+10-07 00:00:21.996  5623  5623 I flutter : PATROL_LOG {"timestamp":"2026-10-07T00:00:21.996448","type":"step","action":"\u001b[94mpressHome\u001b[0m \u001b[90m(native)\u001b[0m","status":"success","data":null}
+10-07 00:01:35.279  5623  5623 I flutter : PatrolBinding: tearDown(): count: 1, results: {secondary game engine: exact item and crew POSTs after Home: success}
+10-07 00:01:35.280  5623  5623 I flutter : PatrolBinding: finished test integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home. Will report its status back to the native side
+10-07 00:01:35.280  5623  5623 I flutter : PatrolBinding: tearDown(): test "secondary game engine: exact item and crew POSTs after Home" in group "integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home", passed: true
+10-07 00:01:35.280  5623  5623 I flutter : PatrolAppService.markDartTestAsCompleted(): integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home
+10-07 00:01:35.280  5623  5623 I flutter : 2026-10-07T00:00:19.399573  0:01:15.880692 POST    [200] /runDartTest
+10-07 00:01:35.280  5623  5623 I flutter : PATROL_LOG {"timestamp":"2026-10-07T00:01:35.280186","type":"test","name":"integration_test.game_actions_engine_test secondary game engine: exact item and crew POSTs after Home","status":"success","error":null}
+10-07 00:01:35.282  5623  5623 I flutter : 01:16 +2: All tests passed!

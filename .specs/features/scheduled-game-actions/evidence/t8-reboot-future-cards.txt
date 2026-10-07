@@ -1,0 +1,66 @@
+    NotificationRecord(0x0ebfde2a: pkg=com.popmundo.popmundo_app.backgrounddebug user=UserHandle{0} id=-1 tag=null importance=4 key=0|com.popmundo.popmundo_app.backgrounddebug|-1|null|10264: Notification(channel=popflutter_schedules shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=AUTO_CANCEL color=0x00000000 vis=PRIVATE))
+      uid=10264 userId=0
+      opPkg=com.popmundo.popmundo_app.backgrounddebug
+      icon=Icon(typ=RESOURCE pkg=com.popmundo.popmundo_app.backgrounddebug id=0x7f0d0000)
+      flags=AUTO_CANCEL
+      originalFlags=AUTO_CANCEL
+      pri=1
+      key=0|com.popmundo.popmundo_app.backgrounddebug|-1|null|10264
+      seen=true
+      groupKey=0|com.popmundo.popmundo_app.backgrounddebug|-1|null|10264
+      notification=
+            fullscreenIntent=null
+            contentIntent=PendingIntent{bde941b: PendingIntentRecord{b736a98 com.popmundo.popmundo_app.backgrounddebug startActivity (allowlist: 19793dc:+30s0ms/0/NOTIFICATION_SERVICE/NotificationManagerService)}}
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=0
+            when=1791332005824/1791332005824
+            tickerText=null
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=PT72H
+            extras={
+                android.title=String (Use item: action confirmed)
+                android.reduced.images=Boolean (true)
+                android.chronometerCountDown=Boolean (false)
+                android.subText=null
+                android.showChronometer=Boolean (false)
+                android.text=String (Character: Saved Character)
+                android.progress=Integer (0)
+                android.progressMax=Integer (0)
+    NotificationRecord(0x07a93812: pkg=com.popmundo.popmundo_app.backgrounddebug user=UserHandle{0} id=1000 tag=null importance=2 key=0|com.popmundo.popmundo_app.backgrounddebug|1000|null|10264: Notification(channel=popmundo_keepalive shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|ONLY_ALERT_ONCE|NO_CLEAR|FOREGROUND_SERVICE color=0x00000000 vis=PUBLIC))
+      uid=10264 userId=0
+      opPkg=com.popmundo.popmundo_app.backgrounddebug
+      icon=Icon(typ=RESOURCE pkg=com.popmundo.popmundo_app.backgrounddebug id=0x7f0d0000)
+      flags=ONGOING_EVENT|ONLY_ALERT_ONCE|NO_CLEAR|FOREGROUND_SERVICE
+      originalFlags=ONGOING_EVENT|ONLY_ALERT_ONCE|FOREGROUND_SERVICE
+      pri=0
+      key=0|com.popmundo.popmundo_app.backgrounddebug|1000|null|10264
+      seen=false
+      groupKey=0|com.popmundo.popmundo_app.backgrounddebug|1000|null|10264
+      notification=
+            fullscreenIntent=null
+            contentIntent=PendingIntent{20e8be3: PendingIntentRecord{ba8044 com.popmundo.popmundo_app.backgrounddebug startActivity (allowlist: 19793dc:+30s0ms/0/NOTIFICATION_SERVICE/NotificationManagerService)}}
+            deleteIntent=PendingIntent{362e9e0: PendingIntentRecord{2eead57 com.popmundo.popmundo_app.backgrounddebug broadcastIntent (allowlist: 19793dc:+30s0ms/0/NOTIFICATION_SERVICE/NotificationManagerService)}}
+            number=0
+            groupAlertBehavior=0
+            when=1791331969324/1791331969324
+            tickerText=null
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=PT72H
+            extras={
+                android.title=String (Game actions fixture)
+                android.reduced.images=Boolean (true)
+                android.template=String (android.app.Notification$BigTextStyle)
+                android.text=String (Loopback only)
+                android.appInfo=ApplicationInfo (ApplicationInfo{7a00499 com.popmundo.popmundo_app.backgrounddebug})
+                android.showWhen=Boolean (false)
+                android.bigText=null
+            }

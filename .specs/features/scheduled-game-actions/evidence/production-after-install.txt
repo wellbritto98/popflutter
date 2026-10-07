@@ -1,0 +1,5 @@
+﻿versionCode=1 minSdk=24 targetSdk=36
+versionName=1.0.0
+lastUpdateTime=2026-10-07 01:43:25
+User 0: ceDataInode=353749 deDataInode=41024 installed=true hidden=false suspended=false distractionFlags=0 stopped=true notLaunched=true enabled=0 instant=false virtual=false quarantined=false
+firstInstallTime=2026-10-07 01:43:25

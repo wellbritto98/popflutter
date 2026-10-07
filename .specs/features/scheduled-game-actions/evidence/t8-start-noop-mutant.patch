@@ -1,0 +1,13 @@
+diff --git a/apps/popmundo_app/lib/scheduler/scheduled_game_notifications.dart b/apps/popmundo_app/lib/scheduler/scheduled_game_notifications.dart
+index acc327c..efc561a 100644
+--- a/apps/popmundo_app/lib/scheduler/scheduled_game_notifications.dart
++++ b/apps/popmundo_app/lib/scheduler/scheduled_game_notifications.dart
+@@ -20,7 +20,7 @@ class NativeScheduledGameNotifications implements ScheduledGameNotifications {
+   Future<void> showStart({
+     required GameScheduledAction action,
+     required int notificationId,
+-  }) async => _publish(notificationId, (await loadMessages()).start(action));
++  }) async {}
+   @override
+   Future<void> showResult({
+     required GameScheduledAction action,
