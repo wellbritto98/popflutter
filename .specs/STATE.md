@@ -204,11 +204,11 @@
 
 ## Handoff
 
-- **Feature**: scheduled-game-actions F3 instrument mapping amendment, 2026-10-07.
-- **Phase / Task**: F3-core and F3-shell executing; branch codex/scheduled-game-actions; previous release verified a330677.
-- **Completed**: browser inspection confirms Deon Mesa de DJ and Violino offer Item_Tune.png/Afinar; domain review approves persisted use/tune operation with legacy absent=use. Previous full feature passed 419/31/186 tests and Android loopback lifecycle evidence.
-- **In-progress**: utils specialist owns codecs/candidates/POST; shell specialist owns choices/effects/RPC/notifications. Root owns matching specs and official docs. SDK core first, shell second.
-- **Next step**: full owned gates/atomic commits, fresh independent amendment verification, normal release build and install on observed Android.
-- **Blockers**: none; no live gameplay POST performed. No credentials, cookies or authenticated HTML retained.
-- **Uncommitted files**: F3 specs/docs and specialist-owned code; unrelated docs/firebase-popmund-scrap-functions.js remains unstaged.
+- **Feature**: scheduled-game-actions, including F3 instrument mapping amendment (2026-10-07).
+- **Phase / Task**: complete. Previous release a330677; F3 core 0d24224, shell fdea551; independent amendment report validation-instruments.md covers a330677..78e2b61. Branch codex/scheduled-game-actions.
+- **Completed**: Deon's observed Mesa de DJ/Violino Item_Tune.png actions are selectable as tuning; use/tune persists with the saved character across editor/offline/RPC and native EN/PT notices. Legacy absent operation remains use; invalid explicit values reject; no operation fallback. Current independent gates 438 core/196 app/31 WebView, three clean analyzers, six behavior mutants killed. Universal release APK built and updated on emulator-5554; current October firstInstallTime/data inodes retained; normal MainActivity/foreground service startup confirmed. Evidence f3-final-gates.md.
+- **In-progress**: none.
+- **Next step**: none for this amendment. APK is apps/popmundo_app/build/app/outputs/flutter-apk/app-release.apk.
+- **Blockers**: none. No credentials, cookies or authenticated HTML retained. No real item use/tuning/payment submitted; no new physical/overnight claim. Previous Android loopback lifecycle evidence remains historical and bounded.
+- **Uncommitted files**: none owned by this amendment after closure; unrelated docs/firebase-popmund-scrap-functions.js remains unstaged.
 - **Branch**: codex/scheduled-game-actions.

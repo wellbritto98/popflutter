@@ -1,0 +1,12 @@
+diff --git a/packages/popmundo_utils/lib/src/scheduler/scheduler_actions.dart b/packages/popmundo_utils/lib/src/scheduler/scheduler_actions.dart
+index 32d841f..d583ad6 100644
+--- a/packages/popmundo_utils/lib/src/scheduler/scheduler_actions.dart
++++ b/packages/popmundo_utils/lib/src/scheduler/scheduler_actions.dart
+@@ -80,7 +80,6 @@ class UseItemAction extends GameScheduledAction {
+   Map<String, Object?> toJson() => {
+     ..._target,
+     'itemName': itemName,
+-    if (operation != GameItemOperation.use) 'operation': operation.name,
+   };
+ }
+ 

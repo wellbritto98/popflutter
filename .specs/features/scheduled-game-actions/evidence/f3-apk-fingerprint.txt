@@ -1,0 +1,12 @@
+bbb316e2d730360265dc23e924ee6733b72895fd0e19320720f4b2a1c2e5b640  apps/popmundo_app/build/app/outputs/flutter-apk/app-release.apk
+62556850 bytes
+package: name='com.popmundo.popmundo_app' versionCode='1' versionName='1.0.0' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'
+sdkVersion:'24'
+targetSdkVersion:'36'
+native-code: 'arm64-v8a' 'armeabi-v7a' 'x86_64'
+lib/arm64-v8a/libapp.so
+lib/arm64-v8a/libflutter.so
+lib/armeabi-v7a/libapp.so
+lib/armeabi-v7a/libflutter.so
+lib/x86_64/libapp.so
+lib/x86_64/libflutter.so

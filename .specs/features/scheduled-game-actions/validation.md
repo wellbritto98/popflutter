@@ -1,5 +1,6 @@
 # scheduled-game-actions Validation
 
+Historical prior-release report. The 2026-10-07 instrument amendment is verified separately in [validation-instruments.md](validation-instruments.md).
 **Date**: 2026-10-06 (America/Sao_Paulo)
 **Spec**: `.specs/features/scheduled-game-actions/spec.md`
 **Diff range**: `5ce2153..dfc6d27` (feature tip `dfc6d27c7990b3107f26ce63d369685cd582946a`). SGA-02.1 re-verified at fix commit `857466b`.

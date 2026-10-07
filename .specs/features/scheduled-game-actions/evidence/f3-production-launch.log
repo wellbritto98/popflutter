@@ -1,0 +1,7 @@
+Starting: Intent { cmp=com.popmundo.popmundo_app/.MainActivity }
+Status: ok
+LaunchState: WARM
+Activity: com.popmundo.popmundo_app/.MainActivity
+TotalTime: 2668
+WaitTime: 2676
+Complete

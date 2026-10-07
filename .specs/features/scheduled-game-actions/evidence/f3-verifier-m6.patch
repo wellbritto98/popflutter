@@ -1,0 +1,13 @@
+diff --git a/apps/popmundo_app/lib/scheduler/game_notification_messages.dart b/apps/popmundo_app/lib/scheduler/game_notification_messages.dart
+index fc2191f..327c51f 100644
+--- a/apps/popmundo_app/lib/scheduler/game_notification_messages.dart
++++ b/apps/popmundo_app/lib/scheduler/game_notification_messages.dart
+@@ -40,7 +40,7 @@ class GameNotificationMessages {
+   }
+ 
+   String _service(GameScheduledAction action) => _text(
+-    action is UseItemAction && action.operation == GameItemOperation.tune
++    action is UseItemAction && action.operation == GameItemOperation.use
+         ? 'tuneInstrument'
+         : action.type,
+   );

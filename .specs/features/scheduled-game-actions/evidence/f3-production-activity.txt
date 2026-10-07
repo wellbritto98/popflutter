@@ -1,0 +1,1 @@
+    topResumedActivity=ActivityRecord{173955171 u0 com.popmundo.popmundo_app/.MainActivity t36}

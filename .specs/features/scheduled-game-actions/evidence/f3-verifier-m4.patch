@@ -1,0 +1,13 @@
+diff --git a/packages/popmundo_utils/lib/src/scheduler/scheduler_actions.dart b/packages/popmundo_utils/lib/src/scheduler/scheduler_actions.dart
+index 32d841f..7a06f4f 100644
+--- a/packages/popmundo_utils/lib/src/scheduler/scheduler_actions.dart
++++ b/packages/popmundo_utils/lib/src/scheduler/scheduler_actions.dart
+@@ -20,7 +20,7 @@ GameItemOperation _itemOperation(Map json) {
+   return switch (json['operation']) {
+     'use' => GameItemOperation.use,
+     'tune' => GameItemOperation.tune,
+-    _ => throw const SchedulerException('invalidAction'),
++    _ => GameItemOperation.use,
+   };
+ }
+ 

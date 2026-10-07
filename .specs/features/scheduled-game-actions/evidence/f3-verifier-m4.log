@@ -1,0 +1,79 @@
+00:00 +0: loading test/game_actions_tune_test.dart
+00:00 +0: F3/SGA-01 explicit tune survives action JSON roundtrip
+00:00 +1: F3/SGA-01 absent or explicit use keeps legacy action shape
+00:00 +2: F3/SGA-02 tune choice survives discovery RPC JSON roundtrip
+00:00 +3: F3/SGA-01 invalid operation rejects action and DTO null
+00:00 +3 -1: F3/SGA-01 invalid operation rejects action and DTO null [E]
+  Expected: throws <Instance of 'SchedulerException'> with `code`: 'invalidAction'
+    Actual: <Closure: () => ScheduledAction>
+     Which: returned <Instance of 'UseItemAction'>
+  
+  package:matcher                        expect
+  test\game_actions_tune_test.dart 63:7  main.<fn>
+  
+00:00 +3 -1: F3/SGA-01 invalid operation rejects action and DTO wear
+00:00 +3 -2: F3/SGA-01 invalid operation rejects action and DTO wear [E]
+  Expected: throws <Instance of 'SchedulerException'> with `code`: 'invalidAction'
+    Actual: <Closure: () => ScheduledAction>
+     Which: returned <Instance of 'UseItemAction'>
+  
+  package:matcher                        expect
+  test\game_actions_tune_test.dart 63:7  main.<fn>
+  
+00:00 +3 -2: F3/SGA-01 invalid operation rejects action and DTO Tune
+00:00 +3 -3: F3/SGA-01 invalid operation rejects action and DTO Tune [E]
+  Expected: throws <Instance of 'SchedulerException'> with `code`: 'invalidAction'
+    Actual: <Closure: () => ScheduledAction>
+     Which: returned <Instance of 'UseItemAction'>
+  
+  package:matcher                        expect
+  test\game_actions_tune_test.dart 63:7  main.<fn>
+  
+00:00 +3 -3: F3/SGA-01 invalid operation rejects action and DTO 
+00:00 +3 -4: F3/SGA-01 invalid operation rejects action and DTO  [E]
+  Expected: throws <Instance of 'SchedulerException'> with `code`: 'invalidAction'
+    Actual: <Closure: () => ScheduledAction>
+     Which: returned <Instance of 'UseItemAction'>
+  
+  package:matcher                        expect
+  test\game_actions_tune_test.dart 63:7  main.<fn>
+  
+00:00 +3 -4: F3/SGA-01 invalid operation rejects action and DTO 1
+00:00 +3 -5: F3/SGA-01 invalid operation rejects action and DTO 1 [E]
+  Expected: throws <Instance of 'SchedulerException'> with `code`: 'invalidAction'
+    Actual: <Closure: () => ScheduledAction>
+     Which: returned <Instance of 'UseItemAction'>
+  
+  package:matcher                        expect
+  test\game_actions_tune_test.dart 63:7  main.<fn>
+  
+00:00 +3 -5: F3/SGA-01 invalid operation rejects action and DTO false
+00:00 +3 -6: F3/SGA-01 invalid operation rejects action and DTO false [E]
+  Expected: throws <Instance of 'SchedulerException'> with `code`: 'invalidAction'
+    Actual: <Closure: () => ScheduledAction>
+     Which: returned <Instance of 'UseItemAction'>
+  
+  package:matcher                        expect
+  test\game_actions_tune_test.dart 63:7  main.<fn>
+  
+00:00 +3 -6: F3/SGA-02 discover use and tune pairs without duplicate instruments
+00:00 +4 -6: F3/SGA-05 tune posts first exact matching operation and fresh full form
+00:00 +5 -6: F3/SGA-05 defaultUseNeverTunes no POST and no operation fallback
+00:00 +6 -6: F3/SGA-05 tuneNeverUses no POST and no operation fallback
+00:00 +7 -6: F3/SGA-05 ambiguous no POST and no operation fallback
+00:00 +8 -6: F3/SGA-05 disabled no POST and no operation fallback
+00:00 +9 -6: F3/SGA-05 wear no POST and no operation fallback
+00:00 +10 -6: F3/SGA-05 discard no POST and no operation fallback
+00:00 +11 -6: F3/SGA-05 wrongBasename no POST and no operation fallback
+00:00 +12 -6: F3/SGA-05 hiddenMissing no POST and no operation fallback
+00:00 +13 -6: Some tests failed.
+
+Failing tests:
+  test/game_actions_tune_test.dart: F3/SGA-01 invalid operation rejects action and DTO 
+  test/game_actions_tune_test.dart: F3/SGA-01 invalid operation rejects action and DTO 1
+  test/game_actions_tune_test.dart: F3/SGA-01 invalid operation rejects action and DTO Tune
+  test/game_actions_tune_test.dart: F3/SGA-01 invalid operation rejects action and DTO false
+  ... and 2 more
+
+Consider enabling the flag chain-stack-traces to receive more detailed exceptions.
+For example, 'dart test --chain-stack-traces'.

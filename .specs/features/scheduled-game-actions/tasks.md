@@ -4,7 +4,7 @@
 
 Use tlc-spec-driven Execute and Critical Rules. Tests derive from spec outcomes; red test before production; gate then one atomic commit per task. Do not weaken/delete tests. Fresh independent verifier after last task. Repo CLAUDE.md requires domain specialists; this overrides inline authoring default. Specialists execute sequentially, no SDK/Gradle overlap. User approved scope/HTTP/character binding; tools already specified (skill, embedded browser, connected Android, repo shell/git). No further permission gate.
 
-Design: design.md. Status: In Progress. Baseline: core277, WebView31, app164 tests passed. Eight cohesive deliverables; no phase-batch offer needed.
+Design: design.md. Status: Complete, including F3 instrument amendment. Baseline: core277, WebView31, app164 tests passed. Eight cohesive deliverables; no phase-batch offer needed.
 
 ## Test Coverage Matrix
 
@@ -161,4 +161,4 @@ Current request expands item support to observed Item_Tune.png/Afinar instrument
 2. F3-shell: show tuning choices/effects EN/PT; retain operation through create/edit/offline/RPC/cards/native notices. Owner app-shell. Gate full app tests/analyze; atomic commit.
 3. F3-validation: independent fresh verifier checks SGA-11 and affected existing requirements, behavior mutants for operation swap/legacy fallback; rebuild release APK and install on observed connected Android. Existing loopback device lifecycle proof remains applicable; no new lifecycle/platform code requested.
 
-Status: F3-core and F3-shell in progress; SDK jobs serialized. No live gameplay POST.
+Status: F3-core 0d24224 and F3-shell fdea551 complete; independent validation-instruments.md PASS (4/4 ACs, six mutants killed), 665 tests and three analyzers clean. Universal release build and emulator update passed; evidence/f3-final-gates.md. No live gameplay POST.

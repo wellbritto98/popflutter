@@ -1,0 +1,4 @@
+  * ServiceRecord{fcd9cf4 u0 com.popmundo.popmundo_app/org.chromium.content.app.SandboxedProcessService0:0 c:com.popmundo.popmundo_app}
+  * ServiceRecord{d0f20cc u0 com.popmundo.popmundo_app/com.pravera.flutter_foreground_task.service.ForegroundService c:com.popmundo.popmundo_app}
+    isForeground=true foregroundId=1000 types=0x40000000 foregroundNoti=Notification(channel=popmundo_keepalive shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|ONLY_ALERT_ONCE|NO_CLEAR|FOREGROUND_SERVICE color=0x00000000 vis=PUBLIC)
+    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=2

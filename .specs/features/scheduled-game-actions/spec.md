@@ -1,6 +1,6 @@
 # Scheduled Game Actions — Specification
 
-Status: Implementing instrument amendment F3 (2026-10-07); previous release verified in validation.md at commit 857466b. User confirmed isolated HTTP and character binding on 2026-10-05.
+Status: Verified including instrument amendment F3 (2026-10-07); validation-instruments.md covers a330677..78e2b61, and validation.md retains the prior release. User confirmed isolated HTTP and character binding on 2026-10-05.
 Date: 2026-10-05 (America/Sao_Paulo).
 Scope: Complex; Android scheduler, isolated authentication, game forms and native UI, including instrument tuning amendment.
 Baseline: 5ce2153; AD-021 scheduler and AD-022 AppWiring.
@@ -65,8 +65,8 @@ SGA-05 — usarItem
 1. WHEN an eligible occurrence executes, THEN it SHALL GET /World/Popmundo.aspx/Character/Items/ on its authenticated host and match only item links inside #checkedlist rows by exact case/whitespace-normalized name, never substring matching.
 2. WHEN multiple eligible rows have that exact name, THEN it SHALL use the first eligible row with the configured operation in document order. User confirmation accepted this proposed default; each occurrence uses only one item.
 3. WHEN the row contains input[type=image], THEN enabled buttons whose src pathname basename is Item_Use.png SHALL map to use and Item_Tune.png SHALL map to tune. Execution SHALL require the saved operation and exact normalized name. Wearable buttons, unrelated images and missing buttons SHALL NOT be executed, even if named btnUse. A changed icon SHALL NOT silently change the authorized operation.
-4. WHEN submitting use, THEN the entire fresh form plus <use-button-name>.x=1 and <use-button-name>.y=1 SHALL be posted once. All hidItemIDstring values remain those returned in the current document; none are persisted for later reuse.
-5. WHEN the named item is absent or no eligible use row exists, THEN the occurrence SHALL be marked unavailable with zero gameplay POSTs; future recurrence remains enabled unless the user pauses it.
+4. WHEN submitting use or tuning, THEN the entire fresh form plus <chosen-button-name>.x=1 and <chosen-button-name>.y=1 SHALL be posted once. All hidItemIDstring values remain those returned in the current document; none are persisted for later reuse.
+5. WHEN the named item is absent or no eligible row with the saved operation exists, THEN the occurrence SHALL be marked unavailable with zero gameplay POSTs; future recurrence remains enabled unless the user pauses it.
 
 ### Distribute the chosen crew bonus
 
@@ -151,18 +151,18 @@ The user confirmed the proposal and character binding. Remaining details follow 
 | SGA-08 | Truthful durable outcome | Verified |
 | SGA-09 | Serial cancellation/deadlines | Verified |
 | SGA-10 | Device proof, verifier and docs | Verified |
-| SGA-11 | Persisted item use/tune operation and labels | Implementing |
+| SGA-11 | Persisted item use/tune operation and labels | Verified |
 
 Coverage: 11 requirements; task mapping follows approved design. No implementation claim.
 
 ## Success criteria
 
-- [ ] Existing local reminders retain data and behavior.
-- [ ] User can configure either game action with owned targets and explicit parameters.
-- [ ] Action runs through isolated native HTTP without touching visible session state.
-- [ ] Start notice precedes requests; results never infer gameplay success from HTTP 200 alone.
-- [ ] Timeout/restart cannot duplicate uncertain item use or payment.
-- [ ] Secondary-engine Android loopback proof and independent verification pass.
+- [x] Existing local reminders retain data and behavior.
+- [x] User can configure either game action with owned targets and explicit parameters.
+- [x] Action runs through isolated native HTTP without touching visible session state.
+- [x] Start notice precedes requests; results never infer gameplay success from HTTP 200 alone.
+- [x] Timeout/restart cannot duplicate uncertain item use or payment.
+- [x] Secondary-engine Android loopback proof and independent verification pass.
 
 ## Approved precision notes
 

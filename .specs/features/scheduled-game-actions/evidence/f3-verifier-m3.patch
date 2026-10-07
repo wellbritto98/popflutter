@@ -1,0 +1,13 @@
+diff --git a/packages/popmundo_utils/lib/src/game_actions/game_forms.dart b/packages/popmundo_utils/lib/src/game_actions/game_forms.dart
+index 3b2d607..7db29a1 100644
+--- a/packages/popmundo_utils/lib/src/game_actions/game_forms.dart
++++ b/packages/popmundo_utils/lib/src/game_actions/game_forms.dart
+@@ -115,7 +115,7 @@ GameItemOperation? itemImageOperation(Element element) =>
+         .split('/')
+         .last) {
+       'Item_Use.png' => GameItemOperation.use,
+-      'Item_Tune.png' => GameItemOperation.tune,
++      'Item_Tune.png' => GameItemOperation.use,
+       _ => null,
+     };
+ 

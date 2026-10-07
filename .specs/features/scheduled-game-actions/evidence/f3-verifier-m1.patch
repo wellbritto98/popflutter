@@ -1,0 +1,13 @@
+diff --git a/packages/popmundo_utils/lib/src/game_actions/game_item_action.dart b/packages/popmundo_utils/lib/src/game_actions/game_item_action.dart
+index e8224c3..0154e6e 100644
+--- a/packages/popmundo_utils/lib/src/game_actions/game_item_action.dart
++++ b/packages/popmundo_utils/lib/src/game_actions/game_item_action.dart
+@@ -12,7 +12,7 @@ AspNetFormData itemPost(Document document, Uri url, UseItemAction action) {
+     (candidate) =>
+         normalized(candidate.name).toLowerCase() ==
+             normalized(action.itemName).toLowerCase() &&
+-        candidate.operation == action.operation,
++        true,
+   );
+   if (candidates.isEmpty) throw const GameActionException('itemUnavailable');
+   final button = candidates.first.buttonName;
