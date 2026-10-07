@@ -11,7 +11,8 @@ AspNetFormData itemPost(Document document, Uri url, UseItemAction action) {
   final candidates = itemCandidates(document).where(
     (candidate) =>
         normalized(candidate.name).toLowerCase() ==
-        normalized(action.itemName).toLowerCase(),
+            normalized(action.itemName).toLowerCase() &&
+        candidate.operation == action.operation,
   );
   if (candidates.isEmpty) throw const GameActionException('itemUnavailable');
   final button = candidates.first.buttonName;

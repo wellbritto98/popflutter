@@ -104,10 +104,20 @@ AspNetFormData freshForm(Document doc, Uri url) {
 }
 
 class ItemCandidate {
-  ItemCandidate(this.name, this.buttonName);
+  ItemCandidate(this.name, this.buttonName, this.operation);
   final String name;
   final String buttonName;
+  final GameItemOperation operation;
 }
+
+GameItemOperation? itemImageOperation(Element element) =>
+    switch (Uri.tryParse(element.attributes['src'] ?? '')?.path
+        .split('/')
+        .last) {
+      'Item_Use.png' => GameItemOperation.use,
+      'Item_Tune.png' => GameItemOperation.tune,
+      _ => null,
+    };
 
 List<ItemCandidate> itemCandidates(Document doc) {
   final candidates = <ItemCandidate>[];
@@ -143,9 +153,7 @@ List<ItemCandidate> itemCandidates(Document doc) {
               nearestRow(e) == row &&
               ownsControl(e, form) &&
               !AspNetFormData.isDisabledControl(e) &&
-              (Uri.tryParse(e.attributes['src'] ?? '')?.path ?? '').endsWith(
-                '/Item_Use.png',
-              ) &&
+              itemImageOperation(e) != null &&
               (e.attributes['name'] ?? '').isNotEmpty,
         )
         .toList();
@@ -154,7 +162,13 @@ List<ItemCandidate> itemCandidates(Document doc) {
     }
     final name = normalized(links.single.text);
     if (name.isEmpty || name.length > 120) continue;
-    candidates.add(ItemCandidate(name, buttons.single.attributes['name']!));
+    candidates.add(
+      ItemCandidate(
+        name,
+        buttons.single.attributes['name']!,
+        itemImageOperation(buttons.single)!,
+      ),
+    );
   }
   return candidates;
 }

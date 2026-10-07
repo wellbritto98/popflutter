@@ -26,7 +26,7 @@ Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testáv
 | Auto Login | `src/autologin/` | Ver [README do submódulo](lib/src/autologin/README.md) |
 | UserScripts / GM | `src/userscript/` | Ver [README do submódulo](lib/src/userscript/README.md) |
 | Agendamentos | src/scheduler/ | Modelos JSON validados, recorrência UTC/IANA e coordenador serializado com claim durável; ver [README do submódulo](lib/src/scheduler/README.md) |
-| Ações de jogo | src/game_actions/ | Descoberta e execução HTTP nativa isolada por conta/personagem; usar item e bônus de equipe. Ver [README do submódulo](lib/src/game_actions/README.md) |
+| Ações de jogo | src/game_actions/ | Descoberta e execução HTTP nativa isolada por conta/personagem; usar ou afinar item e bônus de equipe. Ver [README do submódulo](lib/src/game_actions/README.md) |
 | Barrel | `popmundo_utils.dart` | Único export público |
 
 ## Dependências internas e externas
@@ -55,7 +55,7 @@ Definir **o que** o wrapper faz, sem saber **como** o WebView renderiza. Testáv
 - **Menu notifications:** `MenuNotificationsWatcher.start()` assina `events.network`; ao ver uma contagem diferente da persistida, chama `MenuNotificationsService.fetch()` (`TimedFetch`, `useCache: false`), difere `UID`s contra `MenuNotificationState.notifiedUids` e emite só os novos em `newNotifications`; persiste `{lastCount, notifiedUids}` só em caso de sucesso (falha não corrompe o estado — a próxima contagem diferente tenta de novo).
 
 - **Agendamentos:** SchedulerCoordinator recebe SchedulerStore, executores registrados, relógio e identificador IANA. Comandos e ticks usam uma fila; a execução persiste claim, lastAttemptUtc e próxima ocorrência antes da ação. Ao iniciar, pula ocorrências vencidas e descarta claims interrompidos. Notificações locais têm espera de cinco segundos; ações de jogo delegam a GameActionsService com deadline e cancelamento reais. O adapter fornece persistência e notificações nativas.
-- **Ações de jogo:** GameActionsService usa login independente e jar vazio por transação serial, sem WebView. Regra retém conta/personagem e usa formulário fresco. PayCrewAction aceita teto positivo preservado para regras anteriores ou null para autorizar o nível configurado pelo preço futuro válido; a ausência do bônus atual não impede cadastrar uma ocorrência futura, mas impede pagamento naquela execução.
+- **Ações de jogo:** GameActionsService usa login independente e jar vazio por transação serial, sem WebView. Regra retém conta/personagem e usa formulário fresco. Item retém operação use ou tune, selecionando somente o botão correspondente (Item_Use.png ou Item_Tune.png); regras antigas continuam use e jamais afinam implicitamente. PayCrewAction aceita teto positivo preservado para regras anteriores ou null para autorizar o nível configurado pelo preço futuro válido; a ausência do bônus atual não impede cadastrar uma ocorrência futura, mas impede pagamento naquela execução.
 
 ## Arquivos críticos
 

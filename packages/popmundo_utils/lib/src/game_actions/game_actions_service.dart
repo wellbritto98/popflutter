@@ -204,8 +204,15 @@ class GameActionsService implements ScheduledGameActionExecutor {
     character,
     '/World/Popmundo.aspx/Character/Items/',
     (doc) {
-      final names = itemCandidates(doc).map((c) => c.name).toSet();
-      return names.map((name) => GameItemChoice(name: name)).toList();
+      final seen = <(String, GameItemOperation)>{};
+      return [
+        for (final candidate in itemCandidates(doc))
+          if (seen.add((candidate.name.toLowerCase(), candidate.operation)))
+            GameItemChoice(
+              name: candidate.name,
+              operation: candidate.operation,
+            ),
+      ];
     },
   );
   Future<GameCrewOptions> discoverCrew({

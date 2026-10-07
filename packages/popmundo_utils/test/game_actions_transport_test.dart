@@ -136,6 +136,7 @@ void main() {
           .discoverItems(boundUsername: 'account', character: testCharacter);
       expect(choices.map((i) => i.toJson()).toList(), [
         {'name': 'Cubo mágico'},
+        {'name': 'Violino', 'operation': 'tune'},
       ]);
       final selected = transport.requests.firstWhere(
         (r) => r.method == 'POST' && r.url.path.endsWith('ChooseCharacter'),

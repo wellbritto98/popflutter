@@ -43,16 +43,24 @@ class GameCharacterCatalog {
 }
 
 class GameItemChoice {
-  GameItemChoice({required String name}) : name = _actionText(name);
+  GameItemChoice({required String name, this.operation = GameItemOperation.use})
+    : name = _actionText(name);
   final String name;
+  final GameItemOperation operation;
   factory GameItemChoice.fromJson(Map json) {
     try {
-      return GameItemChoice(name: json['name'] as String);
+      return GameItemChoice(
+        name: json['name'] as String,
+        operation: _itemOperation(json),
+      );
     } catch (_) {
       throw const SchedulerException('invalidAction');
     }
   }
-  Map<String, Object?> toJson() => {'name': name};
+  Map<String, Object?> toJson() => {
+    'name': name,
+    if (operation != GameItemOperation.use) 'operation': operation.name,
+  };
 }
 
 class GameBonusChoice {

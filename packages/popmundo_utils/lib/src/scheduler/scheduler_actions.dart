@@ -13,6 +13,17 @@ int _positive(int value) {
   return value;
 }
 
+enum GameItemOperation { use, tune }
+
+GameItemOperation _itemOperation(Map json) {
+  if (!json.containsKey('operation')) return GameItemOperation.use;
+  return switch (json['operation']) {
+    'use' => GameItemOperation.use,
+    'tune' => GameItemOperation.tune,
+    _ => throw const SchedulerException('invalidAction'),
+  };
+}
+
 sealed class ScheduledAction {
   String get type;
   Map<String, Object?> toJson();
@@ -24,6 +35,7 @@ sealed class ScheduledAction {
           boundUsername: json['boundUsername'] as String,
           character: GameCharacter.fromJson(json['character'] as Map),
           itemName: json['itemName'] as String,
+          operation: _itemOperation(json),
         ),
         'payCrew' => PayCrewAction(
           boundUsername: json['boundUsername'] as String,
@@ -58,12 +70,18 @@ class UseItemAction extends GameScheduledAction {
     required super.boundUsername,
     required super.character,
     required String itemName,
+    this.operation = GameItemOperation.use,
   }) : itemName = _actionText(itemName);
   final String itemName;
+  final GameItemOperation operation;
   @override
   String get type => 'useItem';
   @override
-  Map<String, Object?> toJson() => {..._target, 'itemName': itemName};
+  Map<String, Object?> toJson() => {
+    ..._target,
+    'itemName': itemName,
+    if (operation != GameItemOperation.use) 'operation': operation.name,
+  };
 }
 
 class PayCrewAction extends GameScheduledAction {
